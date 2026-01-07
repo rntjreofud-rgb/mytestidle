@@ -1,5 +1,29 @@
 ﻿document.addEventListener("DOMContentLoaded", () => {
-    // === 1. 게임 데이터 설정 ===
+    // 1. 요소 가져오기
+    const ui = {
+        wood: document.getElementById('res-wood'),
+        stone: document.getElementById('res-stone'),
+        iron: document.getElementById('res-iron'),
+        mpsWood: document.getElementById('mps-wood'),
+        mpsStone: document.getElementById('mps-stone'),
+        mpsIron: document.getElementById('mps-iron'),
+        houseName: document.getElementById('house-name'),
+        houseDesc: document.getElementById('house-desc'),
+        upgradeBtn: document.getElementById('upgrade-btn'),
+        btnWood: document.getElementById('btn-gather-wood'),
+        btnStone: document.getElementById('btn-gather-stone'),
+        btnIron: document.getElementById('btn-gather-iron'),
+        buildingList: document.getElementById('building-list'),
+        log: document.getElementById('message-log')
+    };
+
+    // 요소 체크 (안전장치)
+    if (!ui.btnWood) {
+        console.error("HTML 요소가 없습니다. index.html을 확인하세요.");
+        return;
+    }
+
+    // 2. 게임 데이터
     let gameData = {
         resources: { wood: 0, stone: 0, iron: 0 },
         houseLevel: 0,
@@ -21,35 +45,12 @@
         { name: "우주선 발사 (엔딩)", desc: "지구를 떠납니다!", req: { wood: 50000, stone: 50000, iron: 50000 }, unlock: "end" }
     ];
 
-    // === 2. UI 요소 가져오기 (안전하게) ===
-    const ui = {
-        wood: document.getElementById('res-wood'),
-        stone: document.getElementById('res-stone'),
-        iron: document.getElementById('res-iron'),
-        mpsWood: document.getElementById('mps-wood'),
-        mpsStone: document.getElementById('mps-stone'),
-        mpsIron: document.getElementById('mps-iron'),
-        houseName: document.getElementById('house-name'),
-        houseDesc: document.getElementById('house-desc'),
-        upgradeBtn: document.getElementById('upgrade-btn'),
-        btnWood: document.getElementById('btn-gather-wood'),
-        btnStone: document.getElementById('btn-gather-stone'),
-        btnIron: document.getElementById('btn-gather-iron'),
-        buildingList: document.getElementById('building-list'),
-        log: document.getElementById('message-log')
-    };
+    // 시간 계산을 위한 변수
+    let lastTime = performance.now();
 
-    // 요소가 제대로 로드되었는지 확인 (디버깅용)
-    if (!ui.btnWood) {
-        console.error("HTML 요소를 찾을 수 없습니다. index.html의 ID를 확인해주세요.");
-        return;
-    }
-
-    // === 3. 초기화 및 이벤트 연결 ===
     function init() {
         loadGame();
 
-        // 버튼 이벤트 연결
         ui.btnWood.addEventListener('click', () => manualGather('wood'));
         ui.btnStone.addEventListener('click', () => manualGather('stone'));
         ui.btnIron.addEventListener('click', () => manualGather('iron'));
@@ -57,63 +58,67 @@
         renderShop();
         updateUI();
 
-        // 자동 생산 루프 (1초)
-        setInterval(() => {
-            produceResources();
-            updateUI();
-        }, 1000);
+        // ⭐ 변경점: setInterval 대신 requestAnimationFrame 게임 루프 시작
+        requestAnimationFrame(gameLoop);
 
-        // 자동 저장 (10초)
+        // 자동 저장은 그대로 10초마다
         setInterval(saveGame, 10000);
     }
 
-    // === 4. 게임 로직 함수들 ===
+    // ⭐ 핵심: 게임 루프 (매 프레임 실행됨)
+    function gameLoop(currentTime) {
+        // 지난 프레임과의 시간 차이(초 단위) 계산 (Delta Time)
+        const deltaTime = (currentTime - lastTime) / 1000;
+        lastTime = currentTime;
 
-    function produceResources() {
+        // 시간 차이만큼 자원 생산
+        produceResources(deltaTime);
+        updateUI();
+
+        // 다음 프레임 예약
+        requestAnimationFrame(gameLoop);
+    }
+
+    // ⭐ 변경점: deltaTime을 받아서 곱해줌
+    function produceResources(deltaTime) {
         gameData.buildings.forEach(b => {
             if (b.count > 0) {
-                gameData.resources[b.type] += b.production * b.count;
+                // 생산량 * 시간(초)
+                // 예: 초당 10개 생산이고 0.01초 지났으면 0.1개 추가
+                gameData.resources[b.type] += (b.production * b.count) * deltaTime;
             }
         });
     }
 
     function manualGather(type) {
-        // 잠금 상태면 채집 불가
         if (type === 'stone' && gameData.houseLevel < 1) return;
         if (type === 'iron' && gameData.houseLevel < 2) return;
 
         const amount = 1 + gameData.houseLevel;
         gameData.resources[type] += amount;
-        updateUI();
 
-        // 버튼 눌림 효과
+        // 클릭 효과
         const btn = type === 'wood' ? ui.btnWood : (type === 'stone' ? ui.btnStone : ui.btnIron);
         btn.style.transform = "scale(0.95)";
         setTimeout(() => btn.style.transform = "scale(1)", 50);
     }
 
     function updateUI() {
-        // 자원 텍스트
+        // 소수점 버리고 표시 (내부적으로는 소수점까지 쌓임)
         ui.wood.innerText = Math.floor(gameData.resources.wood).toLocaleString();
         ui.stone.innerText = Math.floor(gameData.resources.stone).toLocaleString();
         ui.iron.innerText = Math.floor(gameData.resources.iron).toLocaleString();
 
-        // 초당 생산량
         let mps = { wood: 0, stone: 0, iron: 0 };
         gameData.buildings.forEach(b => {
             mps[b.type] += b.production * b.count;
         });
-        ui.mpsWood.innerText = `+${mps.wood}/초`;
-        ui.mpsStone.innerText = `+${mps.stone}/초`;
-        ui.mpsIron.innerText = `+${mps.iron}/초`;
+        ui.mpsWood.innerText = `+${mps.wood.toFixed(1)}/초`; // 소수점 1자리까지 표시
+        ui.mpsStone.innerText = `+${mps.stone.toFixed(1)}/초`;
+        ui.mpsIron.innerText = `+${mps.iron.toFixed(1)}/초`;
 
-        // 집 업그레이드 UI
         updateHouseUI();
-
-        // 버튼 잠금/해제 시각화
         checkUnlocks();
-
-        // 상점 버튼 상태
         updateShopButtons();
     }
 
@@ -126,7 +131,6 @@
         ui.houseName.innerText = `🏡 Lv.${gameData.houseLevel} ${currentStage.name}`;
         ui.houseDesc.innerText = currentStage.desc;
 
-        // 기존 이벤트 리스너 제거를 위해 cloneNode 사용하거나 onclick 재할당
         ui.upgradeBtn.onclick = null;
 
         if (nextStage) {
@@ -168,7 +172,6 @@
     }
 
     function checkUnlocks() {
-        // 돌 버튼
         if (gameData.houseLevel >= 1) {
             ui.btnStone.classList.remove('locked');
             ui.btnStone.innerText = "🪨 돌 캐기";
@@ -177,7 +180,6 @@
             ui.btnStone.innerText = "🪨 돌 캐기 (잠김)";
         }
 
-        // 철 버튼
         if (gameData.houseLevel >= 2) {
             ui.btnIron.classList.remove('locked');
             ui.btnIron.innerText = "⚙️ 철광석 캐기";
@@ -229,7 +231,6 @@
             b.count++;
             log(`${b.name} 건설 완료!`);
 
-            // 상점 UI 텍스트 갱신 (가격 증가 반영)
             const newCost = getBuildingCost(b);
             const div = document.getElementById(`build-${index}`);
             let costTxt = [];
@@ -238,8 +239,6 @@
             }
             div.querySelector('.cost-text').innerText = costTxt.join(' ');
             div.querySelector('.build-count').innerText = `보유: ${b.count} | +${b.production}/초`;
-
-            updateUI();
         } else {
             log("자원이 부족합니다.");
         }
@@ -312,6 +311,5 @@
         location.reload();
     }
 
-    // 게임 시작
     init();
 });
