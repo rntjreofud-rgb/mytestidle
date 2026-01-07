@@ -1,0 +1,95 @@
+body {
+	font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+	background-color: #1a1a2e;
+	color: #e0e0e0;
+	margin: 0;
+	display: flex;
+	justify-content: center;
+	min-height: 100vh;
+}
+
+.container {
+	width: 100%;
+	max-width: 600px;
+	padding: 20px;
+	text-align: center;
+}
+
+header h1 {
+	color: #4ecca3;
+	margin-bottom: 5px;
+}
+
+.display-area {
+	background-color: #16213e;
+	padding: 20px;
+	border-radius: 10px;
+	margin: 20px 0;
+	box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+}
+
+#resource-display {
+	font-size: 2.5em;
+	margin: 0;
+	color: #ffd700;
+}
+
+#click-btn {
+	background-color: #e94560;
+	color: white;
+	border: none;
+	padding: 15px 30px;
+	font-size: 1.2em;
+	border-radius: 50px;
+	cursor: pointer;
+	transition: transform 0.1s;
+	box-shadow: 0 4px 0 #c0354a;
+}
+
+	#click-btn:active {
+		transform: translateY(4px);
+		box-shadow: none;
+	}
+
+.shop-area {
+	margin-top: 30px;
+	text-align: left;
+}
+
+.building-item {
+	background-color: #0f3460;
+	margin-bottom: 10px;
+	padding: 15px;
+	border-radius: 8px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	cursor: pointer;
+	transition: background 0.2s;
+	user-select: none;
+}
+
+	.building-item:hover {
+		background-color: #1a4a8a;
+	}
+
+	.building-item.disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
+	}
+
+.building-info h4 {
+	margin: 0 0 5px 0;
+}
+
+.building-cost {
+	color: #4ecca3;
+	font-weight: bold;
+}
+
+#message-log {
+	margin-top: 20px;
+	font-size: 0.9em;
+	color: #888;
+	height: 20px;
+}
