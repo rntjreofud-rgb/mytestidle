@@ -1,0 +1,161 @@
+﻿<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>나의 깃허브 방치형 게임</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+            background-color: #f0f0f0;
+            padding-top: 50px;
+        }
+
+        .stats {
+            font-size: 24px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        button {
+            padding: 15px 30px;
+            font-size: 18px;
+            cursor: pointer;
+            border-radius: 10px;
+            border: none;
+            background-color: #4CAF50;
+            color: white;
+            transition: 0.2s;
+        }
+
+            button:hover {
+                background-color: #45a049;
+            }
+
+            button:disabled {
+                background-color: #ccc;
+                cursor: not-allowed;
+            }
+
+        .shop {
+            margin-top: 40px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .item {
+            border: 1px solid #ddd;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+
+    <h1>💰 골드 모으기 게임</h1>
+
+    <div class="stats">
+        현재 골드: <span id="gold">0</span><br>
+        초당 생산량: <span id="gps">0</span>
+    </div>
+
+    <button onclick="clickGold()">골드 클릭!</button>
+
+    <div class="shop">
+        <div class="item">
+            <h3>알바생 고용</h3>
+            <p>초당 +1 골드 생성</p>
+            <p>가격: <span id="worker-cost">10</span> 골드</p>
+            <button id="buy-worker" onclick="buyItem('worker')">구매하기</button>
+        </div>
+        <div class="item">
+            <h3>자동화 기계</h3>
+            <p>초당 +10 골드 생성</p>
+            <p>가격: <span id="machine-cost">100</span> 골드</p>
+            <button id="buy-machine" onclick="buyItem('machine')">구매하기</button>
+        </div>
+    </div>
+
+    <div style="margin-top: 50px;">
+        <button onclick="resetGame()" style="background-color: #ff4444; font-size: 12px;">게임 초기화</button>
+    </div>
+
+    <script>// 게임 데이터 상태
+        let gameState = {
+            gold: 0,
+            gps: 0,
+            workerCount: 0,
+            workerCost: 10,
+            machineCount: 0,
+            machineCost: 100
+        };
+
+        // 로컬 스토리지에서 데이터 불러오기
+        const savedData = localStorage.getItem('myIdleGameSave');
+        if (savedData) {
+            gameState = JSON.parse(savedData);
+        }
+
+        // 화면 업데이트 함수
+        function updateUI() {
+            document.getElementById('gold').innerText = Math.floor(gameState.gold);
+            document.getElementById('gps').innerText = gameState.gps;
+            document.getElementById('worker-cost').innerText = gameState.workerCost;
+            document.getElementById('machine-cost').innerText = gameState.machineCost;
+
+            // 구매 가능 여부에 따른 버튼 비활성화
+            document.getElementById('buy-worker').disabled = gameState.gold < gameState.workerCost;
+            document.getElementById('buy-machine').disabled = gameState.gold < gameState.machineCost;
+        }
+
+        // 클릭 이벤트
+        function clickGold() {
+            gameState.gold += 1;
+            updateUI();
+        }
+
+        // 아이템 구매
+        function buyItem(type) {
+            if (type === 'worker' && gameState.gold >= gameState.workerCost) {
+                gameState.gold -= gameState.workerCost;
+                gameState.workerCount++;
+                gameState.gps += 1;
+                gameState.workerCost = Math.floor(gameState.workerCost * 1.15); // 가격 상승
+            } else if (type === 'machine' && gameState.gold >= gameState.machineCost) {
+                gameState.gold -= gameState.machineCost;
+                gameState.machineCount++;
+                gameState.gps += 10;
+                gameState.machineCost = Math.floor(gameState.machineCost * 1.15);
+            }
+            updateUI();
+            saveGame();
+        }
+
+        // 자동 골드 생산 (1초마다 실행)
+        setInterval(function() {
+            gameState.gold += gameState.gps / 10; // 0.1초마다 10분의 1씩 추가 (부드럽게 보이기 위함)
+            updateUI();
+        }, 100);
+
+        // 자동 저장 (30초마다)
+        setInterval(saveGame, 30000);
+
+        function saveGame() {
+            localStorage.setItem('myIdleGameSave', JSON.stringify(gameState));
+            console.log("게임 저장됨!");
+        }
+
+        function resetGame() {
+            if(confirm("정말로 초기화하시겠습니까?")) {
+                localStorage.removeItem('myIdleGameSave');
+                location.reload();
+            }
+        }
+
+        // 초기 UI 업데이트
+        updateUI();</script>
+</body>
+</html>
