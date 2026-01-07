@@ -3,29 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Earth to Space - Idle Game</title>
+    <title>Civilization Idle: Earth to Space</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>🚀 Earth to Space</h1>
-            <p>집부터 시작해서 우주로 나아가세요!</p>
+            <h1>🚀 문명 발전: 지구에서 우주로</h1>
+            <p>자원을 모아 시대를 발전시키세요.</p>
         </header>
 
-        <section class="display-area">
-            <h2 id="resource-display">0 자원</h2>
-            <p id="mps-display">초당 생산량: 0</p>
+        <!-- 자원 현황판 -->
+        <section class="resources-panel">
+            <div class="res-box wood">
+                <span>🌲 나무</span>
+                <h3 id="res-wood">0</h3>
+                <small id="mps-wood">+0/초</small>
+            </div>
+            <div class="res-box stone">
+                <span>🪨 돌</span>
+                <h3 id="res-stone">0</h3>
+                <small id="mps-stone">+0/초</small>
+            </div>
+            <div class="res-box iron">
+                <span>⚙️ 철</span>
+                <h3 id="res-iron">0</h3>
+                <small id="mps-iron">+0/초</small>
+            </div>
         </section>
 
-        <section class="click-area">
-            <button id="click-btn">⛏️ 자원 채집하기</button>
+        <!-- 메인 본부 업그레이드 -->
+        <section class="main-house-area">
+            <div class="house-info">
+                <h2 id="house-name">⛺ 레벨 0: 텐트</h2>
+                <p id="house-desc">나무를 모아 판잣집으로 발전하세요.</p>
+            </div>
+            <button id="upgrade-btn">
+                ⬆️ 업그레이드 (비용 표시)
+            </button>
         </section>
 
+        <!-- 행동(채집) 영역 -->
+        <section class="action-area">
+            <h3>⛏️ 수동 채집</h3>
+            <div class="buttons-grid">
+                <button id="btn-gather-wood" class="gather-btn">🌲 나무 베기</button>
+                <button id="btn-gather-stone" class="gather-btn locked">🪨 돌 캐기 (잠김)</button>
+                <button id="btn-gather-iron" class="gather-btn locked">⚙️ 철광석 캐기 (잠김)</button>
+            </div>
+        </section>
+
+        <!-- 자동화 건물 상점 -->
         <section class="shop-area">
-            <h3>🔨 건설 상점</h3>
+            <h3>🏭 생산 시설 건설</h3>
             <div id="building-list">
-                <!-- 자바스크립트로 건물이 여기에 추가됩니다 -->
+                <!-- JS로 생성됨 -->
             </div>
         </section>
 

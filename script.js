@@ -1,161 +1,307 @@
-﻿// 게임 상태 변수
+﻿// 게임 데이터
 let gameData = {
-    resources: 0,
+    resources: { wood: 0, stone: 0, iron: 0 },
+    houseLevel: 0,
     buildings: [
-        { id: 0, name: "텐트", cost: 15, production: 0.5, count: 0, icon: "⛺" },
-        { id: 1, name: "나무 집", cost: 100, production: 2, count: 0, icon: "🏠" },
-        { id: 2, name: "벽돌 집", cost: 500, production: 10, count: 0, icon: "🏡" },
-        { id: 3, name: "아파트", cost: 2000, production: 40, count: 0, icon: "🏢" },
-        { id: 4, name: "연구소", cost: 10000, production: 150, count: 0, icon: "🔬" },
-        { id: 5, name: "로켓 발사대", cost: 50000, production: 500, count: 0, icon: "🚀" },
-        { id: 6, name: "우주선 (엔딩)", cost: 1000000, production: 0, count: 0, icon: "🛸" } // 엔딩 조건
+        // type: 어떤 자원을 생산하는가
+        { id: 0, name: "나무꾼 오두막", type: "wood", baseCost: { wood: 15 }, production: 1, count: 0 },
+        { id: 1, name: "채석장", type: "stone", baseCost: { wood: 50, stone: 10 }, production: 1, count: 0 },
+        { id: 2, name: "제철소", type: "iron", baseCost: { wood: 200, stone: 100, iron: 20 }, production: 1, count: 0 },
+        { id: 3, name: "고급 벌목 기계", type: "wood", baseCost: { wood: 500, iron: 50 }, production: 10, count: 0 },
+        { id: 4, name: "자동 채굴 드릴", type: "stone", baseCost: { wood: 1000, stone: 500, iron: 100 }, production: 10, count: 0 }
     ]
 };
 
-// DOM 요소 가져오기
-const resourceDisplay = document.getElementById('resource-display');
-const mpsDisplay = document.getElementById('mps-display');
-const clickBtn = document.getElementById('click-btn');
-const buildingList = document.getElementById('building-list');
-const messageLog = document.getElementById('message-log');
+// 집 업그레이드 정보 (비용 및 해금 요소)
+const houseStages = [
+    { name: "텐트", desc: "야생의 시작입니다.", req: { wood: 20 }, unlock: "none" },
+    { name: "나무 오두막", desc: "이제 돌을 캘 수 있습니다.", req: { wood: 100, stone: 0 }, unlock: "stone" },
+    { name: "석조 주택", desc: "단단한 집입니다. 철을 발견하세요.", req: { wood: 300, stone: 150 }, unlock: "iron" },
+    { name: "현대식 아파트", desc: "자동화 기계를 늘리세요.", req: { wood: 1000, stone: 500, iron: 100 }, unlock: "all" },
+    { name: "우주 센터", desc: "우주선을 건조할 준비가 되었습니다.", req: { wood: 5000, stone: 3000, iron: 2000 }, unlock: "rocket" },
+    { name: "우주선 발사 (엔딩)", desc: "지구를 떠납니다!", req: { wood: 50000, stone: 50000, iron: 50000 }, unlock: "end" }
+];
+
+// DOM 요소 연결
+const ui = {
+    wood: document.getElementById('res-wood'),
+    stone: document.getElementById('res-stone'),
+    iron: document.getElementById('res-iron'),
+    mpsWood: document.getElementById('mps-wood'),
+    mpsStone: document.getElementById('mps-stone'),
+    mpsIron: document.getElementById('mps-iron'),
+    houseName: document.getElementById('house-name'),
+    houseDesc: document.getElementById('house-desc'),
+    upgradeBtn: document.getElementById('upgrade-btn'),
+    btnWood: document.getElementById('btn-gather-wood'),
+    btnStone: document.getElementById('btn-gather-stone'),
+    btnIron: document.getElementById('btn-gather-iron'),
+    buildingList: document.getElementById('building-list'),
+    log: document.getElementById('message-log')
+};
 
 // 초기화
 function init() {
     loadGame();
     renderShop();
-    updateDisplay();
+    updateUI();
 
-    // 1초마다 자동 생산 (방치형 요소)
+    // 1초 루프
     setInterval(() => {
-        let mps = calculateMPS();
-        gameData.resources += mps;
-        updateDisplay();
-        checkShopStatus();
+        produceResources();
+        updateUI();
+        saveGame();
     }, 1000);
-
-    // 30초마다 자동 저장
-    setInterval(saveGame, 30000);
 }
 
-// 초당 생산량 계산 (Money Per Second)
-function calculateMPS() {
-    let mps = 0;
+// 자원 생산 (초당)
+function produceResources() {
     gameData.buildings.forEach(b => {
-        mps += b.production * b.count;
+        if (b.count > 0) {
+            gameData.resources[b.type] += b.production * b.count;
+        }
     });
-    return mps;
 }
 
-// 화면 업데이트
-function updateDisplay() {
-    resourceDisplay.innerText = Math.floor(gameData.resources).toLocaleString() + " 자원";
-    mpsDisplay.innerText = "초당 생산량: " + calculateMPS().toFixed(1);
+// 화면 업데이트 (핵심)
+function updateUI() {
+    // 자원 표시
+    ui.wood.innerText = Math.floor(gameData.resources.wood).toLocaleString();
+    ui.stone.innerText = Math.floor(gameData.resources.stone).toLocaleString();
+    ui.iron.innerText = Math.floor(gameData.resources.iron).toLocaleString();
+
+    // 초당 생산량 계산
+    let mps = { wood: 0, stone: 0, iron: 0 };
+    gameData.buildings.forEach(b => {
+        mps[b.type] += b.production * b.count;
+    });
+    ui.mpsWood.innerText = `+${mps.wood}/초`;
+    ui.mpsStone.innerText = `+${mps.stone}/초`;
+    ui.mpsIron.innerText = `+${mps.iron}/초`;
+
+    // 집 업그레이드 버튼 상태
+    updateHouseUI();
+
+    // 버튼 잠금 해제 체크
+    checkUnlocks();
+
+    // 상점 버튼 활성/비활성 업데이트
+    updateShopButtons();
 }
 
-// 로그 메시지 출력
-function log(msg) {
-    messageLog.innerText = msg;
-    setTimeout(() => { messageLog.innerText = ""; }, 3000);
+function updateHouseUI() {
+    if (gameData.houseLevel >= houseStages.length) return;
+
+    const currentStage = houseStages[gameData.houseLevel];
+    const nextStage = houseStages[gameData.houseLevel + 1]; // 다음 단계 정보
+
+    ui.houseName.innerText = `🏡 Lv.${gameData.houseLevel} ${currentStage.name}`;
+    ui.houseDesc.innerText = currentStage.desc;
+
+    if (nextStage) {
+        // 비용 텍스트 만들기
+        let costText = [];
+        if (nextStage.req.wood > 0) costText.push(`나무 ${nextStage.req.wood}`);
+        if (nextStage.req.stone > 0) costText.push(`돌 ${nextStage.req.stone}`);
+        if (nextStage.req.iron > 0) costText.push(`철 ${nextStage.req.iron}`);
+
+        ui.upgradeBtn.innerText = `⬆️ 다음: ${nextStage.name} (${costText.join(', ')})`;
+
+        // 비용 충족 확인
+        const canUpgrade =
+            gameData.resources.wood >= (nextStage.req.wood || 0) &&
+            gameData.resources.stone >= (nextStage.req.stone || 0) &&
+            gameData.resources.iron >= (nextStage.req.iron || 0);
+
+        ui.upgradeBtn.disabled = !canUpgrade;
+        ui.upgradeBtn.onclick = () => upgradeHouse(nextStage);
+    } else {
+        ui.upgradeBtn.innerText = "🚀 우주 정복 완료!";
+        ui.upgradeBtn.disabled = true;
+    }
 }
 
-// 클릭 이벤트
-clickBtn.addEventListener('click', () => {
-    gameData.resources += 1;
-    updateDisplay();
-    checkShopStatus();
+function upgradeHouse(nextStage) {
+    // 자원 소모
+    gameData.resources.wood -= (nextStage.req.wood || 0);
+    gameData.resources.stone -= (nextStage.req.stone || 0);
+    gameData.resources.iron -= (nextStage.req.iron || 0);
 
-    // 클릭 애니메이션 효과 (선택사항)
-    clickBtn.style.transform = "scale(0.95)";
-    setTimeout(() => clickBtn.style.transform = "scale(1)", 50);
-});
+    gameData.houseLevel++;
+
+    log(`🎉 ${nextStage.name}으로 발전했습니다!`);
+
+    if (gameData.houseLevel === houseStages.length - 1) {
+        alert("축하합니다! 우주선을 발사하여 지구를 떠났습니다! 게임 클리어!");
+        resetGame();
+    }
+
+    updateUI();
+}
+
+function checkUnlocks() {
+    // 레벨에 따른 버튼 해금
+    if (gameData.houseLevel >= 1) {
+        ui.btnStone.classList.remove('locked');
+        ui.btnStone.onclick = () => manualGather('stone');
+    } else {
+        ui.btnStone.onclick = null;
+    }
+
+    if (gameData.houseLevel >= 2) {
+        ui.btnIron.classList.remove('locked');
+        ui.btnIron.onclick = () => manualGather('iron');
+    } else {
+        ui.btnIron.onclick = null;
+    }
+}
+
+// 수동 채집
+ui.btnWood.onclick = () => manualGather('wood');
+
+function manualGather(type) {
+    // 집 레벨이 높을수록 클릭 효율 증가
+    const amount = 1 + gameData.houseLevel;
+    gameData.resources[type] += amount;
+
+    updateUI();
+
+    // 간단한 클릭 애니메이션
+    const btn = document.getElementById(`btn-gather-${type}`);
+    btn.style.transform = "scale(0.95)";
+    setTimeout(() => btn.style.transform = "scale(1)", 50);
+}
 
 // 상점 렌더링
 function renderShop() {
-    buildingList.innerHTML = "";
-    gameData.buildings.forEach((building, index) => {
+    ui.buildingList.innerHTML = "";
+    gameData.buildings.forEach((b, index) => {
         const div = document.createElement('div');
-        div.className = 'building-item disabled';
-        div.id = `building-${index}`;
-        div.onclick = () => buyBuilding(index);
+        div.className = `shop-item type-${b.type}`;
+        div.id = `build-${index}`;
+
+        // 비용 텍스트
+        let costTxt = [];
+        for (let r in b.baseCost) {
+            costTxt.push(`${getResIcon(r)} ${b.baseCost[r]}`);
+        }
 
         div.innerHTML = `
-            <div class="building-info">
-                <h4>${building.icon} ${building.name}</h4>
-                <span>보유: ${building.count} | +${building.production}/초</span>
+            <div>
+                <strong>${b.name}</strong> <br>
+                <small>보유: ${b.count} | +${b.production} ${getResIcon(b.type)}/초</small>
             </div>
-            <div class="building-cost">
-                ${building.cost.toLocaleString()} 자원
+            <div style="text-align:right">
+                <span class="cost-text">${costTxt.join(' ')}</span>
             </div>
         `;
-        buildingList.appendChild(div);
+
+        div.onclick = () => buyBuilding(index);
+        ui.buildingList.appendChild(div);
     });
 }
 
-// 구매 가능 여부 체크 및 스타일 변경
-function checkShopStatus() {
-    gameData.buildings.forEach((building, index) => {
-        const div = document.getElementById(`building-${index}`);
-        if (gameData.resources >= building.cost) {
-            div.classList.remove('disabled');
-        } else {
-            div.classList.add('disabled');
-        }
-    });
-}
-
-// 건물 구매 로직
 function buyBuilding(index) {
-    const building = gameData.buildings[index];
+    const b = gameData.buildings[index];
+    const cost = getBuildingCost(b);
 
-    if (gameData.resources >= building.cost) {
-        // 엔딩 조건 체크
-        if (building.id === 6) {
-            if (confirm("정말로 우주선을 발사하시겠습니까? 지구를 떠납니다!")) {
-                alert("축하합니다! 우주선을 타고 지구를 탈출했습니다! 게임 클리어!");
-                resetGame();
-                return;
-            } else {
-                return;
-            }
-        }
+    // 자원 충분한지 체크
+    if (gameData.resources.wood >= (cost.wood || 0) &&
+        gameData.resources.stone >= (cost.stone || 0) &&
+        gameData.resources.iron >= (cost.iron || 0)) {
 
-        gameData.resources -= building.cost;
-        building.count++;
+        // 자원 차감
+        gameData.resources.wood -= (cost.wood || 0);
+        gameData.resources.stone -= (cost.stone || 0);
+        gameData.resources.iron -= (cost.iron || 0);
 
-        // 가격 상승 로직 (구매할 때마다 1.15배 비싸짐)
-        building.cost = Math.ceil(building.cost * 1.15);
-
-        log(`${building.name} 구매 완료!`);
-        updateDisplay();
-        renderShop(); // 가격이 바뀌었으므로 다시 렌더링
+        b.count++;
+        log(`${b.name} 건설 완료!`);
+        updateUI();
+        updateShopCostDisplay(); // 가격 갱신
     } else {
         log("자원이 부족합니다.");
     }
 }
 
-// 저장 기능 (로컬 스토리지 사용)
+// 건물 가격 계산 (보유량에 따라 1.2배씩 증가)
+function getBuildingCost(building) {
+    let multiplier = Math.pow(1.2, building.count);
+    let currentCost = {};
+    for (let r in building.baseCost) {
+        currentCost[r] = Math.floor(building.baseCost[r] * multiplier);
+    }
+    return currentCost;
+}
+
+function updateShopCostDisplay() {
+    gameData.buildings.forEach((b, index) => {
+        const div = document.getElementById(`build-${index}`);
+        const cost = getBuildingCost(b);
+        let costTxt = [];
+        for (let r in cost) {
+            costTxt.push(`${getResIcon(r)} ${cost[r]}`);
+        }
+        div.querySelector('.cost-text').innerText = costTxt.join(' ');
+
+        // 보유 개수 업데이트
+        div.querySelector('small').innerText = `보유: ${b.count} | +${b.production} ${getResIcon(b.type)}/초`;
+    });
+}
+
+function updateShopButtons() {
+    gameData.buildings.forEach((b, index) => {
+        const div = document.getElementById(`build-${index}`);
+        const cost = getBuildingCost(b);
+        const canBuy =
+            gameData.resources.wood >= (cost.wood || 0) &&
+            gameData.resources.stone >= (cost.stone || 0) &&
+            gameData.resources.iron >= (cost.iron || 0);
+
+        if (canBuy) div.classList.remove('disabled');
+        else div.classList.add('disabled');
+    });
+}
+
+// 유틸리티
+function getResIcon(type) {
+    if (type === 'wood') return '🌲';
+    if (type === 'stone') return '🪨';
+    if (type === 'iron') return '⚙️';
+    return '';
+}
+
+function log(msg) {
+    ui.log.innerText = msg;
+    ui.log.style.opacity = 1;
+    setTimeout(() => { ui.log.style.opacity = 0.5; }, 2000);
+}
+
+// 저장/불러오기
 function saveGame() {
-    localStorage.setItem('earthToSpaceSave', JSON.stringify(gameData));
-    log("게임이 저장되었습니다.");
+    localStorage.setItem('civIdleSave', JSON.stringify(gameData));
 }
 
 function loadGame() {
-    const save = localStorage.getItem('earthToSpaceSave');
+    const save = localStorage.getItem('civIdleSave');
     if (save) {
-        const savedData = JSON.parse(save);
-        // 저장된 데이터 불러오되, 구조가 바뀌었을 수 있으므로 병합
-        gameData = { ...gameData, ...savedData };
-        // buildings 배열 내부 객체들도 업데이트
-        gameData.buildings = gameData.buildings.map((b, i) => {
-            return { ...b, ...savedData.buildings[i] };
-        });
+        const saved = JSON.parse(save);
+        // 간단한 병합 로직
+        gameData.resources = saved.resources || gameData.resources;
+        gameData.houseLevel = saved.houseLevel || 0;
+        if (saved.buildings) {
+            saved.buildings.forEach((sb, i) => {
+                if (gameData.buildings[i]) {
+                    gameData.buildings[i].count = sb.count;
+                }
+            });
+        }
     }
 }
 
 function resetGame() {
-    localStorage.removeItem('earthToSpaceSave');
+    localStorage.removeItem('civIdleSave');
     location.reload();
 }
 
-// 게임 시작
 init();
