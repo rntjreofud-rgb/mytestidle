@@ -82,12 +82,42 @@ export const researchList = [
 ];
 
 export const houseStages = [
-    { name: "야영지", desc: "나무를 모아 판자를 만드세요.", req: { wood: 20 }, unlock: "basic" },
-    { name: "목조 주택", desc: "석탄을 발견하고 채굴을 시작하세요.", req: { plank: 50, stone: 20 }, unlock: "coal" },
-    { name: "산업 혁명", desc: "발전소를 짓고 전력으로 광물을 캐세요.", req: { brick: 100, coal: 100 }, unlock: "power" },
-    { name: "공장 단지", desc: "구리와 회로를 양산하세요.", req: { ironPlate: 200, copperPlate: 200, energy: 0 }, unlock: "copper" },
-    { name: "하이테크 연구소", desc: "정밀 부품을 생산하세요.", req: { gear: 100, circuit: 50 }, unlock: "advanced" },
-    { name: "로켓 발사대 (엔딩)", desc: "이 행성을 탈출합니다.", req: { circuit: 2000, gear: 5000, ironPlate: 10000 }, unlock: "end" }
+    { 
+        name: "임시 야영지", 
+        desc: "지구 탈출을 위한 첫 걸음입니다. 나무를 모아 거주지를 확보하세요.", 
+        req: { wood: 20 }, 
+        unlock: "basic" 
+    },
+    { 
+        name: "목재 작업장", 
+        desc: "비와 바람을 피할 지붕을 만들었습니다. 이제 광물을 캘 도구를 만드세요.", 
+        req: { plank: 50, stone: 20 }, 
+        unlock: "coal" 
+    },
+    { 
+        name: "강철 요새", 
+        desc: "집이라기보단 벙커에 가깝습니다. 발전기를 설치하고 공장화를 시작하세요.", 
+        req: { brick: 100, coal: 100 }, 
+        unlock: "power" 
+    },
+    { 
+        name: "발사체 조립동", 
+        desc: "거주 구역을 개조하여 로켓 엔진을 부착할 프레임을 짰습니다.", 
+        req: { ironPlate: 300, copperPlate: 300, energy: 0 }, 
+        unlock: "copper" 
+    },
+    { 
+        name: "우주선 본체 (Starship)", 
+        desc: "이것은 더 이상 집이 아닙니다. 궤도 진입을 위한 정밀 부품을 장착하세요.", 
+        req: { gear: 200, circuit: 100 }, 
+        unlock: "advanced" 
+    },
+    { 
+        name: "지구 탈출 (Launch)", 
+        desc: "모든 준비가 끝났습니다. 카운트다운을 시작합니다.", 
+        req: { circuit: 2000, gear: 5000, ironPlate: 10000 }, 
+        unlock: "end" 
+    }
 ];
 
 export function setGameData(newData) {
