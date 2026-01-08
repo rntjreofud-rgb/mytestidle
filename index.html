@@ -3,17 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Civilization Idle: Earth to Space</title>
+    <title>Civilization Idle: Modular</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
         <header>
             <h1>🚀 문명 발전: 지구에서 우주로</h1>
-            <p>자원을 모아 시대를 발전시키세요.</p>
+            <p>모듈화된 시스템으로 더 복잡한 문명을 만드세요.</p>
         </header>
 
-        <!-- 자원 현황판 -->
         <section class="resources-panel">
             <div class="res-box wood">
                 <span>🌲 나무</span>
@@ -32,38 +31,32 @@
             </div>
         </section>
 
-        <!-- 메인 본부 업그레이드 -->
         <section class="main-house-area">
             <div class="house-info">
                 <h2 id="house-name">⛺ 레벨 0: 텐트</h2>
-                <p id="house-desc">나무를 모아 판잣집으로 발전하세요.</p>
+                <p id="house-desc">설명</p>
             </div>
-            <button id="upgrade-btn">
-                ⬆️ 업그레이드 (비용 표시)
-            </button>
+            <button id="upgrade-btn">⬆️ 업그레이드</button>
         </section>
 
-        <!-- 행동(채집) 영역 -->
         <section class="action-area">
             <h3>⛏️ 수동 채집</h3>
             <div class="buttons-grid">
                 <button id="btn-gather-wood" class="gather-btn">🌲 나무 베기</button>
-                <button id="btn-gather-stone" class="gather-btn locked">🪨 돌 캐기 (잠김)</button>
-                <button id="btn-gather-iron" class="gather-btn locked">⚙️ 철광석 캐기 (잠김)</button>
+                <button id="btn-gather-stone" class="gather-btn locked">🪨 돌 캐기</button>
+                <button id="btn-gather-iron" class="gather-btn locked">⚙️ 철광석 캐기</button>
             </div>
         </section>
 
-        <!-- 자동화 건물 상점 -->
         <section class="shop-area">
             <h3>🏭 생산 시설 건설</h3>
-            <div id="building-list">
-                <!-- JS로 생성됨 -->
-            </div>
+            <div id="building-list"></div>
         </section>
 
-        <div id="message-log">게임을 시작합니다.</div>
+        <div id="message-log">시스템 준비 완료.</div>
     </div>
 
-    <script src="script.js"></script>
+    <!-- type="module"이 중요합니다 -->
+    <script type="module" src="js/main.js"></script>
 </body>
 </html>

@@ -15,7 +15,7 @@ body {
 	text-align: center;
 }
 
-/* ÀÚ¿ø ÆĞ³Î */
+/* ìì› íŒ¨ë„ */
 .resources-panel {
 	display: grid;
 	grid-template-columns: 1fr 1fr 1fr;
@@ -51,7 +51,7 @@ body {
 	border-bottom: 3px solid #3498db;
 }
 
-/* ¸ŞÀÎ ÇÏ¿ì½º */
+/* ë©”ì¸ í•˜ìš°ìŠ¤ */
 .main-house-area {
 	background: linear-gradient(45deg, #2c3e50, #4ca1af);
 	padding: 20px;
@@ -78,7 +78,7 @@ body {
 		opacity: 0.7;
 	}
 
-/* Çàµ¿ ¹öÆ° */
+/* í–‰ë™ ë²„íŠ¼ */
 .buttons-grid {
 	display: flex;
 	gap: 10px;
@@ -120,7 +120,7 @@ body {
 	cursor: not-allowed;
 }
 
-/* »óÁ¡ ¸®½ºÆ® */
+/* ìƒì  ë¦¬ìŠ¤íŠ¸ */
 .shop-item {
 	background-color: #393e46;
 	margin-bottom: 8px;
@@ -160,3 +160,4 @@ body {
 	min-height: 20px;
 	font-size: 0.9rem;
 }
+
