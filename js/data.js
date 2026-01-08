@@ -8,55 +8,37 @@ export let gameData = {
         energy: 0, energyMax: 0 
     },
     houseLevel: 0,
-    // ⭐ [신규] 완료된 연구 ID 목록 저장
     researches: [], 
     buildings: [
-        // (기존 건물 데이터 유지...)
-        { id: 0, name: "자동 벌목기", cost: { wood: 10 }, inputs: null, outputs: { wood: 1 }, count: 0 },
-        { id: 1, name: "채석 드릴", cost: { wood: 50, plank: 10 }, inputs: null, outputs: { stone: 1 }, count: 0 },
-        { id: 2, name: "석탄 채굴기", cost: { wood: 50, stone: 20 }, inputs: null, outputs: { coal: 1 }, count: 0 },
-        { id: 3, name: "석탄 발전소", cost: { stone: 100, brick: 20, plank: 20 }, inputs: { coal: 1 }, outputs: { energy: 10 }, count: 0 },
-        { id: 4, name: "전기 철광석 채굴기", cost: { brick: 50, gear: 10 }, inputs: { energy: 2 }, outputs: { ironOre: 1 }, count: 0 },
-        { id: 5, name: "전기 구리 채굴기", cost: { brick: 50, gear: 10 }, inputs: { energy: 2 }, outputs: { copperOre: 1 }, count: 0 },
-        { id: 6, name: "제재소 (판자)", cost: { wood: 100, stone: 50 }, inputs: { wood: 2 }, outputs: { plank: 1 }, count: 0 },
-        { id: 7, name: "돌 용광로 (벽돌)", cost: { stone: 100, wood: 50 }, inputs: { stone: 2 }, outputs: { brick: 1 }, count: 0 },
-        { id: 8, name: "철 용광로 (철판)", cost: { brick: 100, stone: 100 }, inputs: { ironOre: 2, coal: 0.5 }, outputs: { ironPlate: 1 }, count: 0 },
-        { id: 9, name: "구리 용광로 (구리판)", cost: { brick: 100, stone: 100 }, inputs: { copperOre: 2, coal: 0.5 }, outputs: { copperPlate: 1 }, count: 0 },
-        { id: 10, name: "부품 조립기 (톱니)", cost: { ironPlate: 50, brick: 50 }, inputs: { ironPlate: 2, energy: 1 }, outputs: { gear: 1 }, count: 0 },
-        { id: 11, name: "전자 공장 (회로)", cost: { ironPlate: 100, copperPlate: 100, gear: 20 }, inputs: { ironPlate: 1, copperPlate: 2, energy: 2 }, outputs: { circuit: 1 }, count: 0 }
+        // ⭐ reqLevel 속성 추가됨
+        // reqLevel: 0 -> 처음부터 보임
+        { id: 0, name: "자동 벌목기", cost: { wood: 10 }, inputs: null, outputs: { wood: 1 }, count: 0, reqLevel: 0 },
+        
+        // reqLevel: 0.5 -> 돌이 해금되면 보임 (채석, 제재소, 돌용광로)
+        { id: 1, name: "채석 드릴", cost: { wood: 50, plank: 10 }, inputs: null, outputs: { stone: 1 }, count: 0, reqLevel: 0.5 },
+        { id: 6, name: "제재소 (판자)", cost: { wood: 100, stone: 50 }, inputs: { wood: 2 }, outputs: { plank: 1 }, count: 0, reqLevel: 0.5 },
+        { id: 7, name: "돌 용광로 (벽돌)", cost: { stone: 100, wood: 50 }, inputs: { stone: 2 }, outputs: { brick: 1 }, count: 0, reqLevel: 0.5 },
+
+        // reqLevel: 1 -> Lv.1 달성 시 보임 (석탄, 광물 제련)
+        { id: 2, name: "석탄 채굴기", cost: { wood: 50, stone: 20 }, inputs: null, outputs: { coal: 1 }, count: 0, reqLevel: 1 },
+        { id: 8, name: "철 용광로 (철판)", cost: { brick: 100, stone: 100 }, inputs: { ironOre: 2, coal: 0.5 }, outputs: { ironPlate: 1 }, count: 0, reqLevel: 1 },
+        { id: 9, name: "구리 용광로 (구리판)", cost: { brick: 100, stone: 100 }, inputs: { copperOre: 2, coal: 0.5 }, outputs: { copperPlate: 1 }, count: 0, reqLevel: 1 },
+
+        // reqLevel: 2 -> Lv.2 달성 시 보임 (전력 시스템, 전기 채굴)
+        { id: 3, name: "석탄 발전소", cost: { stone: 100, brick: 20, plank: 20 }, inputs: { coal: 1 }, outputs: { energy: 10 }, count: 0, reqLevel: 2 },
+        { id: 4, name: "전기 철광석 채굴기", cost: { brick: 50, gear: 10 }, inputs: { energy: 2 }, outputs: { ironOre: 1 }, count: 0, reqLevel: 2 },
+        { id: 5, name: "전기 구리 채굴기", cost: { brick: 50, gear: 10 }, inputs: { energy: 2 }, outputs: { copperOre: 1 }, count: 0, reqLevel: 2 },
+        { id: 10, name: "부품 조립기 (톱니)", cost: { ironPlate: 50, brick: 50 }, inputs: { ironPlate: 2, energy: 1 }, outputs: { gear: 1 }, count: 0, reqLevel: 2 },
+        { id: 11, name: "전자 공장 (회로)", cost: { ironPlate: 100, copperPlate: 100, gear: 20 }, inputs: { ironPlate: 1, copperPlate: 2, energy: 2 }, outputs: { circuit: 1 }, count: 0, reqLevel: 2 }
     ]
 };
 
-// ⭐ [신규] 연구 목록 (Static Data)
+// ... (researchList, houseStages 등 나머지는 기존과 동일) ...
 export const researchList = [
-    { 
-        id: "stone_tool", 
-        name: "돌 곡괭이 연마", 
-        desc: "수동 채집량이 +1 증가합니다.", 
-        cost: { wood: 50, stone: 20 },
-        bonus: 1 
-    },
-    { 
-        id: "iron_pickaxe", 
-        name: "철제 도구 제작", 
-        desc: "수동 채집량이 +2 증가합니다.", 
-        cost: { plank: 100, ironPlate: 20 },
-        bonus: 2 
-    },
-    { 
-        id: "mining_drill", 
-        name: "강철 드릴 헤드", 
-        desc: "수동 채집량이 +5 증가합니다.", 
-        cost: { gear: 50, copperPlate: 50 },
-        bonus: 5 
-    },
-    { 
-        id: "laser_mining", 
-        name: "레이저 채광 기술", 
-        desc: "수동 채집량이 +10 증가합니다.", 
-        cost: { circuit: 100, energy: 0 }, // 에너지 조건 없음
-        bonus: 10 
-    }
+    { id: "stone_tool", name: "돌 곡괭이 연마", desc: "수동 채집량이 +1 증가합니다.", cost: { wood: 50, stone: 20 }, bonus: 1 },
+    { id: "iron_pickaxe", name: "철제 도구 제작", desc: "수동 채집량이 +2 증가합니다.", cost: { plank: 100, ironPlate: 20 }, bonus: 2 },
+    { id: "mining_drill", name: "강철 드릴 헤드", desc: "수동 채집량이 +5 증가합니다.", cost: { gear: 50, copperPlate: 50 }, bonus: 5 },
+    { id: "laser_mining", name: "레이저 채광 기술", desc: "수동 채집량이 +10 증가합니다.", cost: { circuit: 100, energy: 0 }, bonus: 10 }
 ];
 
 export const houseStages = [
@@ -77,7 +59,6 @@ export function setGameData(newData) {
         }
     }
     gameData.houseLevel = newData.houseLevel || 0;
-    // ⭐ 연구 데이터 로드 (없으면 빈 배열)
     gameData.researches = newData.researches || [];
     
     if (newData.buildings) {

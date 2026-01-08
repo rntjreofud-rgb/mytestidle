@@ -1,7 +1,7 @@
 // js/ui.js
 
-import { gameData, houseStages, researchList } from './data.js'; // researchList import 추가
-import * as Logic from './logic.js'; // 로직 함수 사용을 위해 import
+import { gameData, houseStages, researchList } from './data.js';
+import * as Logic from './logic.js';
 
 const elements = {
     viewDashboard: document.getElementById('view-dashboard'),
@@ -26,10 +26,7 @@ const elements = {
     buildingList: document.getElementById('building-list'),
     headerLog: document.getElementById('message-log'),
     powerDisplay: document.getElementById('power-display-text'), 
-    powerBar: document.getElementById('power-fill-bar'),
-    // ⭐ 연구 목록 컨테이너 (index.html에서 id="research-list"를 찾도록 할 예정이나,
-    // 현재 구조상 view-research 내부의 action-box 내용을 바꿔야 함)
-    // 따라서 동적으로 생성하거나 기존 구조를 활용
+    powerBar: document.getElementById('power-fill-bar')
 };
 
 const resNames = {
@@ -69,7 +66,6 @@ export function switchTab(tabName) {
     } else if (tabName === 'research') {
         elements.viewResearch.classList.remove('hidden');
         elements.navResearch.classList.add('active');
-        // 연구 탭 열릴 때 렌더링
         renderResearchTab();
     }
 }
@@ -118,12 +114,13 @@ export function updateScreen(netMPS) {
         }
     }
     updatePowerUI();
-    
-    // 연구 탭이 활성화 상태라면 버튼 상태 실시간 갱신
     if(!elements.viewResearch.classList.contains('hidden')) {
         updateResearchButtons();
     }
     
+    // ⭐ 중요: 해금 상태 체크 후 상점도 다시 그릴지 판단하면 좋지만,
+    // 성능을 위해 checkUnlocks()는 버튼만 제어하고,
+    // renderShop은 main.js에서 건설/업그레이드 등 이벤트 발생 시 호출하는 구조 유지.
     checkUnlocks();
 }
 
@@ -145,13 +142,9 @@ function updatePowerUI() {
     }
 }
 
-// ⭐ [신규] 연구 탭 렌더링
 function renderResearchTab() {
     const container = elements.viewResearch.querySelector('.action-box');
-    // 제목
     container.innerHTML = `<div class="section-title">연구 목록</div>`;
-    
-    // 연구 리스트 생성
     const listDiv = document.createElement('div');
     listDiv.id = 'research-list-container';
     listDiv.style.display = 'grid';
@@ -175,39 +168,31 @@ function renderResearchTab() {
                 <span class="cost-text" style="${isDone ? 'color:#2ecc71' : ''}">${costTxt}</span>
             </div>
         `;
-        
-        // 클릭 이벤트
         if (!isDone) {
             div.onclick = () => {
                 if(Logic.tryBuyResearch(r.id)) {
                     log(`🔬 [연구 완료] ${r.name}`, true);
-                    renderResearchTab(); // 화면 갱신
+                    renderResearchTab();
                 } else {
                     log("연구 자원이 부족합니다.");
                 }
             };
         }
-
         listDiv.appendChild(div);
     });
-    
     container.appendChild(listDiv);
     updateResearchButtons();
 }
 
-// 연구 버튼 활성/비활성 업데이트
 function updateResearchButtons() {
     researchList.forEach(r => {
-        if(gameData.researches.includes(r.id)) return; // 이미 완료된건 패스
-
+        if(gameData.researches.includes(r.id)) return;
         const div = document.getElementById(`research-${r.id}`);
         if(!div) return;
-
         let canBuy = true;
         for(let k in r.cost) {
             if((gameData.resources[k] || 0) < r.cost[k]) canBuy = false;
         }
-
         if(canBuy) div.classList.remove('disabled');
         else div.classList.add('disabled');
     });
@@ -229,11 +214,10 @@ function checkUnlocks() {
     const lv = gameData.houseLevel;
     const wood = gameData.resources.wood || 0;
     
-    // ⭐ [방어 코드 추가]
-    // 1. 자동 벌목기(ID:0)를 1개라도 가지고 있는지 확인
+    // 돌 해금 조건 (reqLevel 0.5에 해당)
     const hasLogger = gameData.buildings[0] && gameData.buildings[0].count > 0;
-    // 2. 판자를 1개라도 가지고 있는지 확인 (이미 가공을 시작했으므로)
     const hasPlank = (gameData.resources.plank || 0) > 0;
+    const canGatherStone = (lv >= 1 || wood >= 10 || hasLogger || hasPlank);
 
     const toggle = (el, show) => {
         if(!el) return;
@@ -241,15 +225,8 @@ function checkUnlocks() {
         else el.classList.add('hidden');
     };
 
-    // 🔓 해금 조건: 
-    // 레벨 1 이상 OR 나무 10개 이상 OR 벌목기 보유 OR 판자 보유
-    // (이제 나무를 써버려도 벌목기나 판자가 있다면 버튼이 사라지지 않습니다)
-    const canGatherStone = (lv >= 1 || wood >= 10 || hasLogger || hasPlank);
-    
     toggle(elements.btns.stone, canGatherStone);
     toggle(elements.btns.plank, canGatherStone);
-
-    // 나머지 조건은 기존 유지
     toggle(elements.btns.coal, (lv >= 1));
     toggle(elements.btns.ironOre, (lv >= 1));
     toggle(elements.btns.copperOre, (lv >= 1));
@@ -258,11 +235,38 @@ function checkUnlocks() {
         if(lv >= 2) elements.navPower.style.display = 'flex';
         else elements.navPower.style.display = 'none';
     }
+
+    // ⭐ 중요: checkUnlocks가 호출될 때마다 상점 목록을 다시 그리는 것은 비효율적이지만,
+    // "해금 상태"가 바뀌었는지 체크해서 필요하면 다시 그리는게 좋습니다.
+    // 여기서는 간단하게 로직을 분리해 둠.
+    // (상점 갱신은 main.js에서 이벤트 발생 시 하거나, 
+    //  아래에서 1초마다 하는 루프 안에서 조건부 호출 가능)
 }
 
+// ⭐ [수정됨] 상점 렌더링 시 조건 필터링
 export function renderShop(onBuyCallback, getCostFunc) {
     elements.buildingList.innerHTML = "";
+    
+    // 조건 체크용 변수들
+    const lv = gameData.houseLevel;
+    const wood = gameData.resources.wood || 0;
+    const hasLogger = gameData.buildings[0] && gameData.buildings[0].count > 0;
+    const hasPlank = (gameData.resources.plank || 0) > 0;
+    const isStoneUnlocked = (lv >= 1 || wood >= 10 || hasLogger || hasPlank);
+
     gameData.buildings.forEach((b, index) => {
+        // ⭐ 건물 등장 조건 체크
+        const req = b.reqLevel || 0;
+        
+        // 0.5 레벨 (돌 해금 단계) 처리
+        if (req === 0.5) {
+            if (!isStoneUnlocked) return; // 돌 해금 안됐으면 안 보여줌
+        } 
+        // 정수 레벨 (1, 2...) 처리
+        else if (req >= 1) {
+            if (lv < req) return; // 레벨 부족하면 안 보여줌
+        }
+        
         const div = document.createElement('div');
         div.className = `shop-item`;
         div.id = `build-${index}`;
@@ -308,7 +312,8 @@ export function renderShop(onBuyCallback, getCostFunc) {
 export function updateShopButtons(getCostFunc) {
     gameData.buildings.forEach((b, index) => {
         const div = document.getElementById(`build-${index}`);
-        if(!div) return;
+        if(!div) return; // 조건 미달로 생성 안 된 건물은 패스
+        
         const cost = getCostFunc(b);
         let canBuy = true;
         for(let k in cost) {

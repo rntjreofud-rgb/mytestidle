@@ -1,4 +1,4 @@
-// js/main.js 덮어쓰기
+// js/main.js
 
 import { gameData, houseStages } from './data.js';
 import * as UI from './ui.js';
@@ -9,10 +9,12 @@ function init() {
     Storage.loadGame();
     setupEvents();
     
+    // 초기 상점 렌더링
     UI.renderShop(handleBuyBuilding, Logic.getBuildingCost);
     UI.updateHouseUI(handleHouseUpgrade);
     
-    UI.log("시스템 가동. 지구 탈출 시퀀스 준비.");
+    UI.log("시스템 로드 완료. Escape Earth 가동 시작.");
+
     requestAnimationFrame(gameLoop);
     setInterval(() => Storage.saveGame(), 10000);
 }
@@ -22,12 +24,9 @@ function setupEvents() {
     if(UI.uiElements.navPower) UI.uiElements.navPower.addEventListener('click', () => UI.switchTab('power'));
     if(UI.uiElements.navResearch) UI.uiElements.navResearch.addEventListener('click', () => UI.switchTab('research'));
 
-    // 자원 버튼
     UI.uiElements.btns.wood.addEventListener('click', () => handleGather('wood'));
     UI.uiElements.btns.stone.addEventListener('click', () => handleGather('stone'));
-    // ⭐ 석탄 추가됨
     if(UI.uiElements.btns.coal) UI.uiElements.btns.coal.addEventListener('click', () => handleGather('coal'));
-    
     UI.uiElements.btns.ironOre.addEventListener('click', () => handleGather('ironOre'));
     UI.uiElements.btns.copperOre.addEventListener('click', () => handleGather('copperOre'));
     UI.uiElements.btns.plank.addEventListener('click', () => handleGather('plank'));
@@ -41,6 +40,19 @@ function handleGather(type) {
             btn.style.transform = "scale(0.95)";
             setTimeout(() => btn.style.transform = "scale(1)", 50);
         }
+        
+        // ⭐ 자원을 캘 때도 해금 조건(나무 10개)이 달성될 수 있으므로 상점 갱신 체크
+        // (매번 다시 그리면 느리니, 특정 조건에서만 다시 그리게 하거나, 
+        // 간단히 여기서 호출해도 됩니다. 여기선 10개 돌파 순간을 잡기 어려우니 
+        // 일단 checkUnlocks가 버튼은 처리해주고, 건물 목록은 아래 1초 루프에서 처리하는게 낫지만
+        // 즉각 반응을 위해 10개 돌파 시 한번 호출하는게 좋음. 
+        // 복잡하므로 여기선 UI.checkUnlocks()는 내부적으로 항상 돕니다.)
+        
+        // 나무 10개가 되는 순간 상점을 갱신하고 싶다면:
+        if (type === 'wood' && gameData.resources.wood === 10) {
+             UI.renderShop(handleBuyBuilding, Logic.getBuildingCost);
+        }
+        
     } else {
         UI.log("작업 불가: 재료 부족 또는 도구 필요");
     }
@@ -48,24 +60,28 @@ function handleGather(type) {
 
 function handleBuyBuilding(index) {
     if (Logic.tryBuyBuilding(index)) {
-        UI.log(`[건설] ${gameData.buildings[index].name} 가동 시작.`);
+        UI.log(`[건설] ${gameData.buildings[index].name} 건설 완료.`);
         UI.renderShop(handleBuyBuilding, Logic.getBuildingCost); 
     } else {
-        UI.log("자원이 부족하여 건설할 수 없습니다.");
+        UI.log("자원이 부족합니다.");
     }
 }
 
 function handleHouseUpgrade(nextStage) {
     if (Logic.tryUpgradeHouse(nextStage)) {
-        UI.log(`🎉 기술 발전 성공: [${nextStage.name}]`, true);
+        UI.log(`🎉 기술 발전 성공! [${nextStage.name}] 단계로 진입했습니다.`, true);
+        
+        // ⭐ 중요: 레벨이 올랐으니 새로운 건물이 해금되었을 수 있음. 상점 다시 그리기
+        UI.renderShop(handleBuyBuilding, Logic.getBuildingCost);
+        
         UI.updateHouseUI(handleHouseUpgrade);
         if(gameData.houseLevel >= houseStages.length - 1) {
-            UI.log("🚀 엔딩 조건 달성! 탈출 프로세스 개시.", true);
-            alert("지구 탈출 성공!");
+            UI.log("🚀 우주 진출 조건 달성! 엔딩 시퀀스 시작.", true);
+            alert("엔딩: 행성 탈출 성공!");
             Storage.resetGame();
         }
     } else {
-        UI.log("업그레이드 자원 부족");
+        UI.log("업그레이드 자원이 부족합니다.");
     }
 }
 
