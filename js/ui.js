@@ -1,4 +1,7 @@
-import { gameData, houseStages } from './data.js';
+// js/ui.js
+
+import { gameData, houseStages, researchList } from './data.js'; // researchList import 추가
+import * as Logic from './logic.js'; // 로직 함수 사용을 위해 import
 
 const elements = {
     viewDashboard: document.getElementById('view-dashboard'),
@@ -23,7 +26,10 @@ const elements = {
     buildingList: document.getElementById('building-list'),
     headerLog: document.getElementById('message-log'),
     powerDisplay: document.getElementById('power-display-text'), 
-    powerBar: document.getElementById('power-fill-bar')
+    powerBar: document.getElementById('power-fill-bar'),
+    // ⭐ 연구 목록 컨테이너 (index.html에서 id="research-list"를 찾도록 할 예정이나,
+    // 현재 구조상 view-research 내부의 action-box 내용을 바꿔야 함)
+    // 따라서 동적으로 생성하거나 기존 구조를 활용
 };
 
 const resNames = {
@@ -63,6 +69,8 @@ export function switchTab(tabName) {
     } else if (tabName === 'research') {
         elements.viewResearch.classList.remove('hidden');
         elements.navResearch.classList.add('active');
+        // 연구 탭 열릴 때 렌더링
+        renderResearchTab();
     }
 }
 
@@ -86,7 +94,6 @@ export function log(msg, isImportant = false) {
 export function updateScreen(netMPS) {
     for (let key in gameData.resources) {
         if(key === 'energy' || key === 'energyMax') continue;
-
         let card = document.getElementById(`card-${key}`);
         if (!card) {
             card = createResourceCard(key);
@@ -98,7 +105,6 @@ export function updateScreen(netMPS) {
         
         card.querySelector('.res-amount').innerText = formatNumber(val);
         const mpsEl = card.querySelector('.res-mps');
-        
         let mpsText = Math.abs(mps) < 1000 ? Math.abs(mps).toFixed(1) : formatNumber(Math.abs(mps));
         if(mps < 0) {
             mpsEl.style.color = "#e74c3c";
@@ -112,6 +118,12 @@ export function updateScreen(netMPS) {
         }
     }
     updatePowerUI();
+    
+    // 연구 탭이 활성화 상태라면 버튼 상태 실시간 갱신
+    if(!elements.viewResearch.classList.contains('hidden')) {
+        updateResearchButtons();
+    }
+    
     checkUnlocks();
 }
 
@@ -133,6 +145,74 @@ function updatePowerUI() {
     }
 }
 
+// ⭐ [신규] 연구 탭 렌더링
+function renderResearchTab() {
+    const container = elements.viewResearch.querySelector('.action-box');
+    // 제목
+    container.innerHTML = `<div class="section-title">연구 목록</div>`;
+    
+    // 연구 리스트 생성
+    const listDiv = document.createElement('div');
+    listDiv.id = 'research-list-container';
+    listDiv.style.display = 'grid';
+    listDiv.style.gap = '10px';
+    
+    researchList.forEach(r => {
+        const isDone = gameData.researches.includes(r.id);
+        const div = document.createElement('div');
+        div.className = `shop-item ${isDone ? 'disabled' : ''}`;
+        div.id = `research-${r.id}`;
+        
+        let costTxt = Object.entries(r.cost).map(([k, v]) => `${formatNumber(v)} ${resNames[k].split(' ')[1]}`).join(', ');
+        if(isDone) costTxt = "연구 완료";
+
+        div.innerHTML = `
+            <div style="flex:1;">
+                <div style="font-weight:bold; font-size:1em;">${r.name}</div>
+                <div style="font-size:0.8em; margin-top:3px; color:#aaa;">${r.desc}</div>
+            </div>
+            <div style="text-align:right; font-size:0.9em;">
+                <span class="cost-text" style="${isDone ? 'color:#2ecc71' : ''}">${costTxt}</span>
+            </div>
+        `;
+        
+        // 클릭 이벤트
+        if (!isDone) {
+            div.onclick = () => {
+                if(Logic.tryBuyResearch(r.id)) {
+                    log(`🔬 [연구 완료] ${r.name}`, true);
+                    renderResearchTab(); // 화면 갱신
+                } else {
+                    log("연구 자원이 부족합니다.");
+                }
+            };
+        }
+
+        listDiv.appendChild(div);
+    });
+    
+    container.appendChild(listDiv);
+    updateResearchButtons();
+}
+
+// 연구 버튼 활성/비활성 업데이트
+function updateResearchButtons() {
+    researchList.forEach(r => {
+        if(gameData.researches.includes(r.id)) return; // 이미 완료된건 패스
+
+        const div = document.getElementById(`research-${r.id}`);
+        if(!div) return;
+
+        let canBuy = true;
+        for(let k in r.cost) {
+            if((gameData.resources[k] || 0) < r.cost[k]) canBuy = false;
+        }
+
+        if(canBuy) div.classList.remove('disabled');
+        else div.classList.add('disabled');
+    });
+}
+
 function createResourceCard(key) {
     const div = document.createElement('div');
     div.className = `res-card ${key}`;
@@ -145,7 +225,6 @@ function createResourceCard(key) {
     return div;
 }
 
-// ⭐ [수정된 부분] 잠금 해제 조건 복구
 function checkUnlocks() {
     const lv = gameData.houseLevel;
     const wood = gameData.resources.wood || 0;
@@ -156,17 +235,13 @@ function checkUnlocks() {
         else el.classList.add('hidden');
     };
 
-    // 1. 돌과 판자는 [레벨 1 이상] OR [나무 10개 이상]이면 무조건 보임
     const canGatherStone = (lv >= 1 || wood >= 10);
     toggle(elements.btns.stone, canGatherStone);
     toggle(elements.btns.plank, canGatherStone);
-
-    // 2. 석탄, 철, 구리는 Lv 1 이상이면 보임
     toggle(elements.btns.coal, (lv >= 1));
     toggle(elements.btns.ironOre, (lv >= 1));
     toggle(elements.btns.copperOre, (lv >= 1));
 
-    // 3. 전력 탭은 Lv 2 이상
     if(elements.navPower) {
         if(lv >= 2) elements.navPower.style.display = 'flex';
         else elements.navPower.style.display = 'none';
