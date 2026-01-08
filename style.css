@@ -2,16 +2,19 @@
 @import url('https://fonts.googleapis.com/css2?family=Consolas&display=swap');
 
 :root {
-    --bg-dark: #121212;
-    --bg-panel: #1e2124;
-    --bg-sidebar: #16181c;
-    --primary-orange: #f39c12;
-    --accent-green: #2ecc71;
-    --accent-blue: #3498db;
-    --accent-red: #e74c3c;
-    --text-main: #ecf0f1;
-    --text-muted: #95a5a6;
-    --border-color: #2c2f33;
+    --bg-main: #0b0b0b;       /* 메인 배경 (완전 어두움) */
+    --bg-panel: #161616;      /* 패널 배경 */
+    --bg-element: #202020;    /* 버튼/아이템 배경 */
+    --bg-hover: #2a2a2a;      /* 호버 배경 */
+    --border-color: #333333;  /* 테두리 색 */
+    
+    --primary-orange: #d35400; /* 채도 낮춘 오렌지 */
+    --accent-green: #27ae60;
+    --accent-blue: #2980b9;
+    --accent-red: #c0392b;
+    
+    --text-main: #cccccc;     /* 회색빛 흰색 */
+    --text-muted: #888888;
 }
 
 * {
@@ -19,8 +22,8 @@
 }
 
 body {
-    font-family: 'Noto Sans KR', sans-serif;
-    background-color: var(--bg-dark);
+    font-family: 'Consolas', 'Noto Sans KR', monospace; /* 고정폭 폰트 느낌 */
+    background-color: var(--bg-main);
     color: var(--text-main);
     margin: 0;
     padding: 0;
@@ -28,15 +31,16 @@ body {
     height: 100vh;
     display: flex;
     overflow: hidden;
+    font-size: 13px; /* 기본 폰트 작게 */
 }
 
 /* =========================================
    1. 사이드바 (Sidebar)
    ========================================= */
 .sidebar {
-    width: 240px;
+    width: 200px; /* 너비 축소 */
     height: 100%;
-    background-color: var(--bg-sidebar);
+    background-color: #111;
     border-right: 1px solid var(--border-color);
     display: flex;
     flex-direction: column;
@@ -44,56 +48,52 @@ body {
 }
 
 .logo-area {
-    padding: 20px 10px;
-    background-color: #0e0e0e;
+    padding: 15px 10px;
+    background-color: #080808;
     text-align: center;
     border-bottom: 1px solid var(--border-color);
 }
 
 .logo-area h1 {
     margin: 5px 0 0 0;
-    font-size: 1.1rem;
+    font-size: 1rem;
     color: var(--primary-orange);
-    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 .nav-menu {
     flex: 1;
     overflow-y: auto;
-    padding: 10px;
+    padding: 5px;
 }
 
 .nav-category {
     font-size: 0.7rem;
     color: #555;
     text-transform: uppercase;
-    margin: 15px 0 5px 10px;
+    margin: 10px 0 2px 5px;
     font-weight: bold;
 }
 
 .nav-item {
     display: flex;
     align-items: center;
-    padding: 8px 12px;
-    margin-bottom: 2px;
-    border-radius: 4px;
+    padding: 4px 8px; /* 얇게 */
+    margin-bottom: 1px;
     cursor: pointer;
-    transition: 0.2s;
     color: var(--text-muted);
-    font-size: 0.9rem;
+    font-size: 0.85rem;
+    border: 1px solid transparent;
 }
 
 .nav-item:hover, .nav-item.active {
-    background-color: #2c2f33;
-    color: white;
-    border-left: 3px solid var(--primary-orange);
+    background-color: var(--bg-element);
+    color: #fff;
+    border: 1px solid var(--border-color);
 }
 
-.nav-item i {
-    margin-right: 10px;
-    width: 20px;
-    text-align: center;
-}
+.nav-item i { margin-right: 8px; width: 15px; text-align: center; }
 
 /* =========================================
    2. 메인 레이아웃 (Main Layout)
@@ -104,273 +104,251 @@ body {
     flex-direction: column;
     height: 100%;
     overflow: hidden;
-    position: relative;
 }
 
 header {
-    background-color: #1e2124;
+    background-color: #111;
     border-bottom: 1px solid var(--border-color);
-    padding: 0 20px;
+    padding: 0 15px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     flex-shrink: 0;
-    height: 50px; /* 헤더 높이 축소 */
+    height: 40px; /* 헤더 얇게 */
 }
 
-header h2 {
-    margin: 0;
-    font-size: 1rem;
-    font-weight: bold;
-}
+header h2 { margin: 0; font-size: 0.95rem; color: #eee; }
 
-.header-status {
-    font-size: 0.85rem;
-    color: var(--accent-green);
-}
-
-/* 콘텐츠 영역 (스크롤 가능) */
 .content-area {
     flex: 1;
     overflow-y: auto;
-    padding: 15px; /* 패딩 축소 */
-    background-color: #16171a;
+    padding: 10px; /* 패딩 축소 */
+    background-color: var(--bg-main);
 }
 
 /* =========================================
-   3. UI 컴포넌트 (Components)
+   3. 패널 및 레이아웃 (Panels)
    ========================================= */
-
-/* 정보 패널 */
 .info-panel {
     background-color: var(--bg-panel);
-    border-left: 4px solid var(--accent-blue);
-    padding: 10px 15px;
-    margin-bottom: 15px;
-    border-radius: 4px;
+    border: 1px solid var(--border-color);
+    border-left: 3px solid var(--accent-blue);
+    padding: 5px 10px;
+    margin-bottom: 10px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    min-height: 60px;
+    min-height: auto;
 }
 
-.info-text h3 { margin: 0 0 3px 0; font-size: 1rem; }
-.info-text p { margin: 0; font-size: 0.8rem; color: #aaa; }
+.info-text h3 { margin: 0; font-size: 0.9rem; color: #ddd; }
+.info-text p { margin: 0; font-size: 0.75rem; color: #777; }
 
-/* 업그레이드 버튼 (슬림형) */
-#upgrade-btn {
-    width: 100%;
-    padding: 4px 8px;      /* 패딩 대폭 축소 */
-    background-color: var(--accent-green);
-    border: none;
-    color: white;
-    font-weight: bold;
-    font-size: 0.8rem;     /* 글자 크기 축소 */
-    border-radius: 3px;
-    cursor: pointer;
-    line-height: 1.2;      /* 줄 간격 좁힘 */
-}
-#upgrade-btn:hover:not(:disabled) { background-color: #27ae60; }
-#upgrade-btn:disabled { background-color: #444; cursor: not-allowed; opacity: 0.7; }
-
-/* 섹션 타이틀 */
-.section-title {
-    margin-bottom: 10px;
-    font-size: 0.9rem;
-    color: #888;
-    border-bottom: 1px solid #333;
-    padding-bottom: 5px;
-    font-weight: bold;
-}
-
-/* 구획 박스 */
+/* 구획 박스 (이볼브 스타일: 투박한 박스) */
 .action-box {
     background-color: var(--bg-panel);
-    padding: 12px;
-    border-radius: 6px;
     border: 1px solid var(--border-color);
+    padding: 5px; /* 내부 여백 최소화 */
+    margin-bottom: 0;
 }
 
-/* 그리드 레이아웃 */
+.section-title {
+    font-size: 0.75rem;
+    color: #777;
+    background-color: #111;
+    padding: 2px 5px;
+    margin-bottom: 5px;
+    border-bottom: 1px solid var(--border-color);
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
 .action-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 15px;
+    gap: 10px;
 }
 
 /* =========================================
-   4. 자원 카드 (Resource Cards) - 소형화
+   4. 자원 카드 (Resource Cards) - 텍스트 위주
    ========================================= */
 .resource-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); /* 너비 축소 */
-    gap: 8px;
-    margin-bottom: 15px;
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); /* 너비 아주 좁게 */
+    gap: 2px; /* 간격 좁게 */
+    margin-bottom: 10px;
 }
 
 .res-card {
-    background-color: var(--bg-panel);
-    padding: 8px 10px;
-    border-radius: 4px;
+    background-color: var(--bg-element);
     border: 1px solid var(--border-color);
-    position: relative;
+    padding: 4px 6px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    min-height: 80px; /* 높이 축소 */
-    overflow: hidden;
+    min-height: 45px; /* 높이 아주 작게 */
 }
 
-.res-card::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 3px; }
-
-/* 자원별 색상 */
-.res-card.wood::after { background-color: #27ae60; }
-.res-card.stone::after { background-color: #7f8c8d; }
-.res-card.coal::after { background-color: #34495e; }
-.res-card.ironOre::after { background-color: #95a5a6; }
-.res-card.copperOre::after { background-color: #d35400; }
-.res-card.plank::after { background-color: #f39c12; }
-.res-card.brick::after { background-color: #c0392b; }
-.res-card.ironPlate::after { background-color: #bdc3c7; }
-.res-card.copperPlate::after { background-color: #e67e22; }
-.res-card.gear::after { background-color: #7f8c8d; }
-.res-card.circuit::after { background-color: #2ecc71; }
-
-.res-header { display: flex; justify-content: space-between; align-items: center; }
-.res-name { font-size: 0.8rem; color: #aaa; font-weight: bold; white-space: nowrap; }
-.res-amount { font-size: 1.4rem; font-weight: 700; color: #fff; margin: 2px 0; letter-spacing: -0.5px; }
-.res-mps { font-size: 0.7rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.res-header { display: flex; justify-content: space-between; }
+.res-name { font-size: 0.7rem; color: #999; }
+.res-amount { font-size: 1rem; font-weight: bold; color: #fff; margin: 2px 0; }
+.res-mps { font-size: 0.65rem; color: #666; white-space: nowrap; overflow: hidden; }
 
 /* =========================================
-   5. 버튼 및 상점 (Buttons & Shop) - 소형화
+   5. 버튼 및 리스트 (Buttons & Lists) - 핵심!
    ========================================= */
-/* 수동 작업 버튼 */
+
+/* 수동 버튼 (얇은 바 형태) */
 .btn-large {
     width: 100%;
-    height: 36px; /* 높이 고정 */
-    padding: 0 10px;
-    background-color: #2c2f33;
-    border: 1px solid #444;
-    color: white;
-    font-size: 0.85rem;
-    border-radius: 4px;
-    margin-bottom: 5px;
+    height: 26px; /* 높이 고정 (얇게) */
+    padding: 0 8px;
+    background-color: var(--bg-element);
+    border: 1px solid var(--border-color);
+    color: #ccc;
+    font-size: 0.8rem;
+    border-radius: 0; /* 각지게 */
+    margin-bottom: 1px; /* 다닥다닥 */
     cursor: pointer;
-    transition: 0.1s;
     display: flex;
-    justify-content: center;
     align-items: center;
-    gap: 6px;
+    justify-content: flex-start; /* 왼쪽 정렬 */
+    gap: 8px;
+    font-family: inherit;
 }
 
-.btn-large:hover { background-color: #383c42; border-color: var(--accent-green); }
-.btn-large:active { transform: translateY(1px); }
-.hidden { display: none !important; }
+.btn-large:hover { background-color: var(--bg-hover); color: #fff; border-color: #555; }
+.btn-large:active { background-color: #000; }
+.btn-large span { font-size: 0.9rem; } /* 이모지 크기 */
 
-/* 상점 리스트 */
+/* 업그레이드 버튼 */
+#upgrade-btn {
+    width: 100%;
+    padding: 3px 8px;
+    background-color: #1e5a25; /* 어두운 초록 */
+    border: 1px solid #2e7d32;
+    color: #ddd;
+    font-size: 0.8rem;
+    cursor: pointer;
+    border-radius: 0;
+    text-align: center;
+    margin: 0;
+}
+#upgrade-btn:hover:not(:disabled) { background-color: #27ae60; color: #fff; }
+#upgrade-btn:disabled { background-color: #222; border-color: #333; color: #555; }
+
+/* 상점 리스트 (건물/연구) */
 #building-list, #research-list-container {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 5px; /* 간격 축소 */
+    gap: 1px; /* 1px 간격 */
 }
 
+/* 상점 아이템 (행 형태) */
 .shop-item {
-    background-color: #25282c;
-    padding: 4px 8px;      /* 내부 여백을 4px로 줄임 */
-    border-radius: 3px;
+    background-color: var(--bg-element);
+    padding: 3px 8px; /* 패딩 최소화 */
     display: flex;
     justify-content: space-between;
     align-items: center;
     cursor: pointer;
-    border: 1px solid transparent;
-    transition: background 0.1s;
-    min-height: 34px;      /* 최소 높이를 34px로 고정 */
+    border: 1px solid transparent; /* 투명 테두리 */
+    min-height: 28px; /* 높이 얇게 */
 }
 
 .shop-item:hover {
-    background-color: #2c3035;
-    border-color: var(--accent-blue);
+    background-color: var(--bg-hover);
+    border: 1px solid #555;
 }
-/* 건물 이름 */
+
+.shop-item.disabled {
+    opacity: 0.6;
+    background-color: #111;
+    color: #555;
+    cursor: default;
+}
+
+/* JS 인라인 스타일 강제 오버라이드 (중요!) */
 .shop-item strong {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
+    font-weight: normal;
+    color: #ddd;
 }
 
-/* 레벨 표시 (Lv.1) */
-.shop-item span[style*="font-size:0.8em"] {
-    font-size: 0.75rem !important;
+/* 레벨, 설명, 비용 텍스트 조정 */
+.shop-item span, .shop-item small, .shop-item div {
+    font-size: 0.75rem !important; 
 }
 
-/* 상세 설명 (소모/생산 텍스트) */
-.shop-item div[style*="font-size:0.8em"] {
-    font-size: 0.7rem !important; /* 아주 작게 */
-    margin-top: 0 !important;     /* 위쪽 여백 제거 */
-    line-height: 1;               /* 줄 간격 붙이기 */
+/* 설명 부분 (소모/생산) */
+.shop-item div[style*="margin-top"] {
+    margin-top: 0 !important;
     color: #888 !important;
+    display: inline-block;
+    margin-left: 5px;
 }
 
-/* 가격 텍스트 */
+/* 비용 부분 */
 .cost-text {
     font-size: 0.75rem;
-    font-weight: normal; /* 너무 두껍지 않게 */
+    color: var(--primary-orange);
 }
 
-.shop-item.disabled { opacity: 0.5; filter: grayscale(100%); cursor: default; }
-.cost-text { color: var(--primary-orange); font-size: 0.8rem; font-weight: bold; }
+.hidden { display: none !important; }
 
 /* =========================================
-   6. 하단 로그 (Log Area)
+   6. 로그 영역 (Log Area)
    ========================================= */
 .system-log-area {
-    height: 180px; /* 높이 적당히 */
-    background-color: #0d0d0d;
-    border-top: 1px solid var(--primary-orange);
+    height: 150px;
+    background-color: #0a0a0a;
+    border-top: 1px solid var(--border-color);
     display: flex;
     flex-direction: column;
     flex-shrink: 0;
 }
 
 .log-header {
-    background-color: #1a1a1a;
-    padding: 4px 10px;
-    font-size: 0.75rem;
-    color: #777;
-    border-bottom: 1px solid #333;
+    background-color: #111;
+    padding: 2px 10px;
+    font-size: 0.7rem;
+    color: #555;
+    border-bottom: 1px solid var(--border-color);
     font-weight: bold;
-    text-transform: uppercase;
 }
 
 .log-content {
     flex: 1;
     overflow-y: auto;
-    padding: 5px 10px;
+    padding: 0 5px;
     font-family: 'Consolas', monospace;
 }
 
-#game-log-list { list-style: none; padding: 0; margin: 0; }
-
 .log-entry {
-    padding: 2px 0;
-    border-bottom: 1px solid #1a1a1a;
-    font-size: 0.85rem;
-    color: #bbb;
+    padding: 1px 0;
+    border-bottom: none; /* 줄 없음 */
+    font-size: 0.75rem;
+    color: #aaa;
     display: flex;
     gap: 8px;
 }
 
-.log-time { color: #555; min-width: 60px; font-size: 0.75rem; }
-.log-msg { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.log-highlight { color: var(--primary-orange); font-weight: bold; }
+.log-entry:hover { background-color: #111; }
+.log-time { color: #444; min-width: 55px; }
+.log-highlight { color: #f39c12; }
 
-/* 스크롤바 커스텀 */
-::-webkit-scrollbar { width: 8px; height: 8px; }
-::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
-::-webkit-scrollbar-track { background: #0d0d0d; }
+/* 스크롤바 (커스텀) */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-thumb { background: #333; }
+::-webkit-scrollbar-track { background: #0b0b0b; }
 
-/* 반응형 */
+/* =========================================
+   7. 반응형 (Mobile)
+   ========================================= */
 @media (max-width: 768px) {
     body { flex-direction: column; height: auto; overflow: auto; }
     .sidebar { width: 100%; height: auto; }
     .main-wrapper { height: auto; }
-    .system-log-area { height: 150px; }
+    .system-log-area { height: 120px; }
+    .action-grid { grid-template-columns: 1fr; }
 }
