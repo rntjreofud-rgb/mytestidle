@@ -16,18 +16,18 @@
         </div>
         <div class="nav-menu">
             <div class="nav-category">Control Center</div>
-            <!-- 로그 탭 버튼 제거됨, 대시보드만 유지 -->
             <div class="nav-item active" id="nav-dashboard"><i>📊</i> 대시보드</div>
             
-            <div class="nav-category">Logistics</div>
-            <div class="nav-item"><i>⚡</i> 전력 (준비중)</div>
-            <div class="nav-item"><i>🔬</i> 연구 (준비중)</div>
+            <div class="nav-category">Systems</div>
+            <!-- ⭐ 전력, 연구 버튼 활성화 -->
+            <div class="nav-item" id="nav-power"><i>⚡</i> 전력 관리</div>
+            <div class="nav-item" id="nav-research"><i>🔬</i> 기술 연구</div>
         </div>
     </nav>
 
     <div class="main-wrapper">
         <header>
-            <h2 id="house-name">Lv.0 야영지</h2>
+            <h2 id="header-title">Lv.0 야영지</h2> <!-- ID 변경 -->
             <div class="header-status">
                 <span id="message-log">시스템 가동.</span>
             </div>
@@ -36,46 +36,88 @@
             </div>
         </header>
 
-        <!-- 메인 콘텐츠 (위쪽 영역) -->
+        <!-- 메인 콘텐츠 영역 (여기에 탭 내용들이 들어감) -->
         <main class="content-area">
             
-            <div class="info-panel">
-                <div class="info-text">
-                    <h3 id="house-desc">지구 탈출 프로젝트</h3>
-                    <p>자원을 모아 우주선을 건조하고 지구를 떠나세요.</p>
+            <!-- 1. 대시보드 뷰 -->
+            <div id="view-dashboard">
+                <div class="info-panel">
+                    <div class="info-text">
+                        <h3 id="house-desc">지구 탈출 프로젝트</h3>
+                        <p>자원을 모아 우주선을 건조하고 지구를 떠나세요.</p>
+                    </div>
+                    <div style="width: 250px;">
+                        <button id="upgrade-btn">⬆️ 업그레이드</button>
+                    </div>
                 </div>
-                <div style="width: 250px;">
-                    <button id="upgrade-btn">⬆️ 업그레이드</button>
+
+                <div class="section-title">📦 자원 창고 (Inventory)</div>
+                <div class="resource-grid"></div>
+
+                <div class="action-grid">
+                    <div class="action-box">
+                        <div class="section-title">🖐️ 수동 작업</div>
+                        <div style="display: flex; flex-direction: column; gap: 10px;">
+                            <button id="btn-gather-wood" class="btn-large">🌲 나무 베기</button>
+                            <button id="btn-gather-stone" class="btn-large hidden">🪨 돌 캐기</button>
+                            <button id="btn-craft-plank" class="btn-large hidden" style="border-color:#f39c12">🪚 판자 깎기 (나무 -2)</button>
+                            <button id="btn-gather-iron" class="btn-large hidden">⚙️ 철광석 캐기</button>
+                            <button id="btn-gather-copper" class="btn-large hidden">🥉 구리광석 캐기</button>
+                        </div>
+                    </div>
+                    <div class="action-box">
+                        <div class="section-title">🏭 공장 건설 (Automation)</div>
+                        <div id="building-list"></div>
+                    </div>
                 </div>
             </div>
 
-            <div class="section-title">📦 자원 창고 (Inventory)</div>
-            <div class="resource-grid"></div>
-
-            <div class="action-grid">
-                <div class="action-box">
-                    <div class="section-title">🖐️ 수동 작업</div>
-                    <div style="display: flex; flex-direction: column; gap: 10px;">
-                        <button id="btn-gather-wood" class="btn-large">🌲 나무 베기</button>
-                        <button id="btn-gather-stone" class="btn-large hidden">🪨 돌 캐기</button>
-                        <button id="btn-craft-plank" class="btn-large hidden" style="border-color:#f39c12">🪚 판자 깎기 (나무 -2)</button>
-                        <button id="btn-gather-iron" class="btn-large hidden">⚙️ 철광석 캐기</button>
-                        <button id="btn-gather-copper" class="btn-large hidden">🥉 구리광석 캐기</button>
+            <!-- ⭐ 2. 전력 뷰 (신규) -->
+            <div id="view-power" class="hidden">
+                <div class="section-title">⚡ 전력 네트워크 (Power Grid)</div>
+                <div class="info-panel" style="border-left-color: #f1c40f;">
+                    <div class="info-text">
+                        <h3>발전 현황</h3>
+                        <p>공장을 가동하기 위해 전력을 생산하세요. (개발 중)</p>
+                    </div>
+                    <div style="text-align: right;">
+                        <h2 style="margin:0; color:#f1c40f;">0 MW</h2>
+                        <small>생산량</small>
                     </div>
                 </div>
                 <div class="action-box">
-                    <div class="section-title">🏭 공장 건설 (Automation)</div>
-                    <div id="building-list"></div>
+                    <div class="section-title">발전소 건설</div>
+                    <div style="padding:20px; text-align:center; color:#777;">
+                        아직 건설 가능한 발전소가 없습니다.
+                    </div>
                 </div>
             </div>
+
+            <!-- ⭐ 3. 연구 뷰 (신규) -->
+            <div id="view-research" class="hidden">
+                <div class="section-title">🔬 기술 연구 (Research Tree)</div>
+                <div class="info-panel" style="border-left-color: #9b59b6;">
+                    <div class="info-text">
+                        <h3>연구소</h3>
+                        <p>자원을 소모하여 새로운 기술을 잠금 해제하세요.</p>
+                    </div>
+                </div>
+                <div class="action-box">
+                    <div class="section-title">연구 목록</div>
+                    <div style="padding:20px; text-align:center; color:#777;">
+                        연구 데이터가 부족합니다.
+                    </div>
+                </div>
+            </div>
+
         </main>
 
-        <!-- ⭐ [신규] 화면 하단 고정 로그 영역 -->
+        <!-- ⭐ 하단 로그 영역 (스크롤 가능) -->
         <section class="system-log-area">
             <div class="log-header">📜 System Log</div>
             <div class="log-content">
                 <ul id="game-log-list">
-                    <!-- 로그가 여기에 쌓임 -->
+                    <!-- 로그 쌓이는 곳 -->
                 </ul>
             </div>
         </section>

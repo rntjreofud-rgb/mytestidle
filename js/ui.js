@@ -3,12 +3,22 @@
 import { gameData, houseStages } from './data.js';
 
 const elements = {
-    // 로그 리스트 (하단)
+    // 뷰(View) 요소들
+    viewDashboard: document.getElementById('view-dashboard'),
+    viewPower: document.getElementById('view-power'),
+    viewResearch: document.getElementById('view-research'),
+    
+    // 네비게이션 버튼들
+    navDashboard: document.getElementById('nav-dashboard'),
+    navPower: document.getElementById('nav-power'),
+    navResearch: document.getElementById('nav-research'),
+
+    // 로그 리스트
     logList: document.getElementById('game-log-list'),
 
-    // 기존 요소들
+    // 기타 요소
     resGrid: document.querySelector('.resource-grid'),
-    houseName: document.getElementById('house-name'),
+    houseName: document.getElementById('header-title'), // ID 변경됨에 주의
     houseDesc: document.getElementById('house-desc'),
     upgradeBtn: document.getElementById('upgrade-btn'),
     btns: {
@@ -40,33 +50,46 @@ function formatNumber(num) {
     return shortValue + suffixes[suffixNum - 1];
 }
 
-// ⭐ 로그 출력 함수
+// ⭐ [신규] 탭 전환 함수
+export function switchTab(tabName) {
+    // 1. 모든 뷰 숨김
+    if(elements.viewDashboard) elements.viewDashboard.classList.add('hidden');
+    if(elements.viewPower) elements.viewPower.classList.add('hidden');
+    if(elements.viewResearch) elements.viewResearch.classList.add('hidden');
+    
+    // 2. 모든 버튼 비활성화
+    if(elements.navDashboard) elements.navDashboard.classList.remove('active');
+    if(elements.navPower) elements.navPower.classList.remove('active');
+    if(elements.navResearch) elements.navResearch.classList.remove('active');
+
+    // 3. 선택된 탭 활성화
+    if (tabName === 'dashboard') {
+        elements.viewDashboard.classList.remove('hidden');
+        elements.navDashboard.classList.add('active');
+    } else if (tabName === 'power') {
+        elements.viewPower.classList.remove('hidden');
+        elements.navPower.classList.add('active');
+    } else if (tabName === 'research') {
+        elements.viewResearch.classList.remove('hidden');
+        elements.navResearch.classList.add('active');
+    }
+}
+
 export function log(msg, isImportant = false) {
-    // 1. 헤더 메시지 (잠깐 떴다 사라짐)
     if(elements.headerLog) {
         elements.headerLog.innerText = msg;
         elements.headerLog.style.opacity = 1;
         setTimeout(() => { elements.headerLog.style.opacity = 0.5; }, 3000);
     }
-
-    // 2. 하단 로그창에 쌓기
     if(elements.logList) {
         const li = document.createElement('li');
         li.className = 'log-entry';
-        
-        const time = new Date().toLocaleTimeString('ko-KR', { hour12: false, hour: '2-digit', minute:'2-digit', second:'2-digit' });
+        const time = new Date().toLocaleTimeString('ko-KR', { hour12: false });
         const contentClass = isImportant ? 'log-msg log-highlight' : 'log-msg';
+        li.innerHTML = `<span class="log-time">${time}</span><span class="${contentClass}">${msg}</span>`;
         
-        li.innerHTML = `
-            <span class="log-time">${time}</span>
-            <span class="${contentClass}">${msg}</span>
-        `;
-        
-        // 최신 메시지를 맨 위에 추가 (prepend)
-        // 만약 최신 메시지가 맨 아래로 가길 원하면 append로 바꾸세요
         elements.logList.prepend(li);
         
-        // 로그 50개 제한
         if (elements.logList.children.length > 50) {
             elements.logList.removeChild(elements.logList.lastChild);
         }
@@ -109,16 +132,9 @@ function createResourceCard(key) {
     div.className = `res-card ${key}`;
     div.id = `card-${key}`;
     div.innerHTML = `
-        <div class="res-header">
-            <span class="res-name">${resNames[key] || key}</span>
-        </div>
-        <div class="res-body">
-            <span style="font-size:0.8rem; color:#aaa; display:block;">현재 보유</span>
-            <h3 class="res-amount">0</h3>
-        </div>
-        <div class="res-footer">
-            <small class="res-mps">+0.0 /초</small>
-        </div>
+        <div class="res-header"><span class="res-name">${resNames[key] || key}</span></div>
+        <div class="res-body"><span style="font-size:0.7rem; color:#666;">보유</span><h3 class="res-amount">0</h3></div>
+        <div class="res-footer"><small class="res-mps">+0.0/s</small></div>
     `;
     return div;
 }
@@ -150,10 +166,7 @@ export function renderShop(onBuyCallback, getCostFunc) {
         div.id = `build-${index}`;
         
         const cost = getCostFunc(b);
-        let costTxt = Object.entries(cost)
-            .map(([k, v]) => `${formatNumber(v)} ${resNames[k].split(' ')[1]}`)
-            .join(', ');
-
+        let costTxt = Object.entries(cost).map(([k, v]) => `${formatNumber(v)} ${resNames[k].split(' ')[1]}`).join(', ');
         let processTxt = "";
         if (b.inputs) {
             let inTxt = Object.entries(b.inputs).map(([k,v]) => `${v} ${resNames[k].split(' ')[1]}`).join(',');
@@ -166,14 +179,11 @@ export function renderShop(onBuyCallback, getCostFunc) {
 
         div.innerHTML = `
             <div style="flex:1;">
-                <div style="font-weight:bold; font-size:1.05em;">${b.name} <span style="font-size:0.8em; color:#f39c12;">(Lv.${b.count})</span></div>
-                <div style="font-size:0.85em; margin-top:5px; color:#ddd;">${processTxt}</div>
+                <div style="font-weight:bold; font-size:1em;">${b.name} <span style="font-size:0.8em; color:#f39c12;">(Lv.${b.count})</span></div>
+                <div style="font-size:0.8em; margin-top:3px; color:#999;">${processTxt}</div>
             </div>
-            <div style="text-align:right; font-size:0.9em;">
-                <span class="cost-text">${costTxt}</span>
-            </div>
+            <div style="text-align:right; font-size:0.9em;"><span class="cost-text">${costTxt}</span></div>
         `;
-        
         div.onclick = () => onBuyCallback(index);
         elements.buildingList.appendChild(div);
     });
@@ -199,25 +209,21 @@ export function updateHouseUI(onUpgrade) {
     const nextStage = houseStages[gameData.houseLevel + 1];
     const currentStage = houseStages[gameData.houseLevel];
 
-    elements.houseName.innerText = `🏡 Lv.${gameData.houseLevel} ${currentStage.name}`;
-    elements.houseDesc.innerText = currentStage.desc;
+    if(elements.houseName) elements.houseName.innerText = `Lv.${gameData.houseLevel} ${currentStage.name}`;
+    if(elements.houseDesc) elements.houseDesc.innerText = currentStage.desc;
 
     if (nextStage) {
         const req = nextStage.req;
-        const reqTxt = Object.entries(req)
-            .map(([k,v]) => `${resNames[k].split(' ')[1]} ${formatNumber(v)}`)
-            .join(', ');
-        
-        elements.upgradeBtn.innerText = `⬆️ 진화: ${nextStage.name} (${reqTxt})`;
+        const reqTxt = Object.entries(req).map(([k,v]) => `${resNames[k].split(' ')[1]} ${formatNumber(v)}`).join(', ');
+        elements.upgradeBtn.innerText = `⬆️ ${nextStage.name} (${reqTxt})`;
         elements.upgradeBtn.onclick = () => onUpgrade(nextStage);
-        
         let canUp = true;
         for(let k in req) {
             if((gameData.resources[k] || 0) < req[k]) canUp = false;
         }
         elements.upgradeBtn.disabled = !canUp;
     } else {
-        elements.upgradeBtn.innerText = "🚀 우주 진출 성공!";
+        elements.upgradeBtn.innerText = "🚀 완료";
         elements.upgradeBtn.disabled = true;
     }
 }

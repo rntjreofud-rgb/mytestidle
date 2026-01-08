@@ -12,19 +12,18 @@ function init() {
     UI.renderShop(handleBuyBuilding, Logic.getBuildingCost);
     UI.updateHouseUI(handleHouseUpgrade);
     
-    UI.log("시스템 로드 완료. Escape Earth 가동 시작.");
-
+    UI.log("시스템 가동. 지구 탈출 시퀀스 준비.");
     requestAnimationFrame(gameLoop);
-
-    setInterval(() => {
-        Storage.saveGame();
-    }, 10000);
+    setInterval(() => Storage.saveGame(), 10000);
 }
 
 function setupEvents() {
-    // 탭 이벤트 삭제됨 (이제 로그는 항상 보임)
+    // ⭐ 탭 버튼 이벤트 연결
+    if(UI.uiElements.navDashboard) UI.uiElements.navDashboard.addEventListener('click', () => UI.switchTab('dashboard'));
+    if(UI.uiElements.navPower) UI.uiElements.navPower.addEventListener('click', () => UI.switchTab('power'));
+    if(UI.uiElements.navResearch) UI.uiElements.navResearch.addEventListener('click', () => UI.switchTab('research'));
 
-    // 자원 버튼 연결
+    // 자원 채집 버튼
     UI.uiElements.btns.wood.addEventListener('click', () => handleGather('wood'));
     UI.uiElements.btns.stone.addEventListener('click', () => handleGather('stone'));
     UI.uiElements.btns.ironOre.addEventListener('click', () => handleGather('ironOre'));
@@ -33,8 +32,7 @@ function setupEvents() {
 }
 
 function handleGather(type) {
-    const success = Logic.manualGather(type);
-    if (success) {
+    if (Logic.manualGather(type)) {
         UI.updateScreen(Logic.calculateNetMPS());
         const btn = UI.uiElements.btns[type];
         if(btn) {
@@ -42,31 +40,30 @@ function handleGather(type) {
             setTimeout(() => btn.style.transform = "scale(1)", 50);
         }
     } else {
-        UI.log("재료가 부족합니다.");
+        UI.log("작업 불가: 재료 부족 또는 도구 필요");
     }
 }
 
 function handleBuyBuilding(index) {
     if (Logic.tryBuyBuilding(index)) {
-        UI.log(`[건설] ${gameData.buildings[index].name} 건설 완료.`);
+        UI.log(`[건설] ${gameData.buildings[index].name} 가동 시작.`);
         UI.renderShop(handleBuyBuilding, Logic.getBuildingCost); 
     } else {
-        UI.log("자원이 부족합니다.");
+        UI.log("자원이 부족하여 건설할 수 없습니다.");
     }
 }
 
 function handleHouseUpgrade(nextStage) {
     if (Logic.tryUpgradeHouse(nextStage)) {
-        UI.log(`🎉 기술 발전 성공! [${nextStage.name}] 단계로 진입했습니다.`, true);
-        
+        UI.log(`🎉 기술 발전 성공: [${nextStage.name}]`, true);
         UI.updateHouseUI(handleHouseUpgrade);
         if(gameData.houseLevel >= houseStages.length - 1) {
-            UI.log("🚀 우주 진출 조건 달성! 엔딩 시퀀스 시작.", true);
-            alert("엔딩: 행성 탈출 성공!");
+            UI.log("🚀 엔딩 조건 달성! 탈출 프로세스 개시.", true);
+            alert("지구 탈출 성공!");
             Storage.resetGame();
         }
     } else {
-        UI.log("업그레이드 자원이 부족합니다.");
+        UI.log("업그레이드 자원 부족");
     }
 }
 
