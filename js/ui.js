@@ -84,25 +84,31 @@ function createResourceCard(key) {
 // ⭐ [수정됨] 잠금 해제 체크 로직
 function checkUnlocks() {
     const lv = gameData.houseLevel;
+    // 안전장치: 자원이 undefined일 경우 0으로 처리
     const woodCount = gameData.resources.wood || 0;
     
-    // 1. 돌, 판자 버튼: 레벨 1 이상이거나 OR 나무를 10개 이상 모았으면 해금
-    // (이미 400개가 넘으셨으니 바로 보일 겁니다)
+    // ⭐ [핵심 수정] 레벨이 1 이상이거나 '또는(OR)' 나무가 10개 이상이면 보임
     if (lv >= 1 || woodCount >= 10) {
-        elements.btns.stone.classList.remove('hidden');
-        elements.btns.plank.classList.remove('hidden');
+        if(elements.btns.stone) elements.btns.stone.classList.remove('hidden');
+        if(elements.btns.plank) elements.btns.plank.classList.remove('hidden');
     } else {
-        elements.btns.stone.classList.add('hidden');
-        elements.btns.plank.classList.add('hidden');
+        if(elements.btns.stone) elements.btns.stone.classList.add('hidden');
+        if(elements.btns.plank) elements.btns.plank.classList.add('hidden');
     }
 
-    // 2. 철광석 (레벨 2 이상)
-    if (lv >= 2) elements.btns.ironOre.classList.remove('hidden');
-    else elements.btns.ironOre.classList.add('hidden');
+    // 철광석
+    if (lv >= 2) {
+        if(elements.btns.ironOre) elements.btns.ironOre.classList.remove('hidden');
+    } else {
+        if(elements.btns.ironOre) elements.btns.ironOre.classList.add('hidden');
+    }
 
-    // 3. 구리광석 (레벨 3 이상)
-    if (lv >= 3) elements.btns.copperOre.classList.remove('hidden');
-    else elements.btns.copperOre.classList.add('hidden');
+    // 구리광석
+    if (lv >= 3) {
+        if(elements.btns.copperOre) elements.btns.copperOre.classList.remove('hidden');
+    } else {
+        if(elements.btns.copperOre) elements.btns.copperOre.classList.add('hidden');
+    }
 }
 
 export function renderShop(onBuyCallback, getCostFunc) {
@@ -186,5 +192,10 @@ export function updateHouseUI(onUpgrade) {
         elements.upgradeBtn.disabled = true;
     }
 }
+
+
+
+
+
 
 export const uiElements = elements;
