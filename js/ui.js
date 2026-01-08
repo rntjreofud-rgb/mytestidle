@@ -24,6 +24,21 @@ const resNames = {
     gear: "⚙️ 톱니", circuit: "📟 회로"
 };
 
+// ⭐ [신규 기능] 숫자 포맷팅 함수 (k, m, b, t)
+function formatNumber(num) {
+    if (num == null) return "0";
+    if (num < 1000) return Math.floor(num).toLocaleString(); // 1,000 미만은 그대로
+
+    const suffixes = ["k", "m", "b", "t", "q"];
+    const suffixNum = Math.floor(("" + Math.floor(num)).length / 3);
+    
+    let shortValue = parseFloat((suffixNum != 0 ? (num / Math.pow(1000, suffixNum)) : num).toPrecision(3));
+    if (shortValue % 1 != 0) {
+        shortValue = shortValue.toFixed(1);
+    }
+    return shortValue + suffixes[suffixNum - 1];
+}
+
 export function log(msg) {
     if(elements.log) {
         elements.log.innerText = msg;
@@ -43,19 +58,23 @@ export function updateScreen(netMPS) {
         const val = gameData.resources[key] || 0;
         const mps = netMPS[key] || 0;
         
+        // ⭐ 포맷팅 적용
         const amountEl = card.querySelector('.res-amount');
-        amountEl.innerText = Math.floor(val).toLocaleString();
+        amountEl.innerText = formatNumber(val); // 여기서 k, m 변환
         
         const mpsEl = card.querySelector('.res-mps');
-        mpsEl.innerText = `${mps > 0 ? '▲' : ''}${mps.toFixed(1)} /초`;
+        // 생산량도 너무 크면 포맷팅
+        let mpsText = Math.abs(mps) < 1000 ? Math.abs(mps).toFixed(1) : formatNumber(Math.abs(mps));
         
         if(mps < 0) {
             mpsEl.style.color = "#e74c3c";
-            mpsEl.innerText = `▼ ${Math.abs(mps).toFixed(1)} /초`;
+            mpsEl.innerText = `▼ ${mpsText} /s`;
         } else if(mps > 0) {
             mpsEl.style.color = "#2ecc71";
+            mpsEl.innerText = `▲ ${mpsText} /s`;
         } else {
             mpsEl.style.color = "#7f8c8d";
+            mpsEl.innerText = `+0.0 /s`;
         }
     }
 
@@ -81,13 +100,11 @@ function createResourceCard(key) {
     return div;
 }
 
-// ⭐ [수정됨] 잠금 해제 체크 로직
 function checkUnlocks() {
     const lv = gameData.houseLevel;
-    // 안전장치: 자원이 undefined일 경우 0으로 처리
     const woodCount = gameData.resources.wood || 0;
     
-    // ⭐ [핵심 수정] 레벨이 1 이상이거나 '또는(OR)' 나무가 10개 이상이면 보임
+    // 나무 10개 or 레벨1 이상이면 해금 (수정된 로직 유지)
     if (lv >= 1 || woodCount >= 10) {
         if(elements.btns.stone) elements.btns.stone.classList.remove('hidden');
         if(elements.btns.plank) elements.btns.plank.classList.remove('hidden');
@@ -96,19 +113,11 @@ function checkUnlocks() {
         if(elements.btns.plank) elements.btns.plank.classList.add('hidden');
     }
 
-    // 철광석
-    if (lv >= 2) {
-        if(elements.btns.ironOre) elements.btns.ironOre.classList.remove('hidden');
-    } else {
-        if(elements.btns.ironOre) elements.btns.ironOre.classList.add('hidden');
-    }
+    if (lv >= 2) { if(elements.btns.ironOre) elements.btns.ironOre.classList.remove('hidden'); }
+    else { if(elements.btns.ironOre) elements.btns.ironOre.classList.add('hidden'); }
 
-    // 구리광석
-    if (lv >= 3) {
-        if(elements.btns.copperOre) elements.btns.copperOre.classList.remove('hidden');
-    } else {
-        if(elements.btns.copperOre) elements.btns.copperOre.classList.add('hidden');
-    }
+    if (lv >= 3) { if(elements.btns.copperOre) elements.btns.copperOre.classList.remove('hidden'); }
+    else { if(elements.btns.copperOre) elements.btns.copperOre.classList.add('hidden'); }
 }
 
 export function renderShop(onBuyCallback, getCostFunc) {
@@ -119,8 +128,9 @@ export function renderShop(onBuyCallback, getCostFunc) {
         div.id = `build-${index}`;
         
         const cost = getCostFunc(b);
+        // 비용에도 포맷팅 적용
         let costTxt = Object.entries(cost)
-            .map(([k, v]) => `${v} ${resNames[k].split(' ')[1]}`)
+            .map(([k, v]) => `${formatNumber(v)} ${resNames[k].split(' ')[1]}`)
             .join(', ');
 
         let processTxt = "";
@@ -153,13 +163,11 @@ export function updateShopButtons(getCostFunc) {
     gameData.buildings.forEach((b, index) => {
         const div = document.getElementById(`build-${index}`);
         if(!div) return;
-
         const cost = getCostFunc(b);
         let canBuy = true;
         for(let k in cost) {
             if((gameData.resources[k] || 0) < cost[k]) canBuy = false;
         }
-        
         if (canBuy) div.classList.remove('disabled');
         else div.classList.add('disabled');
     });
@@ -175,8 +183,9 @@ export function updateHouseUI(onUpgrade) {
 
     if (nextStage) {
         const req = nextStage.req;
+        // 업그레이드 비용에도 포맷팅 적용
         const reqTxt = Object.entries(req)
-            .map(([k,v]) => `${resNames[k].split(' ')[1]} ${v}`)
+            .map(([k,v]) => `${resNames[k].split(' ')[1]} ${formatNumber(v)}`)
             .join(', ');
         
         elements.upgradeBtn.innerText = `⬆️ 진화: ${nextStage.name} (${reqTxt})`;
@@ -192,10 +201,5 @@ export function updateHouseUI(onUpgrade) {
         elements.upgradeBtn.disabled = true;
     }
 }
-
-
-
-
-
 
 export const uiElements = elements;
