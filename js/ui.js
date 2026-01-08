@@ -1,5 +1,3 @@
-// js/ui.js
-
 import { gameData, houseStages } from './data.js';
 
 const elements = {
@@ -35,43 +33,35 @@ export function log(msg) {
 }
 
 export function updateScreen(netMPS) {
-    // 자원 루프
     for (let key in gameData.resources) {
         let card = document.getElementById(`card-${key}`);
-        
-        // 카드가 없으면 새로 생성
         if (!card) {
             card = createResourceCard(key);
             elements.resGrid.appendChild(card);
         }
         
-        // 값 업데이트
-        const val = gameData.resources[key] || 0; // 안전장치
+        const val = gameData.resources[key] || 0;
         const mps = netMPS[key] || 0;
         
-        // ⭐ 보유량 텍스트 업데이트 (명확하게 표시)
         const amountEl = card.querySelector('.res-amount');
         amountEl.innerText = Math.floor(val).toLocaleString();
         
-        // 생산량 텍스트 업데이트
         const mpsEl = card.querySelector('.res-mps');
         mpsEl.innerText = `${mps > 0 ? '▲' : ''}${mps.toFixed(1)} /초`;
         
-        // 생산량 색상 처리
         if(mps < 0) {
-            mpsEl.style.color = "#e74c3c"; // 빨강 (감소 중)
+            mpsEl.style.color = "#e74c3c";
             mpsEl.innerText = `▼ ${Math.abs(mps).toFixed(1)} /초`;
         } else if(mps > 0) {
-            mpsEl.style.color = "#2ecc71"; // 초록 (증가 중)
+            mpsEl.style.color = "#2ecc71";
         } else {
-            mpsEl.style.color = "#7f8c8d"; // 회색 (변화 없음)
+            mpsEl.style.color = "#7f8c8d";
         }
     }
 
     checkUnlocks();
 }
 
-// ⭐ 카드 생성 HTML 구조 변경
 function createResourceCard(key) {
     const div = document.createElement('div');
     div.className = `res-card ${key}`;
@@ -91,11 +81,14 @@ function createResourceCard(key) {
     return div;
 }
 
+// ⭐ [수정됨] 잠금 해제 체크 로직
 function checkUnlocks() {
     const lv = gameData.houseLevel;
+    const woodCount = gameData.resources.wood || 0;
     
-    // 버튼 숨김/보임 처리
-    if (lv >= 1) {
+    // 1. 돌, 판자 버튼: 레벨 1 이상이거나 OR 나무를 10개 이상 모았으면 해금
+    // (이미 400개가 넘으셨으니 바로 보일 겁니다)
+    if (lv >= 1 || woodCount >= 10) {
         elements.btns.stone.classList.remove('hidden');
         elements.btns.plank.classList.remove('hidden');
     } else {
@@ -103,9 +96,11 @@ function checkUnlocks() {
         elements.btns.plank.classList.add('hidden');
     }
 
+    // 2. 철광석 (레벨 2 이상)
     if (lv >= 2) elements.btns.ironOre.classList.remove('hidden');
     else elements.btns.ironOre.classList.add('hidden');
 
+    // 3. 구리광석 (레벨 3 이상)
     if (lv >= 3) elements.btns.copperOre.classList.remove('hidden');
     else elements.btns.copperOre.classList.add('hidden');
 }
