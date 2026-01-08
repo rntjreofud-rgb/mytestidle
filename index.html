@@ -1,0 +1,62 @@
+﻿<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Civilization Idle: Modular</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚀 문명 발전: 지구에서 우주로</h1>
+            <p>모듈화된 시스템으로 더 복잡한 문명을 만드세요.</p>
+        </header>
+
+        <section class="resources-panel">
+            <div class="res-box wood">
+                <span>🌲 나무</span>
+                <h3 id="res-wood">0</h3>
+                <small id="mps-wood">+0/초</small>
+            </div>
+            <div class="res-box stone">
+                <span>🪨 돌</span>
+                <h3 id="res-stone">0</h3>
+                <small id="mps-stone">+0/초</small>
+            </div>
+            <div class="res-box iron">
+                <span>⚙️ 철</span>
+                <h3 id="res-iron">0</h3>
+                <small id="mps-iron">+0/초</small>
+            </div>
+        </section>
+
+        <section class="main-house-area">
+            <div class="house-info">
+                <h2 id="house-name">⛺ 레벨 0: 텐트</h2>
+                <p id="house-desc">설명</p>
+            </div>
+            <button id="upgrade-btn">⬆️ 업그레이드</button>
+        </section>
+
+        <section class="action-area">
+            <h3>⛏️ 수동 채집</h3>
+            <div class="buttons-grid">
+                <button id="btn-gather-wood" class="gather-btn">🌲 나무 베기</button>
+                <button id="btn-gather-stone" class="gather-btn locked">🪨 돌 캐기</button>
+                <button id="btn-gather-iron" class="gather-btn locked">⚙️ 철광석 캐기</button>
+            </div>
+        </section>
+
+        <section class="shop-area">
+            <h3>🏭 생산 시설 건설</h3>
+            <div id="building-list"></div>
+        </section>
+
+        <div id="message-log">시스템 준비 완료.</div>
+    </div>
+
+    <!-- type="module"이 중요합니다 -->
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>
