@@ -39,7 +39,7 @@
         <!-- 메인 콘텐츠 영역 (여기에 탭 내용들이 들어감) -->
         <main class="content-area">
             
-            <!-- 1. 대시보드 뷰 -->
+             <!-- 대시보드 뷰 -->
             <div id="view-dashboard">
                 <div class="info-panel">
                     <div class="info-text">
@@ -59,6 +59,8 @@
                         <div class="section-title">🖐️ 수동 작업</div>
                         <div style="display: flex; flex-direction: column; gap: 10px;">
                             <button id="btn-gather-wood" class="btn-large">🌲 나무 베기</button>
+                            <!-- ⭐ 석탄 추가됨 -->
+                            <button id="btn-gather-coal" class="btn-large hidden" style="border-color:#555;">⚫ 석탄 캐기</button>
                             <button id="btn-gather-stone" class="btn-large hidden">🪨 돌 캐기</button>
                             <button id="btn-craft-plank" class="btn-large hidden" style="border-color:#f39c12">🪚 판자 깎기 (나무 -2)</button>
                             <button id="btn-gather-iron" class="btn-large hidden">⚙️ 철광석 캐기</button>
@@ -72,53 +74,55 @@
                 </div>
             </div>
 
-            <!-- ⭐ 2. 전력 뷰 (신규) -->
+            <!-- ⭐ 2. 전력 뷰 (업데이트됨) -->
             <div id="view-power" class="hidden">
                 <div class="section-title">⚡ 전력 네트워크 (Power Grid)</div>
-                <div class="info-panel" style="border-left-color: #f1c40f;">
-                    <div class="info-text">
-                        <h3>발전 현황</h3>
-                        <p>공장을 가동하기 위해 전력을 생산하세요. (개발 중)</p>
+                
+                <!-- 전력 현황판 -->
+                <div class="info-panel" style="border-left-color: #f1c40f; flex-direction:column; align-items:stretch;">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                        <div>
+                            <h3 style="margin:0;">메인 전력망</h3>
+                            <small style="color:#aaa;">효율이 100% 미만이면 공장 가동이 느려집니다.</small>
+                        </div>
+                        <div style="text-align: right;" id="power-display-text">
+                            <span style="color:#2ecc71">0 MW</span> 생산 / <span style="color:#e74c3c">0 MW</span> 소비
+                        </div>
                     </div>
-                    <div style="text-align: right;">
-                        <h2 style="margin:0; color:#f1c40f;">0 MW</h2>
-                        <small>생산량</small>
+                    <!-- 게이지 바 배경 -->
+                    <div style="width:100%; height:20px; background:#333; border-radius:10px; overflow:hidden;">
+                        <!-- 게이지 바 채움 -->
+                        <div id="power-fill-bar" style="width: 0%; height:100%; background:#2ecc71; transition: width 0.3s, background 0.3s;"></div>
                     </div>
                 </div>
+
                 <div class="action-box">
-                    <div class="section-title">발전소 건설</div>
-                    <div style="padding:20px; text-align:center; color:#777;">
-                        아직 건설 가능한 발전소가 없습니다.
-                    </div>
+                    <div class="section-title">발전소 현황</div>
+                    <p style="color:#777; font-size:0.9rem;">
+                        발전소는 [대시보드 > 공장 건설] 탭에서 건설할 수 있습니다.<br>
+                        석탄 채굴기 등 전력 설비를 건설하면 자동으로 이 화면에 집계됩니다.
+                    </p>
                 </div>
             </div>
 
-            <!-- ⭐ 3. 연구 뷰 (신규) -->
+            <!-- 3. 연구 뷰 (기존 유지) -->
             <div id="view-research" class="hidden">
                 <div class="section-title">🔬 기술 연구 (Research Tree)</div>
                 <div class="info-panel" style="border-left-color: #9b59b6;">
                     <div class="info-text">
                         <h3>연구소</h3>
-                        <p>자원을 소모하여 새로운 기술을 잠금 해제하세요.</p>
-                    </div>
-                </div>
-                <div class="action-box">
-                    <div class="section-title">연구 목록</div>
-                    <div style="padding:20px; text-align:center; color:#777;">
-                        연구 데이터가 부족합니다.
+                        <p>준비 중인 기능입니다.</p>
                     </div>
                 </div>
             </div>
 
         </main>
-
-        <!-- ⭐ 하단 로그 영역 (스크롤 가능) -->
+        
+        <!-- 하단 로그 (기존 유지) -->
         <section class="system-log-area">
             <div class="log-header">📜 System Log</div>
             <div class="log-content">
-                <ul id="game-log-list">
-                    <!-- 로그 쌓이는 곳 -->
-                </ul>
+                <ul id="game-log-list"></ul>
             </div>
         </section>
 

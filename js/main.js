@@ -18,14 +18,16 @@ function init() {
 }
 
 function setupEvents() {
-    // ⭐ 탭 버튼 이벤트 연결
     if(UI.uiElements.navDashboard) UI.uiElements.navDashboard.addEventListener('click', () => UI.switchTab('dashboard'));
     if(UI.uiElements.navPower) UI.uiElements.navPower.addEventListener('click', () => UI.switchTab('power'));
     if(UI.uiElements.navResearch) UI.uiElements.navResearch.addEventListener('click', () => UI.switchTab('research'));
 
-    // 자원 채집 버튼
+    // 자원 버튼
     UI.uiElements.btns.wood.addEventListener('click', () => handleGather('wood'));
     UI.uiElements.btns.stone.addEventListener('click', () => handleGather('stone'));
+    // ⭐ 석탄 추가됨
+    if(UI.uiElements.btns.coal) UI.uiElements.btns.coal.addEventListener('click', () => handleGather('coal'));
+    
     UI.uiElements.btns.ironOre.addEventListener('click', () => handleGather('ironOre'));
     UI.uiElements.btns.copperOre.addEventListener('click', () => handleGather('copperOre'));
     UI.uiElements.btns.plank.addEventListener('click', () => handleGather('plank'));
