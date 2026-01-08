@@ -83,16 +83,16 @@ header h2 { margin: 0; font-size: 1rem; color: #fff; }
 .res-card.circuit::after { background-color: #2ecc71; }
 
 /* =========================================
-   5. 버튼 및 그리드 (넓이 우선 확보 + 겹침 방지)
+   5. 버튼 및 그리드 (충돌 방지 구역 설정)
    ========================================= */
 
-/* 1. 그리드 레이아웃: 4개 고정 X -> 최소 너비 300px 확보 O */
+/* 1. 그리드 레이아웃: 무조건 4열(4x) + 최소 너비 보장 */
 .action-box > div, 
 #building-list, 
 #research-list-container, 
 .action-grid {
     display: grid !important;
-    /* ⭐ 핵심 수정: 버튼 하나당 최소 300px은 무조건 확보. 공간 남으면 늘어남. ⭐ */
+    /* 최소 300px 너비 확보 (공간 남으면 늘어남) */
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)) !important;
     gap: 10px !important;
     padding: 0;
@@ -103,7 +103,7 @@ header h2 { margin: 0; font-size: 1rem; color: #fff; }
 .shop-item {
     position: relative !important;
     width: 100%;
-    height: 80px !important; /* 높이 확보 */
+    height: 90px !important;       
     
     background-color: var(--bg-button);
     border: 1px solid #444;
@@ -119,7 +119,7 @@ header h2 { margin: 0; font-size: 1rem; color: #fff; }
     transition: transform 0.1s;
 }
 
-/* 호버 효과 */
+/* 호버/클릭 효과 */
 .shop-item:hover, .btn-large:hover {
     background-color: var(--bg-button-hover);
     transform: translateY(-2px);
@@ -139,93 +139,99 @@ header h2 { margin: 0; font-size: 1rem; color: #fff; }
 }
 
 /* =========================================
-   3. 텍스트 겹침 방지 (안전 거리 확보)
+   3. 텍스트 위치 고정 (안전 구역 확보)
    ========================================= */
 
 /* [좌측 상단] 이름 */
 .shop-item > div:first-child > div:first-child {
     position: absolute !important;
-    top: 12px;
-    left: 12px;
+    top: 14px;
+    left: 14px;
+    
+    /* ⭐ 핵심: 오른쪽 70px 지점까지만 올 수 있음 (레벨 자리 침범 금지) ⭐ */
+    right: 70px; 
+    text-align: left;
     
     font-size: 0.95rem !important;
     font-weight: bold;
     color: #fff;
-    text-align: left;
     
-    /* ⭐ 오른쪽 레벨 텍스트 공간(60px)을 제외한 나머지 공간만 사용 ⭐ */
-    width: calc(100% - 60px); 
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-/* [우측 상단] 레벨 */
+/* [우측 상단] 레벨 (Lv.0) */
 .shop-item span[style*="color:#f39c12"] {
     position: absolute !important;
-    top: 10px;
-    right: 12px;
+    top: 12px;
+    right: 14px;
     
     font-size: 0.8rem !important;
-    color: #ffd700 !important;
+    color: #ffd700 !important; /* 노란색 */
     background: rgba(0,0,0,0.4);
-    padding: 2px 6px;
+    padding: 3px 8px;
     border-radius: 4px;
     
     margin: 0 !important;
     text-align: right;
-    min-width: 40px; /* 최소 공간 확보 */
+    
+    /* 이름보다 위에 떠서 가려짐 방지 */
+    z-index: 5; 
 }
 
-/* [좌측 하단] 설명 */
+/* [좌측 하단] 설명 (+1 나무/s) */
 .shop-item > div:first-child > div:last-child {
     position: absolute !important;
-    bottom: 12px;
-    left: 12px;
+    bottom: 14px;
+    left: 14px;
+    
+    /* ⭐ 오른쪽 90px 지점까지만 (가격 자리 침범 금지) ⭐ */
+    right: 90px;
+    text-align: left;
     
     font-size: 0.75rem !important;
     color: #aeb6ce !important;
     margin: 0 !important;
     line-height: 1;
     
-    /* ⭐ 오른쪽 가격 텍스트 공간(100px)을 제외한 나머지 공간만 사용 ⭐ */
-    width: calc(100% - 100px);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-/* [우측 하단] 비용 */
+/* [우측 하단] 비용 (10 나무) */
 .shop-item > div:last-child {
     position: absolute !important;
-    bottom: 12px;
-    right: 12px;
+    bottom: 14px;
+    right: 14px;
     text-align: right;
     
-    /* 비용이 길어질 수 있으니 공간 확보 */
-    width: auto;
-    max-width: 50%;
+    /* 비용 텍스트가 넉넉하게 들어갈 공간 */
+    min-width: 80px; 
 }
 
 .cost-text {
     font-size: 0.85rem;
     color: var(--primary-orange);
     font-weight: bold;
-    white-space: nowrap;
 }
 
 
 /* 4. 수동 작업 버튼 */
 .btn-large {
     width: 100%;
-    height: 80px !important;
+    height: 90px !important;
+    
     background-color: var(--bg-button);
     border: 1px solid #444;
     border-radius: 6px;
+    
     display: flex !important;
     align-items: center;
     justify-content: center;
     gap: 8px;
+    
     padding: 0 10px;
     color: #e0e0e0;
     font-size: 0.95rem;
