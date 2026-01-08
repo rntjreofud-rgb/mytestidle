@@ -82,17 +82,91 @@ header h2 { margin: 0; font-size: 1rem; color: #fff; }
 .res-card.gear::after { background-color: #7f8c8d; }
 .res-card.circuit::after { background-color: #2ecc71; }
 
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Consolas&display=swap');
+
+:root {
+    --bg-main: #1a1a2e;       
+    --bg-sidebar: #11111f;    
+    --bg-panel: #16213e;      
+    --bg-button: #0f3460;     
+    --bg-button-hover: #1f4287; 
+    --bg-button-disabled: #0a1120;
+    --border-color: #2a2a40;
+    --primary-orange: #e94560; 
+    --accent-green: #4ecca3;
+    --accent-blue: #4db5ff;
+    --text-main: #e0e0e0;
+    --text-muted: #8892b0;
+}
+
+* { box-sizing: border-box; }
+
+body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background-color: var(--bg-main);
+    color: var(--text-main);
+    margin: 0; padding: 0;
+    width: 100vw; height: 100vh;
+    display: flex; overflow: hidden;
+    font-size: 13px;
+}
+
+/* === 사이드바 === */
+.sidebar {
+    width: 200px;
+    height: 100%;
+    background-color: var(--bg-sidebar);
+    border-right: 1px solid #000;
+    display: flex; flex-direction: column; flex-shrink: 0;
+}
+.logo-area { padding: 20px 10px; background-color: #0b0b14; text-align: center; }
+.logo-area h1 { margin: 0; font-size: 1.1rem; color: var(--accent-green); letter-spacing: 1px; }
+.nav-menu { flex: 1; overflow-y: auto; padding: 10px 0; }
+.nav-category { font-size: 0.75rem; color: #556; margin: 15px 0 5px 15px; font-weight: bold; }
+.nav-item { display: flex; align-items: center; padding: 10px 15px; cursor: pointer; color: var(--text-muted); font-size: 0.9rem; transition: 0.2s; }
+.nav-item:hover, .nav-item.active { background-color: var(--bg-panel); color: #fff; border-left: 3px solid var(--primary-orange); }
+.nav-item i { margin-right: 10px; width: 16px; text-align: center; }
+
+/* === 메인 레이아웃 === */
+.main-wrapper { flex: 1; display: flex; flex-direction: column; height: 100%; overflow: hidden; }
+header { background-color: var(--bg-panel); border-bottom: 1px solid var(--border-color); padding: 0 20px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; height: 50px; }
+header h2 { margin: 0; font-size: 1rem; color: #fff; }
+.content-area { flex: 1; overflow-y: auto; padding: 20px; background-color: var(--bg-main); }
+
+/* === 패널 === */
+.info-panel { background-color: var(--bg-panel); border-left: 4px solid var(--accent-blue); padding: 15px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; border-radius: 8px; }
+.info-text h3 { margin: 0 0 5px 0; font-size: 1.1rem; color: #fff; }
+.action-box { margin-bottom: 25px; }
+.section-title { font-size: 0.9rem; color: #8892b0; margin-bottom: 10px; padding-bottom: 5px; border-bottom: 2px solid var(--bg-panel); font-weight: bold; }
+
+/* === 자원 카드 === */
+.resource-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; margin-bottom: 20px; }
+.res-card { background-color: var(--bg-panel); border: none; padding: 10px 15px; border-radius: 8px; min-height: 70px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+.res-header { display: flex; justify-content: space-between; margin-bottom: 5px; }
+.res-name { font-size: 0.85rem; color: #aaa; font-weight: bold; }
+.res-amount { font-size: 1.3rem; font-weight: 700; color: #fff; margin: 0; }
+.res-mps { font-size: 0.8rem; color: #8892b0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.res-card::after { content: ''; display: block; height: 3px; width: 100%; margin-top: 8px; border-radius: 2px; }
+.res-card.wood::after { background-color: #27ae60; }
+.res-card.stone::after { background-color: #7f8c8d; }
+.res-card.coal::after { background-color: #34495e; }
+.res-card.ironOre::after { background-color: #95a5a6; }
+.res-card.copperOre::after { background-color: #d35400; }
+.res-card.plank::after { background-color: #f39c12; }
+.res-card.brick::after { background-color: #c0392b; }
+.res-card.ironPlate::after { background-color: #bdc3c7; }
+.res-card.copperPlate::after { background-color: #e67e22; }
+.res-card.gear::after { background-color: #7f8c8d; }
+.res-card.circuit::after { background-color: #2ecc71; }
+
 /* =========================================
-   5. 버튼 및 그리드 (4열 고정 + 텍스트 영역 칼분할)
+   5. 버튼 및 그리드 (완벽 수정)
    ========================================= */
 
-/* 1. 그리드 레이아웃: 무조건 4열(4x) 고정 */
-.action-box > div, 
-#building-list, 
-#research-list-container, 
-.action-grid {
+/* 1. 그리드: 무조건 4열 고정 */
+.action-box > div, #building-list, #research-list-container, .action-grid {
     display: grid !important;
-    /* 화면이 줄어들어도 무조건 4등분 (가로 스크롤이 생길지언정 4열 유지) */
     grid-template-columns: repeat(4, 1fr) !important; 
     gap: 8px !important;
     padding: 0;
@@ -101,103 +175,71 @@ header h2 { margin: 0; font-size: 1rem; color: #fff; }
 
 /* 2. 상점 아이템 (건물/연구) - 박스 스타일 */
 .shop-item {
-    position: relative !important; /* 좌표 기준점 */
+    position: relative !important;
     width: 100%;
-    height: 90px !important;       /* 높이 90px 고정 */
-    
+    /* 높이를 충분히 확보하여 텍스트 간격 유지 */
+    height: 80px !important;       
     background-color: var(--bg-button);
     border: 1px solid #444;
     border-radius: 6px;
-    
-    padding: 0 !important;
     margin: 0;
-    
     cursor: pointer;
     box-shadow: 0 4px 0 rgba(0,0,0,0.2);
-    display: block !important; /* Flex 제거 -> 좌표 배치 */
-    
-    overflow: hidden; /* 박스 밖으로 튀어나가는 것 방지 */
+    display: block !important;
     transition: transform 0.1s;
+    overflow: hidden; /* 밖으로 나가는 글자 자름 */
 }
 
-/* 호버 효과 */
-.shop-item:hover, .btn-large:hover {
-    background-color: var(--bg-button-hover);
-    transform: translateY(-2px);
-    z-index: 10;
-}
-.shop-item:active, .btn-large:active {
-    transform: translateY(2px);
-    box-shadow: none;
-}
+/* 호버/클릭 효과 */
+.shop-item:hover, .btn-large:hover { background-color: var(--bg-button-hover); transform: translateY(-2px); z-index: 5; }
+.shop-item:active, .btn-large:active { transform: translateY(2px); box-shadow: none; }
+.shop-item.disabled, .btn-large.disabled { opacity: 0.5; background-color: var(--bg-button-disabled); cursor: not-allowed; box-shadow: none; }
 
-/* 비활성 상태 */
-.shop-item.disabled, .btn-large.disabled {
-    opacity: 0.5;
-    background-color: var(--bg-button-disabled);
-    cursor: not-allowed;
-    box-shadow: none;
-}
-
-/* =========================================
-   3. 내부 텍스트 영역 강제 분할 (겹침 원천 봉쇄)
-   ========================================= */
+/* === 텍스트 위치 및 겹침 방지 === */
 
 /* [좌측 상단] 이름 */
 .shop-item > div:first-child > div:first-child {
     position: absolute !important;
-    top: 12px;
-    left: 12px;
-    
-    /* ⭐ 핵심 수정: 전체 너비에서 오른쪽 80px(레벨 자리)을 뺀 만큼만 사용 ⭐ */
-    width: calc(100% - 80px) !important;
-    
-    font-size: 0.95rem !important;
+    top: 10px;
+    left: 10px;
+    /* ⭐ 핵심: 오른쪽 60px 공간(레벨 자리) 확보 후 자름 ⭐ */
+    width: calc(100% - 60px) !important;
+    font-size: 0.9rem !important;
     font-weight: bold;
     color: #fff;
     text-align: left;
-    
-    white-space: nowrap; /* 줄바꿈 금지 */
-    overflow: hidden;    /* 넘치면 숨김 */
-    text-overflow: ellipsis; /* ... 처리 */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 /* [우측 상단] 레벨 (Lv.0) */
+/* JS에서 span style="color:#f39c12"로 들어간 요소 타겟팅 */
 .shop-item span[style*="color:#f39c12"] {
     position: absolute !important;
-    top: 10px;
-    right: 12px;
-    
-    /* 레벨 표시 영역의 너비와 정렬 */
-    width: auto;
-    max-width: 70px;
-    text-align: right;
-    
+    top: 8px !important;
+    right: 8px !important;
     font-size: 0.75rem !important;
-    color: #ffd700 !important; 
-    background: rgba(0,0,0,0.4);
-    padding: 2px 6px;
+    color: #ffd700 !important;
+    background: rgba(0,0,0,0.6); /* 배경을 어둡게 해서 겹쳐도 보이게 함 */
+    padding: 2px 5px;
     border-radius: 4px;
-    
     margin: 0 !important;
-    z-index: 5; /* 이름보다 위에 표시 */
+    z-index: 10; /* 이름보다 위에 표시 */
 }
 
 /* [좌측 하단] 설명 (+1 나무/s) */
 .shop-item > div:first-child > div:last-child {
     position: absolute !important;
-    bottom: 12px;
-    left: 12px;
-    
+    bottom: 10px;
+    left: 10px;
     /* 설명도 가격(오른쪽)과 겹치지 않게 공간 제한 */
-    width: calc(100% - 100px) !important;
-    
+    width: calc(100% - 70px) !important;
     font-size: 0.75rem !important;
     color: #aeb6ce !important;
     margin: 0 !important;
     line-height: 1;
     text-align: left;
-    
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -206,26 +248,23 @@ header h2 { margin: 0; font-size: 1rem; color: #fff; }
 /* [우측 하단] 비용 (10 나무) */
 .shop-item > div:last-child {
     position: absolute !important;
-    bottom: 12px;
-    right: 12px;
+    bottom: 10px;
+    right: 10px;
     text-align: right;
-    
-    width: auto;
-    max-width: 90px;
+    max-width: 50%; /* 비용 텍스트 최대 너비 */
 }
 
 .cost-text {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     color: var(--primary-orange);
     font-weight: bold;
     white-space: nowrap;
 }
 
-
-/* 4. 수동 작업 버튼 (.btn-large) */
+/* 4. 수동 작업 버튼 */
 .btn-large {
     width: 100%;
-    height: 90px !important;
+    height: 80px !important;
     background-color: var(--bg-button);
     border: 1px solid #444;
     border-radius: 6px;
@@ -235,7 +274,7 @@ header h2 { margin: 0; font-size: 1rem; color: #fff; }
     gap: 8px;
     padding: 0 10px;
     color: #e0e0e0;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     font-weight: bold;
     cursor: pointer;
     box-shadow: 0 4px 0 rgba(0,0,0,0.2);
@@ -256,24 +295,9 @@ header h2 { margin: 0; font-size: 1rem; color: #fff; }
     box-shadow: 0 4px 0 rgba(0,0,0,0.2);
     margin-bottom: 10px;
 }
-#upgrade-btn:disabled {
-    background-color: #333;
-    color: #555;
-    cursor: not-allowed;
-    box-shadow: none;
-}
+#upgrade-btn:disabled { background-color: #333; color: #555; cursor: not-allowed; box-shadow: none; }
 
-/* 모바일 대응 (화면이 너무 좁을 때만 2열) */
-@media (max-width: 800px) {
-    .action-box > div, #building-list, #research-list-container, .action-grid {
-        grid-template-columns: repeat(2, 1fr) !important; 
-    }
-}
-
-.hidden { display: none !important; }
-/* =========================================
-   6. 하단 로그
-   ========================================= */
+/* 하단 로그 */
 .system-log-area { height: 150px; background-color: #0b0b10; border-top: 2px solid #000; display: flex; flex-direction: column; flex-shrink: 0; }
 .log-header { background-color: #161620; padding: 5px 15px; font-size: 0.8rem; color: #8892b0; font-weight: bold; }
 .log-content { flex: 1; overflow-y: auto; padding: 10px; font-family: 'Consolas', monospace; }
@@ -285,15 +309,10 @@ header h2 { margin: 0; font-size: 1rem; color: #fff; }
 ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
 ::-webkit-scrollbar-track { background: #0b0b10; }
 
-/* =========================================
-   7. 반응형 (모바일만 2열, PC는 4열 유지)
-   ========================================= */
-@media (max-width: 768px) {
-    body { flex-direction: column; height: auto; overflow: auto; }
-    .sidebar { width: 100%; height: auto; }
-    .main-wrapper { height: auto; }
-    /* 모바일에서는 2열로 변경 */
+/* 모바일 대응 (화면 좁을 때 2열) */
+@media (max-width: 1000px) {
     .action-box > div, #building-list, #research-list-container, .action-grid {
-        grid-template-columns: repeat(2, 1fr) !important;
+        grid-template-columns: repeat(2, 1fr) !important; 
     }
 }
+.hidden { display: none !important; }
