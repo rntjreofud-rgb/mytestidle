@@ -111,7 +111,13 @@ header h2 { margin: 0; font-size: 1.1rem; }
 .res-card::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 3px; }
 .res-name { font-size: 0.85rem; color: #aaa; font-weight: bold; }
 .res-amount { font-size: 1.5rem; font-weight: 700; color: #fff; margin: 5px 0; }
-.res-mps { font-size: 0.75rem; }
+.res-mps {
+    font-size: 0.8rem;
+    font-weight: bold;
+    white-space: nowrap; /* 줄바꿈 방지 */
+    overflow: hidden;    /* 넘치면 숨김 (필요시) */
+    text-overflow: ellipsis; 
+}
 
 /* 자원별 색상 */
 .res-card.wood::after { background-color: #27ae60; }

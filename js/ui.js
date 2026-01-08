@@ -1,4 +1,4 @@
-// js/ui.js
+// js/ui.js 덮어쓰기
 
 import { gameData, houseStages, researchList } from './data.js';
 import * as Logic from './logic.js';
@@ -87,9 +87,11 @@ export function log(msg, isImportant = false) {
     }
 }
 
-export function updateScreen(netMPS) {
+// ⭐ [수정됨] 생산/소비량 상세 표시 로직
+export function updateScreen(stats) {
     for (let key in gameData.resources) {
         if(key === 'energy' || key === 'energyMax') continue;
+
         let card = document.getElementById(`card-${key}`);
         if (!card) {
             card = createResourceCard(key);
@@ -97,30 +99,42 @@ export function updateScreen(netMPS) {
         }
         
         const val = gameData.resources[key] || 0;
-        const mps = netMPS[key] || 0;
+        
+        // logic.js에서 {prod, cons} 형태로 받아옴
+        const prod = stats[key] ? stats[key].prod : 0;
+        const cons = stats[key] ? stats[key].cons : 0;
+        const net = prod - cons;
         
         card.querySelector('.res-amount').innerText = formatNumber(val);
         const mpsEl = card.querySelector('.res-mps');
-        let mpsText = Math.abs(mps) < 1000 ? Math.abs(mps).toFixed(1) : formatNumber(Math.abs(mps));
-        if(mps < 0) {
-            mpsEl.style.color = "#e74c3c";
-            mpsEl.innerText = `▼ ${mpsText} /s`;
-        } else if(mps > 0) {
-            mpsEl.style.color = "#2ecc71";
-            mpsEl.innerText = `▲ ${mpsText} /s`;
+        
+        // 표시 로직:
+        // 1. 생산과 소비가 둘 다 0이 아니면: "+2.0 | -2.0 /s" 형태로 표시
+        // 2. 아니면 기존처럼 "+2.0/s" 표시
+        
+        if (prod > 0 && cons > 0) {
+            mpsEl.style.color = "#ecf0f1"; // 흰색
+            mpsEl.style.fontSize = "0.75rem"; // 글씨 살짝 작게
+            mpsEl.innerHTML = `<span style="color:#2ecc71">+${formatNumber(prod)}</span> | <span style="color:#e74c3c">-${formatNumber(cons)}</span> /s`;
         } else {
-            mpsEl.style.color = "#7f8c8d";
-            mpsEl.innerText = `+0.0 /s`;
+            // 기존 단순 표시
+            let mpsText = Math.abs(net) < 1000 ? Math.abs(net).toFixed(1) : formatNumber(Math.abs(net));
+            if(net < 0) {
+                mpsEl.style.color = "#e74c3c";
+                mpsEl.innerText = `▼ ${mpsText} /s`;
+            } else if(net > 0) {
+                mpsEl.style.color = "#2ecc71";
+                mpsEl.innerText = `▲ ${mpsText} /s`;
+            } else {
+                mpsEl.style.color = "#7f8c8d";
+                mpsEl.innerText = `+0.0 /s`;
+            }
         }
     }
     updatePowerUI();
     if(!elements.viewResearch.classList.contains('hidden')) {
         updateResearchButtons();
     }
-    
-    // ⭐ 중요: 해금 상태 체크 후 상점도 다시 그릴지 판단하면 좋지만,
-    // 성능을 위해 checkUnlocks()는 버튼만 제어하고,
-    // renderShop은 main.js에서 건설/업그레이드 등 이벤트 발생 시 호출하는 구조 유지.
     checkUnlocks();
 }
 
@@ -235,15 +249,8 @@ function checkUnlocks() {
         if(lv >= 2) elements.navPower.style.display = 'flex';
         else elements.navPower.style.display = 'none';
     }
-
-    // ⭐ 중요: checkUnlocks가 호출될 때마다 상점 목록을 다시 그리는 것은 비효율적이지만,
-    // "해금 상태"가 바뀌었는지 체크해서 필요하면 다시 그리는게 좋습니다.
-    // 여기서는 간단하게 로직을 분리해 둠.
-    // (상점 갱신은 main.js에서 이벤트 발생 시 하거나, 
-    //  아래에서 1초마다 하는 루프 안에서 조건부 호출 가능)
 }
 
-// ⭐ [수정됨] 상점 렌더링 시 조건 필터링
 export function renderShop(onBuyCallback, getCostFunc) {
     elements.buildingList.innerHTML = "";
     
@@ -255,16 +262,12 @@ export function renderShop(onBuyCallback, getCostFunc) {
     const isStoneUnlocked = (lv >= 1 || wood >= 10 || hasLogger || hasPlank);
 
     gameData.buildings.forEach((b, index) => {
-        // ⭐ 건물 등장 조건 체크
+        // 건물 등장 조건 체크
         const req = b.reqLevel || 0;
-        
-        // 0.5 레벨 (돌 해금 단계) 처리
         if (req === 0.5) {
-            if (!isStoneUnlocked) return; // 돌 해금 안됐으면 안 보여줌
-        } 
-        // 정수 레벨 (1, 2...) 처리
-        else if (req >= 1) {
-            if (lv < req) return; // 레벨 부족하면 안 보여줌
+            if (!isStoneUnlocked) return; 
+        } else if (req >= 1) {
+            if (lv < req) return; 
         }
         
         const div = document.createElement('div');
@@ -312,8 +315,7 @@ export function renderShop(onBuyCallback, getCostFunc) {
 export function updateShopButtons(getCostFunc) {
     gameData.buildings.forEach((b, index) => {
         const div = document.getElementById(`build-${index}`);
-        if(!div) return; // 조건 미달로 생성 안 된 건물은 패스
-        
+        if(!div) return;
         const cost = getCostFunc(b);
         let canBuy = true;
         for(let k in cost) {
