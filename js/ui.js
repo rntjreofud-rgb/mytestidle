@@ -228,6 +228,12 @@ function createResourceCard(key) {
 function checkUnlocks() {
     const lv = gameData.houseLevel;
     const wood = gameData.resources.wood || 0;
+    
+    // ⭐ [방어 코드 추가]
+    // 1. 자동 벌목기(ID:0)를 1개라도 가지고 있는지 확인
+    const hasLogger = gameData.buildings[0] && gameData.buildings[0].count > 0;
+    // 2. 판자를 1개라도 가지고 있는지 확인 (이미 가공을 시작했으므로)
+    const hasPlank = (gameData.resources.plank || 0) > 0;
 
     const toggle = (el, show) => {
         if(!el) return;
@@ -235,9 +241,15 @@ function checkUnlocks() {
         else el.classList.add('hidden');
     };
 
-    const canGatherStone = (lv >= 1 || wood >= 10);
+    // 🔓 해금 조건: 
+    // 레벨 1 이상 OR 나무 10개 이상 OR 벌목기 보유 OR 판자 보유
+    // (이제 나무를 써버려도 벌목기나 판자가 있다면 버튼이 사라지지 않습니다)
+    const canGatherStone = (lv >= 1 || wood >= 10 || hasLogger || hasPlank);
+    
     toggle(elements.btns.stone, canGatherStone);
     toggle(elements.btns.plank, canGatherStone);
+
+    // 나머지 조건은 기존 유지
     toggle(elements.btns.coal, (lv >= 1));
     toggle(elements.btns.ironOre, (lv >= 1));
     toggle(elements.btns.copperOre, (lv >= 1));
