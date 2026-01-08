@@ -83,7 +83,7 @@ header h2 { margin: 0; font-size: 1rem; color: #fff; }
 .res-card.circuit::after { background-color: #2ecc71; }
 
 /* =========================================
-   5. 버튼 및 그리드 (수동/건설 분리 스타일)
+   5. 버튼 및 그리드 (4x4 배열 + 4모서리 배치 복구)
    ========================================= */
 
 /* 1. 그리드 레이아웃: 무조건 4열(4x) 고정 */
@@ -98,136 +98,33 @@ header h2 { margin: 0; font-size: 1rem; color: #fff; }
     width: 100%;
 }
 
-/* =================================================
-   A. 수동 채집 버튼 (.btn-large) - 가로 배치 (이전 스타일 복구)
-   ================================================= */
-.btn-large {
-    width: 100%;
-    height: 60px; /* 적당한 높이 */
-    
-    background-color: var(--bg-button);
-    border: 1px solid #444;
-    border-radius: 6px;
-    
-    /* 좌우 배치 (아이콘+이름) */
-    display: flex !important;
-    flex-direction: row !important;
-    justify-content: center;
-    align-items: center;
-    gap: 8px;
-    
-    padding: 0 10px;
-    margin: 0;
-    
-    color: #e0e0e0;
-    font-size: 0.9rem;
-    cursor: pointer;
-    box-shadow: 0 4px 0 rgba(0,0,0,0.2);
-    transition: transform 0.1s;
-    
-    /* 내부 텍스트 정렬 */
-    font-weight: bold;
-    text-align: center;
-}
-
-/* 수동 버튼 안의 텍스트가 겹치지 않게 */
-.btn-large strong {
-    position: static !important;
-    font-size: 0.95rem;
-}
-
-/* =================================================
-   B. 상점 아이템 (.shop-item) - 세로 4줄 배치 (겹침 방지)
-   ================================================= */
+/* 2. 상점 아이템 (건물/연구) - 박스 스타일 */
 .shop-item {
+    position: relative !important; /* 내부 요소 위치 기준점 */
     width: 100%;
-    height: auto;
-    min-height: 110px; /* 4줄이 들어가야 하므로 높이 확보 */
+    height: 80px !important;       /* 높이 고정 (넉넉하게) */
     
     background-color: var(--bg-button);
     border: 1px solid #444;
     border-radius: 6px;
     
-    /* ⭐ 위에서 아래로 쌓이는 구조 (Column) ⭐ */
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: space-between; /* 위아래 균등 분배 */
-    align-items: flex-start; /* 왼쪽 정렬 */
-    
-    padding: 10px 12px;
+    padding: 0 !important; /* 내부 패딩 제거 (좌표로 잡을 것임) */
     margin: 0;
     
     cursor: pointer;
-    text-decoration: none;
     box-shadow: 0 4px 0 rgba(0,0,0,0.2);
+    display: block !important; /* Flex 제거 */
+    
     transition: transform 0.1s;
 }
 
-/* 내부 요소들의 절대 위치(absolute) 제거 -> 흐름대로 배치 */
-.shop-item > div, 
-.shop-item strong, 
-.shop-item span, 
-.shop-item small {
-    position: static !important;
-    width: 100%;
-    text-align: left; /* 기본 왼쪽 정렬 */
-}
-
-/* 1줄: 건물 이름 */
-.shop-item strong {
-    display: block;
-    font-size: 0.95rem;
-    font-weight: bold;
-    color: #fff;
-    margin-bottom: 2px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-/* 2줄: 레벨 (Lv.5) */
-/* JS에서 span style="color:#f39c12"로 들어가는 요소 */
-.shop-item span[style*="color:#f39c12"] {
-    display: block;
-    font-size: 0.8rem !important;
-    color: #ffd700 !important; /* 노란색 */
-    background: transparent;
-    padding: 0;
-    margin-bottom: 8px;
-}
-
-/* 3줄: 설명 (+1 나무/s) */
-.shop-item div[style*="font-size:0.8em"],
-.shop-item div small {
-    display: block;
-    font-size: 0.8rem !important;
-    color: #aeb6ce !important;
-    margin-bottom: auto; /* 남은 공간 밀어내기 */
-    line-height: 1.4;
-}
-
-/* 4줄: 비용 (10 나무) - 오른쪽 정렬 */
-.shop-item > div:last-child, .cost-text {
-    width: 100%;
-    text-align: right !important; /* 가격만 오른쪽 정렬 */
-    font-size: 0.85rem;
-    color: var(--primary-orange);
-    font-weight: bold;
-    margin-top: 8px;
-    border-top: 1px solid rgba(255,255,255,0.1); /* 구분선 살짝 추가 */
-    padding-top: 4px;
-}
-
-/* =================================================
-   공통 호버/클릭 효과
-   ================================================= */
-.btn-large:hover, .shop-item:hover {
+/* 호버/클릭 효과 */
+.shop-item:hover, .btn-large:hover {
     background-color: var(--bg-button-hover);
     transform: translateY(-2px);
-    z-index: 5;
+    z-index: 10;
 }
-
-.btn-large:active, .shop-item:active {
+.shop-item:active, .btn-large:active {
     transform: translateY(2px);
     box-shadow: none;
 }
@@ -236,11 +133,112 @@ header h2 { margin: 0; font-size: 1rem; color: #fff; }
 .shop-item.disabled, .btn-large.disabled {
     opacity: 0.5;
     background-color: var(--bg-button-disabled);
-    color: #666;
     cursor: not-allowed;
     box-shadow: none;
-    border: 1px solid #333;
 }
+
+/* =========================================
+   3. 내부 텍스트 4모서리 강제 고정 (겹침 방지)
+   ========================================= */
+
+/* [좌측 상단] 이름 (ex: 자동 벌목기) */
+.shop-item > div:first-child > div:first-child {
+    position: absolute !important;
+    top: 10px;
+    left: 10px;
+    
+    font-size: 0.9rem !important;
+    font-weight: bold;
+    color: #fff;
+    text-align: left;
+    
+    /* ⭐ 중요: 이름이 길면 ... 처리하고 레벨 침범 금지 ⭐ */
+    width: auto;
+    max-width: 60%; /* 너비 60% 제한 */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* [우측 상단] 레벨 (ex: Lv.0) */
+/* JS에서 span style="color:..."로 들어간 요소 타겟팅 */
+.shop-item span[style*="color:#f39c12"] {
+    position: absolute !important;
+    top: 10px;
+    right: 10px;
+    
+    font-size: 0.75rem !important;
+    color: #ffd700 !important; /* 노란색 */
+    background: rgba(0,0,0,0.4);
+    padding: 2px 6px;
+    border-radius: 4px;
+    
+    margin: 0 !important;
+    white-space: nowrap;
+}
+
+/* [좌측 하단] 설명 (ex: +1 나무/s) */
+.shop-item > div:first-child > div:last-child {
+    position: absolute !important;
+    bottom: 10px;
+    left: 10px;
+    
+    font-size: 0.75rem !important;
+    color: #aeb6ce !important; /* 연한 회색 */
+    margin: 0 !important;
+    line-height: 1;
+    
+    /* 설명이 길면 ... 처리하고 가격 침범 금지 */
+    max-width: 55%; 
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* [우측 하단] 비용 (ex: 10 나무) */
+.shop-item > div:last-child {
+    position: absolute !important;
+    bottom: 10px;
+    right: 10px;
+    text-align: right;
+    
+    /* 가격 공간 확보 */
+    max-width: 40%;
+    white-space: nowrap;
+}
+
+.cost-text {
+    font-size: 0.8rem;
+    color: var(--primary-orange);
+    font-weight: bold;
+}
+
+
+/* 4. 수동 작업 버튼 (.btn-large) - 얘는 가운데 정렬 유지 */
+.btn-large {
+    width: 100%;
+    height: 80px !important;
+    
+    background-color: var(--bg-button);
+    border: 1px solid #444;
+    border-radius: 6px;
+    
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    
+    padding: 0 10px;
+    color: #e0e0e0;
+    font-size: 0.95rem;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 0 rgba(0,0,0,0.2);
+    transition: transform 0.1s;
+}
+/* 수동버튼 텍스트 */
+.btn-large strong { position: static !important; }
+
 
 /* 업그레이드 버튼 */
 #upgrade-btn {
@@ -252,17 +250,16 @@ header h2 { margin: 0; font-size: 1rem; color: #fff; }
     border-radius: 6px;
     font-weight: bold;
     cursor: pointer;
-    box-shadow: 0 4px 0 rgba(0,0,0,0.2);
+    margin-bottom: 10px;
 }
 #upgrade-btn:disabled {
     background-color: #333;
     color: #555;
     cursor: not-allowed;
-    box-shadow: none;
 }
 
-/* 반응형 (모바일) */
-@media (max-width: 768px) {
+/* 모바일 대응 (화면 좁을 때만 2열) */
+@media (max-width: 1000px) {
     .action-box > div, #building-list, #research-list-container, .action-grid {
         grid-template-columns: repeat(2, 1fr) !important; 
     }
