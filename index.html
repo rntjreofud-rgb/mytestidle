@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- ⭐ 타이틀 변경 -->
     <title>Escape Earth: Idle Game</title>
     <link rel="stylesheet" href="style.css">
 </head>
@@ -11,15 +10,14 @@
 
     <nav class="sidebar">
         <div class="logo-area">
-            <!-- ⭐ 로고 및 게임 이름 변경 -->
             <div style="font-size: 3rem;">🌍</div>
             <h1>ESCAPE EARTH</h1>
             <small style="color: #f39c12; letter-spacing: 1px;">IDLE GAME</small>
         </div>
         <div class="nav-menu">
             <div class="nav-category">Control Center</div>
+            <!-- 로그 탭 버튼 제거됨, 대시보드만 유지 -->
             <div class="nav-item active" id="nav-dashboard"><i>📊</i> 대시보드</div>
-            <div class="nav-item" id="nav-log"><i>📜</i> 기록 (Log)</div>
             
             <div class="nav-category">Logistics</div>
             <div class="nav-item"><i>⚡</i> 전력 (준비중)</div>
@@ -34,58 +32,54 @@
                 <span id="message-log">시스템 가동.</span>
             </div>
             <div>
-                <!-- 초기화 버튼도 유지 -->
                 <button onclick="localStorage.removeItem('civIdleModularSave');location.reload()" style="background:#e74c3c; border:none; color:white; padding:5px; cursor:pointer;">초기화</button>
             </div>
         </header>
 
+        <!-- 메인 콘텐츠 (위쪽 영역) -->
         <main class="content-area">
             
-            <!-- 대시보드 뷰 -->
-            <div id="view-dashboard">
-                <div class="info-panel">
-                    <div class="info-text">
-                        <h3 id="house-desc">지구 탈출 프로젝트</h3>
-                        <p>자원을 모아 우주선을 건조하고 지구를 떠나세요.</p>
-                    </div>
-                    <div style="width: 250px;">
-                        <button id="upgrade-btn">⬆️ 업그레이드</button>
-                    </div>
+            <div class="info-panel">
+                <div class="info-text">
+                    <h3 id="house-desc">지구 탈출 프로젝트</h3>
+                    <p>자원을 모아 우주선을 건조하고 지구를 떠나세요.</p>
                 </div>
-
-                <div class="section-title">📦 자원 창고 (Inventory)</div>
-                <div class="resource-grid"></div>
-
-                <div class="action-grid">
-                    <div class="action-box">
-                        <div class="section-title">🖐️ 수동 작업</div>
-                        <div style="display: flex; flex-direction: column; gap: 10px;">
-                            <button id="btn-gather-wood" class="btn-large">🌲 나무 베기</button>
-                            <!-- JS가 자동으로 보이게 처리하므로 hidden 클래스 유지해도 됨 -->
-                            <button id="btn-gather-stone" class="btn-large hidden">🪨 돌 캐기</button>
-                            <button id="btn-craft-plank" class="btn-large hidden" style="border-color:#f39c12">🪚 판자 깎기 (나무 -2)</button>
-                            <button id="btn-gather-iron" class="btn-large hidden">⚙️ 철광석 캐기</button>
-                            <button id="btn-gather-copper" class="btn-large hidden">🥉 구리광석 캐기</button>
-                        </div>
-                    </div>
-                    <div class="action-box">
-                        <div class="section-title">🏭 공장 건설 (Automation)</div>
-                        <div id="building-list"></div>
-                    </div>
+                <div style="width: 250px;">
+                    <button id="upgrade-btn">⬆️ 업그레이드</button>
                 </div>
             </div>
 
-            <!-- 로그 뷰 -->
-            <div id="view-log" class="hidden">
-                <div class="section-title">📜 시스템 기록 (System Log)</div>
-                <div class="log-container">
-                    <ul id="game-log-list">
-                        <!-- 로그가 여기에 쌓임 -->
-                    </ul>
+            <div class="section-title">📦 자원 창고 (Inventory)</div>
+            <div class="resource-grid"></div>
+
+            <div class="action-grid">
+                <div class="action-box">
+                    <div class="section-title">🖐️ 수동 작업</div>
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <button id="btn-gather-wood" class="btn-large">🌲 나무 베기</button>
+                        <button id="btn-gather-stone" class="btn-large hidden">🪨 돌 캐기</button>
+                        <button id="btn-craft-plank" class="btn-large hidden" style="border-color:#f39c12">🪚 판자 깎기 (나무 -2)</button>
+                        <button id="btn-gather-iron" class="btn-large hidden">⚙️ 철광석 캐기</button>
+                        <button id="btn-gather-copper" class="btn-large hidden">🥉 구리광석 캐기</button>
+                    </div>
+                </div>
+                <div class="action-box">
+                    <div class="section-title">🏭 공장 건설 (Automation)</div>
+                    <div id="building-list"></div>
                 </div>
             </div>
-
         </main>
+
+        <!-- ⭐ [신규] 화면 하단 고정 로그 영역 -->
+        <section class="system-log-area">
+            <div class="log-header">📜 System Log</div>
+            <div class="log-content">
+                <ul id="game-log-list">
+                    <!-- 로그가 여기에 쌓임 -->
+                </ul>
+            </div>
+        </section>
+
     </div>
 
     <script type="module" src="js/main.js"></script>

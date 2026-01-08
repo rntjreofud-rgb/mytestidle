@@ -1,4 +1,4 @@
-// js/main.js 전체 덮어쓰기
+// js/main.js 덮어쓰기
 
 import { gameData, houseStages } from './data.js';
 import * as UI from './ui.js';
@@ -9,12 +9,10 @@ function init() {
     Storage.loadGame();
     setupEvents();
     
-    // UI 초기화
     UI.renderShop(handleBuyBuilding, Logic.getBuildingCost);
     UI.updateHouseUI(handleHouseUpgrade);
     
-    // 게임 시작 로그
-    UI.log("시스템 로드 완료. 생산 라인을 점검합니다.");
+    UI.log("시스템 로드 완료. Escape Earth 가동 시작.");
 
     requestAnimationFrame(gameLoop);
 
@@ -24,15 +22,9 @@ function init() {
 }
 
 function setupEvents() {
-    // ⭐ [신규] 탭 전환 이벤트
-    if(UI.uiElements.navDashboard) {
-        UI.uiElements.navDashboard.addEventListener('click', () => UI.switchTab('dashboard'));
-    }
-    if(UI.uiElements.navLog) {
-        UI.uiElements.navLog.addEventListener('click', () => UI.switchTab('log'));
-    }
+    // 탭 이벤트 삭제됨 (이제 로그는 항상 보임)
 
-    // 자원 버튼
+    // 자원 버튼 연결
     UI.uiElements.btns.wood.addEventListener('click', () => handleGather('wood'));
     UI.uiElements.btns.stone.addEventListener('click', () => handleGather('stone'));
     UI.uiElements.btns.ironOre.addEventListener('click', () => handleGather('ironOre'));
@@ -50,13 +42,12 @@ function handleGather(type) {
             setTimeout(() => btn.style.transform = "scale(1)", 50);
         }
     } else {
-        UI.log("재료가 부족하거나 아직 캘 수 없습니다.");
+        UI.log("재료가 부족합니다.");
     }
 }
 
 function handleBuyBuilding(index) {
     if (Logic.tryBuyBuilding(index)) {
-        // 일반 로그 (강조 X)
         UI.log(`[건설] ${gameData.buildings[index].name} 건설 완료.`);
         UI.renderShop(handleBuyBuilding, Logic.getBuildingCost); 
     } else {
@@ -66,7 +57,6 @@ function handleBuyBuilding(index) {
 
 function handleHouseUpgrade(nextStage) {
     if (Logic.tryUpgradeHouse(nextStage)) {
-        // ⭐ 중요 로그 (강조 O, true)
         UI.log(`🎉 기술 발전 성공! [${nextStage.name}] 단계로 진입했습니다.`, true);
         
         UI.updateHouseUI(handleHouseUpgrade);

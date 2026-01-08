@@ -1,17 +1,9 @@
-// js/ui.js 전체 덮어쓰기
+// js/ui.js 덮어쓰기
 
 import { gameData, houseStages } from './data.js';
 
 const elements = {
-    // 뷰(화면) 요소
-    viewDashboard: document.getElementById('view-dashboard'),
-    viewLog: document.getElementById('view-log'),
-    
-    // 네비게이션 버튼
-    navDashboard: document.getElementById('nav-dashboard'),
-    navLog: document.getElementById('nav-log'),
-
-    // 로그 리스트
+    // 로그 리스트 (하단)
     logList: document.getElementById('game-log-list'),
 
     // 기존 요소들
@@ -27,7 +19,7 @@ const elements = {
         plank: document.getElementById('btn-craft-plank')
     },
     buildingList: document.getElementById('building-list'),
-    headerLog: document.getElementById('message-log') // 헤더의 임시 로그
+    headerLog: document.getElementById('message-log') 
 };
 
 const resNames = {
@@ -41,61 +33,40 @@ const resNames = {
 function formatNumber(num) {
     if (num == null) return "0";
     if (num < 1000) return Math.floor(num).toLocaleString();
-    const suffixes = ["k", "m", "b", "t", "q"];
+    const suffixes = ["k", "m", "b", "t"];
     const suffixNum = Math.floor(("" + Math.floor(num)).length / 3);
     let shortValue = parseFloat((suffixNum != 0 ? (num / Math.pow(1000, suffixNum)) : num).toPrecision(3));
     if (shortValue % 1 != 0) shortValue = shortValue.toFixed(1);
     return shortValue + suffixes[suffixNum - 1];
 }
 
-// ⭐ [기능 추가] 탭 전환 함수
-export function switchTab(tabName) {
-    // 1. 모든 뷰 숨김
-    elements.viewDashboard.classList.add('hidden');
-    elements.viewLog.classList.add('hidden');
-    
-    // 2. 모든 네비 버튼 비활성화
-    elements.navDashboard.classList.remove('active');
-    elements.navLog.classList.remove('active');
-
-    // 3. 선택된 탭만 활성화
-    if (tabName === 'dashboard') {
-        elements.viewDashboard.classList.remove('hidden');
-        elements.navDashboard.classList.add('active');
-    } else if (tabName === 'log') {
-        elements.viewLog.classList.remove('hidden');
-        elements.navLog.classList.add('active');
-    }
-}
-
-// ⭐ [기능 수정] 로그 함수: 헤더 표시 + 리스트 추가
+// ⭐ 로그 출력 함수
 export function log(msg, isImportant = false) {
-    // 1. 상단 헤더에 잠시 보여주기 (기존 기능)
+    // 1. 헤더 메시지 (잠깐 떴다 사라짐)
     if(elements.headerLog) {
         elements.headerLog.innerText = msg;
         elements.headerLog.style.opacity = 1;
         setTimeout(() => { elements.headerLog.style.opacity = 0.5; }, 3000);
     }
 
-    // 2. 로그 탭 리스트에 영구 기록 (신규 기능)
+    // 2. 하단 로그창에 쌓기
     if(elements.logList) {
         const li = document.createElement('li');
         li.className = 'log-entry';
         
-        const time = new Date().toLocaleTimeString('ko-KR', { hour12: false });
-        
-        // 중요 메시지(업그레이드 등)는 색상 강조
+        const time = new Date().toLocaleTimeString('ko-KR', { hour12: false, hour: '2-digit', minute:'2-digit', second:'2-digit' });
         const contentClass = isImportant ? 'log-msg log-highlight' : 'log-msg';
         
         li.innerHTML = `
-            <span class="log-time">[${time}]</span>
+            <span class="log-time">${time}</span>
             <span class="${contentClass}">${msg}</span>
         `;
         
-        // 최신 글이 위로 오게
+        // 최신 메시지를 맨 위에 추가 (prepend)
+        // 만약 최신 메시지가 맨 아래로 가길 원하면 append로 바꾸세요
         elements.logList.prepend(li);
         
-        // 로그가 너무 많이 쌓이면 삭제 (성능 최적화, 50개 유지)
+        // 로그 50개 제한
         if (elements.logList.children.length > 50) {
             elements.logList.removeChild(elements.logList.lastChild);
         }

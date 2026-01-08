@@ -195,51 +195,72 @@ header {
 #upgrade-btn:disabled { background-color: #555; cursor: not-allowed; }
 
 
-/* 로그 컨테이너 스타일 */
-.log-container {
-    background-color: var(--bg-panel);
-    border-radius: 8px;
+.content-area {
+    flex: 1;
+    overflow-y: auto; /* 내용이 많으면 스크롤 */
     padding: 20px;
-    border: 1px solid var(--border-color);
-    height: calc(100vh - 200px); /* 화면 꽉 차게 */
-    overflow-y: auto; /* 스크롤 가능 */
+    padding-bottom: 20px;
+}
+
+/* ⭐ 하단 고정 로그 영역 스타일 */
+.system-log-area {
+    height: 200px; /* 높이 고정 */
+    background-color: #0f0f0f;
+    border-top: 2px solid var(--primary-orange);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0; /* 화면이 줄어도 로그창 크기는 유지 */
+    box-shadow: 0 -4px 10px rgba(0,0,0,0.5);
+}
+
+.log-header {
+    background-color: #1a1a1a;
+    padding: 5px 15px;
+    font-size: 0.8rem;
+    color: #999;
+    border-bottom: 1px solid #333;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.log-content {
+    flex: 1;
+    overflow-y: auto; /* 로그가 많으면 내부 스크롤 */
+    padding: 10px 15px;
+    font-family: 'Consolas', 'Courier New', monospace; /* 터미널 폰트 */
 }
 
 #game-log-list {
     list-style: none;
     padding: 0;
     margin: 0;
+    display: flex;
+    flex-direction: column-reverse; /* 최신 로그가 맨 아래에 보이게 하거나, prepend 쓰면 column 사용 */
 }
 
-/* 개별 로그 항목 */
+/* 로그 한 줄 스타일 */
 .log-entry {
-    padding: 10px;
-    border-bottom: 1px solid #333;
-    font-family: 'Consolas', monospace; /* 터미널 느낌 폰트 */
-    font-size: 0.95rem;
+    padding: 4px 0;
+    border-bottom: 1px solid #222;
+    font-size: 0.9rem;
     color: #bdc3c7;
     display: flex;
-    gap: 15px;
-}
-
-.log-entry:first-child {
-    background-color: rgba(46, 204, 113, 0.1); /* 최신 로그 강조 */
-    border-left: 3px solid var(--accent-green);
+    gap: 10px;
 }
 
 .log-time {
-    color: #7f8c8d;
-    min-width: 80px;
+    color: #555;
+    font-size: 0.8rem;
+    min-width: 70px;
 }
 
-.log-msg {
-    color: #ecf0f1;
-}
-
-/* 중요 로그 강조 */
+/* 강조 메시지 */
 .log-highlight {
     color: var(--primary-orange);
     font-weight: bold;
+    background: rgba(243, 156, 18, 0.1);
+    padding: 2px 5px;
+    border-radius: 3px;
 }
 
 @media (max-width: 768px) {
