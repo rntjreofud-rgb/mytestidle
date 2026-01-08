@@ -160,15 +160,15 @@ header h2 {
 /* 업그레이드 버튼 (슬림형) */
 #upgrade-btn {
     width: 100%;
-    padding: 6px 12px;
+    padding: 4px 8px;      /* 패딩 대폭 축소 */
     background-color: var(--accent-green);
     border: none;
     color: white;
     font-weight: bold;
-    font-size: 0.85rem;
-    border-radius: 4px;
+    font-size: 0.8rem;     /* 글자 크기 축소 */
+    border-radius: 3px;
     cursor: pointer;
-    transition: background 0.2s;
+    line-height: 1.2;      /* 줄 간격 좁힘 */
 }
 #upgrade-btn:hover:not(:disabled) { background-color: #27ae60; }
 #upgrade-btn:disabled { background-color: #444; cursor: not-allowed; opacity: 0.7; }
@@ -276,18 +276,45 @@ header h2 {
 
 .shop-item {
     background-color: #25282c;
-    padding: 8px 10px; /* 패딩 축소 */
-    border-radius: 4px;
+    padding: 4px 8px;      /* 내부 여백을 4px로 줄임 */
+    border-radius: 3px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     cursor: pointer;
     border: 1px solid transparent;
-    transition: background 0.2s;
-    min-height: 40px;
+    transition: background 0.1s;
+    min-height: 34px;      /* 최소 높이를 34px로 고정 */
 }
 
-.shop-item:hover { background-color: #2c3035; border-color: var(--accent-blue); }
+.shop-item:hover {
+    background-color: #2c3035;
+    border-color: var(--accent-blue);
+}
+/* 건물 이름 */
+.shop-item strong {
+    font-size: 0.85rem;
+}
+
+/* 레벨 표시 (Lv.1) */
+.shop-item span[style*="font-size:0.8em"] {
+    font-size: 0.75rem !important;
+}
+
+/* 상세 설명 (소모/생산 텍스트) */
+.shop-item div[style*="font-size:0.8em"] {
+    font-size: 0.7rem !important; /* 아주 작게 */
+    margin-top: 0 !important;     /* 위쪽 여백 제거 */
+    line-height: 1;               /* 줄 간격 붙이기 */
+    color: #888 !important;
+}
+
+/* 가격 텍스트 */
+.cost-text {
+    font-size: 0.75rem;
+    font-weight: normal; /* 너무 두껍지 않게 */
+}
+
 .shop-item.disabled { opacity: 0.5; filter: grayscale(100%); cursor: default; }
 .cost-text { color: var(--primary-orange); font-size: 0.8rem; font-weight: bold; }
 
