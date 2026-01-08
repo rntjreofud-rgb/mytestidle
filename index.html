@@ -102,15 +102,21 @@
                 <div class="action-box">
                     <div class="section-title">🖐️ 수동 작업 (Manual Action)</div>
                     <div style="display: flex; flex-direction: column; gap: 10px;">
+        
+                 <!-- 나무는 처음부터 보임 -->
                         <button id="btn-gather-wood" class="btn-large">
-                            <span>🌲</span> 나무 베기
+                        <span>🌲</span> 나무 베기
                         </button>
-                        <button id="btn-gather-stone" class="btn-large locked">
-                            <span>🪨</span> 돌 캐기
+        
+                    <!-- 돌과 철은 'hidden' 클래스를 추가해둠 -->
+                        <button id="btn-gather-stone" class="btn-large hidden">
+                        <span>🪨</span> 돌 캐기
                         </button>
-                        <button id="btn-gather-iron" class="btn-large locked">
-                            <span>⚙️</span> 철광석 캐기
+        
+                        <button id="btn-gather-iron" class="btn-large hidden">
+                        <span>⚙️</span> 철광석 캐기
                         </button>
+        
                     </div>
                 </div>
 
