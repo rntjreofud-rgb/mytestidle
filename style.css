@@ -194,6 +194,54 @@ header {
 #upgrade-btn { width: 100%; padding: 12px; background-color: var(--accent-green); border: none; color: white; font-weight: bold; border-radius: 4px; cursor: pointer; }
 #upgrade-btn:disabled { background-color: #555; cursor: not-allowed; }
 
+
+/* 로그 컨테이너 스타일 */
+.log-container {
+    background-color: var(--bg-panel);
+    border-radius: 8px;
+    padding: 20px;
+    border: 1px solid var(--border-color);
+    height: calc(100vh - 200px); /* 화면 꽉 차게 */
+    overflow-y: auto; /* 스크롤 가능 */
+}
+
+#game-log-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* 개별 로그 항목 */
+.log-entry {
+    padding: 10px;
+    border-bottom: 1px solid #333;
+    font-family: 'Consolas', monospace; /* 터미널 느낌 폰트 */
+    font-size: 0.95rem;
+    color: #bdc3c7;
+    display: flex;
+    gap: 15px;
+}
+
+.log-entry:first-child {
+    background-color: rgba(46, 204, 113, 0.1); /* 최신 로그 강조 */
+    border-left: 3px solid var(--accent-green);
+}
+
+.log-time {
+    color: #7f8c8d;
+    min-width: 80px;
+}
+
+.log-msg {
+    color: #ecf0f1;
+}
+
+/* 중요 로그 강조 */
+.log-highlight {
+    color: var(--primary-orange);
+    font-weight: bold;
+}
+
 @media (max-width: 768px) {
     body { flex-direction: column; height: auto; overflow: auto; }
     .sidebar { width: 100%; height: auto; }

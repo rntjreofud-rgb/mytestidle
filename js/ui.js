@@ -1,6 +1,20 @@
+// js/ui.js 전체 덮어쓰기
+
 import { gameData, houseStages } from './data.js';
 
 const elements = {
+    // 뷰(화면) 요소
+    viewDashboard: document.getElementById('view-dashboard'),
+    viewLog: document.getElementById('view-log'),
+    
+    // 네비게이션 버튼
+    navDashboard: document.getElementById('nav-dashboard'),
+    navLog: document.getElementById('nav-log'),
+
+    // 로그 리스트
+    logList: document.getElementById('game-log-list'),
+
+    // 기존 요소들
     resGrid: document.querySelector('.resource-grid'),
     houseName: document.getElementById('house-name'),
     houseDesc: document.getElementById('house-desc'),
@@ -13,7 +27,7 @@ const elements = {
         plank: document.getElementById('btn-craft-plank')
     },
     buildingList: document.getElementById('building-list'),
-    log: document.getElementById('message-log')
+    headerLog: document.getElementById('message-log') // 헤더의 임시 로그
 };
 
 const resNames = {
@@ -24,26 +38,67 @@ const resNames = {
     gear: "⚙️ 톱니", circuit: "📟 회로"
 };
 
-// ⭐ [신규 기능] 숫자 포맷팅 함수 (k, m, b, t)
 function formatNumber(num) {
     if (num == null) return "0";
-    if (num < 1000) return Math.floor(num).toLocaleString(); // 1,000 미만은 그대로
-
+    if (num < 1000) return Math.floor(num).toLocaleString();
     const suffixes = ["k", "m", "b", "t", "q"];
     const suffixNum = Math.floor(("" + Math.floor(num)).length / 3);
-    
     let shortValue = parseFloat((suffixNum != 0 ? (num / Math.pow(1000, suffixNum)) : num).toPrecision(3));
-    if (shortValue % 1 != 0) {
-        shortValue = shortValue.toFixed(1);
-    }
+    if (shortValue % 1 != 0) shortValue = shortValue.toFixed(1);
     return shortValue + suffixes[suffixNum - 1];
 }
 
-export function log(msg) {
-    if(elements.log) {
-        elements.log.innerText = msg;
-        elements.log.style.opacity = 1;
-        setTimeout(() => { elements.log.style.opacity = 0.5; }, 2000);
+// ⭐ [기능 추가] 탭 전환 함수
+export function switchTab(tabName) {
+    // 1. 모든 뷰 숨김
+    elements.viewDashboard.classList.add('hidden');
+    elements.viewLog.classList.add('hidden');
+    
+    // 2. 모든 네비 버튼 비활성화
+    elements.navDashboard.classList.remove('active');
+    elements.navLog.classList.remove('active');
+
+    // 3. 선택된 탭만 활성화
+    if (tabName === 'dashboard') {
+        elements.viewDashboard.classList.remove('hidden');
+        elements.navDashboard.classList.add('active');
+    } else if (tabName === 'log') {
+        elements.viewLog.classList.remove('hidden');
+        elements.navLog.classList.add('active');
+    }
+}
+
+// ⭐ [기능 수정] 로그 함수: 헤더 표시 + 리스트 추가
+export function log(msg, isImportant = false) {
+    // 1. 상단 헤더에 잠시 보여주기 (기존 기능)
+    if(elements.headerLog) {
+        elements.headerLog.innerText = msg;
+        elements.headerLog.style.opacity = 1;
+        setTimeout(() => { elements.headerLog.style.opacity = 0.5; }, 3000);
+    }
+
+    // 2. 로그 탭 리스트에 영구 기록 (신규 기능)
+    if(elements.logList) {
+        const li = document.createElement('li');
+        li.className = 'log-entry';
+        
+        const time = new Date().toLocaleTimeString('ko-KR', { hour12: false });
+        
+        // 중요 메시지(업그레이드 등)는 색상 강조
+        const contentClass = isImportant ? 'log-msg log-highlight' : 'log-msg';
+        
+        li.innerHTML = `
+            <span class="log-time">[${time}]</span>
+            <span class="${contentClass}">${msg}</span>
+        `;
+        
+        // 최신 글이 위로 오게
+        elements.logList.prepend(li);
+        
+        // 로그가 너무 많이 쌓이면 삭제 (성능 최적화, 50개 유지)
+        if (elements.logList.children.length > 50) {
+            elements.logList.removeChild(elements.logList.lastChild);
+        }
     }
 }
 
@@ -58,12 +113,10 @@ export function updateScreen(netMPS) {
         const val = gameData.resources[key] || 0;
         const mps = netMPS[key] || 0;
         
-        // ⭐ 포맷팅 적용
         const amountEl = card.querySelector('.res-amount');
-        amountEl.innerText = formatNumber(val); // 여기서 k, m 변환
+        amountEl.innerText = formatNumber(val);
         
         const mpsEl = card.querySelector('.res-mps');
-        // 생산량도 너무 크면 포맷팅
         let mpsText = Math.abs(mps) < 1000 ? Math.abs(mps).toFixed(1) : formatNumber(Math.abs(mps));
         
         if(mps < 0) {
@@ -77,7 +130,6 @@ export function updateScreen(netMPS) {
             mpsEl.innerText = `+0.0 /s`;
         }
     }
-
     checkUnlocks();
 }
 
@@ -104,7 +156,6 @@ function checkUnlocks() {
     const lv = gameData.houseLevel;
     const woodCount = gameData.resources.wood || 0;
     
-    // 나무 10개 or 레벨1 이상이면 해금 (수정된 로직 유지)
     if (lv >= 1 || woodCount >= 10) {
         if(elements.btns.stone) elements.btns.stone.classList.remove('hidden');
         if(elements.btns.plank) elements.btns.plank.classList.remove('hidden');
@@ -128,7 +179,6 @@ export function renderShop(onBuyCallback, getCostFunc) {
         div.id = `build-${index}`;
         
         const cost = getCostFunc(b);
-        // 비용에도 포맷팅 적용
         let costTxt = Object.entries(cost)
             .map(([k, v]) => `${formatNumber(v)} ${resNames[k].split(' ')[1]}`)
             .join(', ');
@@ -183,7 +233,6 @@ export function updateHouseUI(onUpgrade) {
 
     if (nextStage) {
         const req = nextStage.req;
-        // 업그레이드 비용에도 포맷팅 적용
         const reqTxt = Object.entries(req)
             .map(([k,v]) => `${resNames[k].split(' ')[1]} ${formatNumber(v)}`)
             .join(', ');
