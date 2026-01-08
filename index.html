@@ -19,7 +19,6 @@
             <div class="nav-item active" id="nav-dashboard"><i>📊</i> 대시보드</div>
             
             <div class="nav-category">Systems</div>
-            <!-- ⭐ 전력, 연구 버튼 활성화 -->
             <div class="nav-item" id="nav-power"><i>⚡</i> 전력 관리</div>
             <div class="nav-item" id="nav-research"><i>🔬</i> 기술 연구</div>
         </div>
@@ -27,7 +26,7 @@
 
     <div class="main-wrapper">
         <header>
-            <h2 id="header-title">Lv.0 야영지</h2> <!-- ID 변경 -->
+            <h2 id="header-title">Lv.0 야영지</h2>
             <div class="header-status">
                 <span id="message-log">시스템 가동.</span>
             </div>
@@ -36,10 +35,9 @@
             </div>
         </header>
 
-        <!-- 메인 콘텐츠 영역 (여기에 탭 내용들이 들어감) -->
         <main class="content-area">
             
-             <!-- 대시보드 뷰 -->
+            <!-- 1. 대시보드 뷰 -->
             <div id="view-dashboard">
                 <div class="info-panel">
                     <div class="info-text">
@@ -59,9 +57,8 @@
                         <div class="section-title">🖐️ 수동 작업</div>
                         <div style="display: flex; flex-direction: column; gap: 10px;">
                             <button id="btn-gather-wood" class="btn-large">🌲 나무 베기</button>
-                            <!-- ⭐ 석탄 추가됨 -->
-                            <button id="btn-gather-coal" class="btn-large hidden" style="border-color:#555;">⚫ 석탄 캐기</button>
                             <button id="btn-gather-stone" class="btn-large hidden">🪨 돌 캐기</button>
+                            <button id="btn-gather-coal" class="btn-large hidden" style="border-color:#555;">⚫ 석탄 캐기</button>
                             <button id="btn-craft-plank" class="btn-large hidden" style="border-color:#f39c12">🪚 판자 깎기 (나무 -2)</button>
                             <button id="btn-gather-iron" class="btn-large hidden">⚙️ 철광석 캐기</button>
                             <button id="btn-gather-copper" class="btn-large hidden">🥉 구리광석 캐기</button>
@@ -74,11 +71,10 @@
                 </div>
             </div>
 
-            <!-- ⭐ 2. 전력 뷰 (업데이트됨) -->
+            <!-- 2. 전력 뷰 -->
             <div id="view-power" class="hidden">
                 <div class="section-title">⚡ 전력 네트워크 (Power Grid)</div>
                 
-                <!-- 전력 현황판 -->
                 <div class="info-panel" style="border-left-color: #f1c40f; flex-direction:column; align-items:stretch;">
                     <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
                         <div>
@@ -89,9 +85,7 @@
                             <span style="color:#2ecc71">0 MW</span> 생산 / <span style="color:#e74c3c">0 MW</span> 소비
                         </div>
                     </div>
-                    <!-- 게이지 바 배경 -->
                     <div style="width:100%; height:20px; background:#333; border-radius:10px; overflow:hidden;">
-                        <!-- 게이지 바 채움 -->
                         <div id="power-fill-bar" style="width: 0%; height:100%; background:#2ecc71; transition: width 0.3s, background 0.3s;"></div>
                     </div>
                 </div>
@@ -105,20 +99,28 @@
                 </div>
             </div>
 
-            <!-- 3. 연구 뷰 (기존 유지) -->
+            <!-- ⭐ 3. 연구 뷰 (이 부분이 중요합니다!) -->
             <div id="view-research" class="hidden">
                 <div class="section-title">🔬 기술 연구 (Research Tree)</div>
                 <div class="info-panel" style="border-left-color: #9b59b6;">
                     <div class="info-text">
                         <h3>연구소</h3>
-                        <p>준비 중인 기능입니다.</p>
+                        <!-- 문구 수정됨 -->
+                        <p>자원을 투자하여 생산 효율을 높이는 기술을 개발하세요.</p>
+                    </div>
+                </div>
+                <!-- 자바스크립트가 여기에 연구 목록을 채워넣습니다 -->
+                <div class="action-box">
+                    <div class="section-title">연구 목록</div>
+                    <!-- 로딩 안됐을 때 보이는 기본 텍스트 -->
+                    <div style="padding:20px; text-align:center; color:#777;">
+                        연구 데이터 불러오는 중...
                     </div>
                 </div>
             </div>
 
         </main>
-        
-        <!-- 하단 로그 (기존 유지) -->
+
         <section class="system-log-area">
             <div class="log-header">📜 System Log</div>
             <div class="log-content">
