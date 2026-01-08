@@ -258,7 +258,6 @@ function checkUnlocks() {
 export function renderShop(onBuyCallback, getCostFunc) {
     elements.buildingList.innerHTML = "";
     
-    // 조건 체크 (기존 로직 유지)
     const lv = gameData.houseLevel;
     const wood = gameData.resources.wood || 0;
     const hasLogger = gameData.buildings[0] && gameData.buildings[0].count > 0;
@@ -299,7 +298,7 @@ export function renderShop(onBuyCallback, getCostFunc) {
              processTxt += `➡ <span style="color:#2ecc71">+${outArr.join(', ')}</span> /s`;
         }
 
-        /* ⭐ 핵심 변경: 복잡한 div 구조 제거 -> 깔끔한 클래스 구조로 변경 ⭐ */
+        /* ⭐ 수정됨: 이름과 레벨을 묶지 않고 따로 배치 ⭐ */
         div.innerHTML = `
             <span class="si-name">${b.name}</span>
             <span class="si-level">Lv.${b.count}</span>

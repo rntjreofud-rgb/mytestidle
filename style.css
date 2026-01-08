@@ -133,17 +133,20 @@ header h2 { margin: 0; font-size: 1rem; color: #fff; }
 .shop-item:active, .btn-large:active { transform: translateY(2px); box-shadow: none; }
 .shop-item.disabled, .btn-large.disabled { opacity: 0.5; background-color: var(--bg-button-disabled); cursor: not-allowed; box-shadow: none; }
 
-/* === 텍스트 4모서리 배치 === */
+/* =========================================
+   3. 텍스트 위치 고정 (4모서리 배치)
+   ========================================= */
 
 /* [좌측 상단] 이름 */
-.shop-item > div:first-child > div:first-child {
+.si-name {
     position: absolute !important;
-    top: 12px; left: 12px;
+    top: 12px;
+    left: 14px;
     
-    /* ⭐ 중요: 이름이 오른쪽 65px(레벨 자리) 침범 금지 ⭐ */
-    max-width: calc(100% - 65px) !important;
+    /* 레벨 텍스트(우측)와 겹치지 않게 공간 제한 */
+    right: 70px; 
     
-    font-size: 0.95rem !important;
+    font-size: 0.95rem;
     font-weight: bold;
     color: #fff;
     text-align: left;
@@ -153,37 +156,32 @@ header h2 { margin: 0; font-size: 1rem; color: #fff; }
     text-overflow: ellipsis;
 }
 
-/* [우측 상단] 레벨 (Lv.0) */
-.shop-item span[style*="color:#f39c12"] {
+/* [우측 상단] 레벨 */
+.si-level {
     position: absolute !important;
-    top: 10px; right: 12px;
+    top: 12px;
+    right: 14px;
     
-    font-size: 0.8rem !important;
-    color: #ffd700 !important;
-    background: rgba(0,0,0,0.4);
-    padding: 2px 6px;
-    border-radius: 4px;
+    font-size: 0.8rem;
+    color: #ffd700; /* 노란색 */
+    font-weight: normal;
+    text-align: right;
     
+    /* 이름과 분리되어 우측 끝에 고정 */
     z-index: 5;
-    /* 레벨 텍스트도 너무 길면 줄임 처리 */
-    max-width: 60px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    text-align: center;
 }
 
-/* [좌측 하단] 설명 (+1 나무/s) */
-.shop-item > div:first-child > div:last-child {
+/* [좌측 하단] 설명 (생산량) */
+.si-desc {
     position: absolute !important;
-    bottom: 12px; left: 12px;
+    bottom: 12px;
+    left: 14px;
     
-    /* ⭐ 중요: 설명이 오른쪽 95px(가격 자리) 침범 금지 ⭐ */
-    max-width: calc(100% - 95px) !important;
+    /* 가격 텍스트(우측)와 겹치지 않게 공간 제한 */
+    right: 80px;
     
-    font-size: 0.75rem !important;
-    color: #aeb6ce !important;
-    margin: 0 !important;
+    font-size: 0.75rem;
+    color: #aeb6ce;
     line-height: 1;
     text-align: left;
     
@@ -192,18 +190,17 @@ header h2 { margin: 0; font-size: 1rem; color: #fff; }
     text-overflow: ellipsis;
 }
 
-/* [우측 하단] 비용 */
-.shop-item > div:last-child {
+/* [우측 하단] 비용 (가격) */
+.si-cost {
     position: absolute !important;
-    bottom: 12px; right: 12px;
-    text-align: right;
+    bottom: 12px;
+    right: 14px;
     
-    max-width: 90px; /* 가격 표시 공간 */
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    text-align: right;
+    font-size: 0.85rem;
+    color: var(--primary-orange);
+    font-weight: bold;
 }
-.cost-text { font-size: 0.85rem; color: var(--primary-orange); font-weight: bold; }
 
 /* 수동 버튼 */
 .btn-large {
