@@ -3,128 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Melvor Style Idle</title>
-    <!-- 폰트 아이콘 (Font Awesome 등) 대신 간단한 이모지 사용 -->
+    <title>Factorio Idle</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <!-- 1. 왼쪽 사이드바 -->
     <nav class="sidebar">
         <div class="logo-area">
-            <div style="font-size: 3rem;">🏔️</div>
-            <h1>IDLE CIVILIZATION</h1>
-            <small style="color: #2ecc71;">Demo Version</small>
+            <div style="font-size: 3rem;">🏭</div>
+            <h1>FACTORIO IDLE</h1>
+            <small style="color: #f39c12;">Production Line</small>
         </div>
-
         <div class="nav-menu">
-            <div class="nav-category">General</div>
-            <div class="nav-item active">
-                <i>🏠</i> 요약 (Overview)
-            </div>
-            
-            <div class="nav-category">Skills</div>
-            <div class="nav-item">
-                <i>🌲</i> 벌목 (Woodcutting)
-            </div>
-            <div class="nav-item">
-                <i>⛏️</i> 채광 (Mining)
-            </div>
-            <div class="nav-item">
-                <i>🔨</i> 건설 (Construction)
-            </div>
-
-            <div class="nav-category">Combat (잠김)</div>
-            <div class="nav-item" style="opacity: 0.5;">
-                <i>⚔️</i> 공격 (Attack)
-            </div>
+            <div class="nav-category">Control Center</div>
+            <div class="nav-item active"><i>📊</i> 대시보드</div>
+            <div class="nav-category">Logistics</div>
+            <div class="nav-item"><i>⚡</i> 전력 (준비중)</div>
+            <div class="nav-item"><i>🔬</i> 연구 (준비중)</div>
         </div>
     </nav>
 
-    <!-- 2. 메인 콘텐츠 -->
     <div class="main-wrapper">
-        <!-- 상단 헤더 -->
         <header>
-            <h2 id="house-name">⛺ 레벨 0: 텐트</h2>
+            <h2 id="house-name">Lv.0 야영지</h2>
             <div class="header-status">
-                <span id="message-log">시스템 준비 완료</span>
+                <span id="message-log">시스템 가동.</span>
             </div>
-            <button style="background:none; border:1px solid white; color:white; padding:5px 10px; border-radius:4px; cursor:pointer;">
-                ☁️ Cloud Save
-            </button>
+            <div>
+                <button onclick="localStorage.removeItem('civIdleModularSave');location.reload()" style="background:#e74c3c; border:none; color:white; padding:5px; cursor:pointer;">초기화</button>
+            </div>
         </header>
 
-        <!-- 스크롤 가능한 콘텐츠 영역 -->
         <main class="content-area">
             
-            <!-- 정보 패널 (튜토리얼 박스 느낌) -->
+            <!-- 정보 패널 -->
             <div class="info-panel">
                 <div class="info-text">
-                    <h3 id="house-desc">문명의 시작</h3>
-                    <p>자원을 모아 다음 시대로 발전하세요.</p>
+                    <h3 id="house-desc">설명</h3>
+                    <p>재료를 모아 공정을 자동화하세요.</p>
                 </div>
-                <!-- 업그레이드 버튼을 여기로 이동 -->
-                <div style="width: 200px;">
+                <div style="width: 250px;">
                     <button id="upgrade-btn">⬆️ 업그레이드</button>
                 </div>
             </div>
 
-            <!-- 자원 현황 (카드 형태) -->
-            <div class="section-title">
-                <span>🎒 보유 자원 (Inventory)</span>
-            </div>
+            <div class="section-title">📦 자원 창고 (Inventory)</div>
             
-            <div class="resource-grid">
-                <!-- 나무 -->
-                <div class="res-card wood">
-                    <span>🌲 통나무</span>
-                    <h3 id="res-wood">0</h3>
-                    <small id="mps-wood">+0/초</small>
-                </div>
-                <!-- 돌 -->
-                <div class="res-card stone">
-                    <span>🪨 돌멩이</span>
-                    <h3 id="res-stone">0</h3>
-                    <small id="mps-stone">+0/초</small>
-                </div>
-                <!-- 철 -->
-                <div class="res-card iron">
-                    <span>⚙️ 철광석</span>
-                    <h3 id="res-iron">0</h3>
-                    <small id="mps-iron">+0/초</small>
-                </div>
-            </div>
+            <!-- 자원 카드가 JS로 동적 생성됩니다 -->
+            <div class="resource-grid"></div>
 
-            <!-- 작업 영역 (2열 배치) -->
             <div class="action-grid">
                 
                 <!-- 왼쪽: 수동 채집 -->
                 <div class="action-box">
-                    <div class="section-title">🖐️ 수동 작업 (Manual Action)</div>
+                    <div class="section-title">🖐️ 수동 작업</div>
                     <div style="display: flex; flex-direction: column; gap: 10px;">
-        
-                 <!-- 나무는 처음부터 보임 -->
-                        <button id="btn-gather-wood" class="btn-large">
-                        <span>🌲</span> 나무 베기
-                        </button>
-        
-                    <!-- 돌과 철은 'hidden' 클래스를 추가해둠 -->
-                        <button id="btn-gather-stone" class="btn-large hidden">
-                        <span>🪨</span> 돌 캐기
-                        </button>
-        
-                        <button id="btn-gather-iron" class="btn-large hidden">
-                        <span>⚙️</span> 철광석 캐기
-                        </button>
-        
+                        <button id="btn-gather-wood" class="btn-large">🌲 나무 베기</button>
+                        <button id="btn-gather-stone" class="btn-large hidden">🪨 돌 캐기</button>
+                        <button id="btn-craft-plank" class="btn-large hidden" style="border-color:#f39c12">🪚 판자 깎기 (나무 -2)</button>
+                        <button id="btn-gather-iron" class="btn-large hidden">⚙️ 철광석 캐기</button>
+                        <button id="btn-gather-copper" class="btn-large hidden">🥉 구리광석 캐기</button>
                     </div>
                 </div>
 
                 <!-- 오른쪽: 상점 -->
                 <div class="action-box">
-                    <div class="section-title">🏭 생산 시설 구매 (Shop)</div>
+                    <div class="section-title">🏭 공장 건설 (Automation)</div>
                     <div id="building-list">
-                        <!-- JS가 여기에 건물을 채워넣음 -->
+                        <!-- JS가 채워넣음 -->
                     </div>
                 </div>
 
@@ -132,10 +78,6 @@
         </main>
     </div>
 
-    <!-- JS 연결 (모듈 버전인 경우) -->
     <script type="module" src="js/main.js"></script>
-    
-    <!-- 만약 모듈화 이전 단일 파일을 쓴다면 아래 주석 해제 후 사용 -->
-    <!-- <script src="script.js"></script> -->
 </body>
 </html>
