@@ -83,57 +83,52 @@ header h2 { margin: 0; font-size: 1rem; color: #fff; }
 .res-card.circuit::after { background-color: #2ecc71; }
 
 /* =========================================
-   5. 버튼 및 그리드 (4x4 가로 배열 강제 적용)
+   5. 버튼 및 그리드 (4x 배열 + 좌우 배치 레이아웃)
    ========================================= */
 
-/* ⭐ 여기가 핵심입니다: 무조건 가로 4개로 고정 ⭐ */
-#building-list, 
-#research-list-container, 
-.action-box > div { /* 수동 버튼 감싸는 div */
+/* 4열 강제 고정 (유지) */
+.action-box > div, #building-list, #research-list-container, .action-grid {
     display: grid !important;
-    grid-template-columns: repeat(4, 1fr) !important; /* 4열 강제 */
-    gap: 10px !important;
+    grid-template-columns: repeat(4, 1fr) !important; 
+    gap: 8px !important;
     padding: 0;
-    width: 100%;
 }
 
-/* 버튼 공통 스타일 */
+/* 버튼 공통 스타일 (박스형) */
 .btn-large, .shop-item, #upgrade-btn {
     width: 100%;
-    /* 높이를 적당히 키워 내용이 잘리지 않게 함 */
-    min-height: 90px; 
+    min-height: 64px;  /* 적당한 높이 */
     height: auto;
     
     background-color: var(--bg-button);
     border: none;
-    border-radius: 8px;
+    border-radius: 6px;
     
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between; /* 위아래 내용 분산 */
-    align-items: center;
-    text-align: center;
+    /* ⭐ 핵심 변경: 가로 배치 (좌우 분리) ⭐ */
+    display: flex !important;
+    flex-direction: row !important; 
+    justify-content: space-between; /* 양쪽 끝으로 밀기 */
+    align-items: center; /* 수직 중앙 정렬 */
+    text-align: left;    /* 텍스트 왼쪽 정렬 */
     
-    padding: 12px 8px;
-    margin: 0; /* 마진 제거 */
+    padding: 10px 12px;
+    margin: 0;
     
     color: #e0e0e0;
     font-size: 0.9rem;
     cursor: pointer;
-    box-shadow: 0 4px 0 rgba(0,0,0,0.2);
+    box-shadow: 0 3px 0 rgba(0,0,0,0.3); /* 입체감 */
     transition: transform 0.1s, background 0.1s;
     position: relative;
-    
-    /* 텍스트 줄바꿈 허용 */
-    white-space: normal !important;
-    word-break: keep-all; 
 }
 
-/* 호버/클릭 효과 */
+/* 호버 효과 */
 .btn-large:hover, .shop-item:hover, #upgrade-btn:hover:not(:disabled) {
-    background-color: var(--bg-button-hover);
+    background-color: #1a4a8a; /* 밝은 파랑 */
     transform: translateY(-2px);
 }
+
+/* 클릭 효과 */
 .btn-large:active, .shop-item:active, #upgrade-btn:active:not(:disabled) {
     transform: translateY(2px);
     box-shadow: none;
@@ -148,45 +143,85 @@ header h2 { margin: 0; font-size: 1rem; color: #fff; }
     box-shadow: none;
     border: 1px solid #333;
 }
-#upgrade-btn:disabled { background-color: #333; color: #555; cursor: not-allowed; box-shadow: none; }
 
-/* === 버튼 내부 텍스트 === */
+#upgrade-btn:disabled {
+    background-color: #333;
+    color: #555;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+/* === 버튼 내부 콘텐츠 정렬 === */
+
+/* 1. 왼쪽 영역 (이름 + 설명) */
+.shop-item > div:first-child, .btn-large > div:first-child {
+    display: flex;
+    flex-direction: column; /* 이름 위, 설명 아래 */
+    align-items: flex-start;
+    flex: 1; /* 남은 공간 차지 */
+    padding-right: 5px;
+}
+
+/* 2. 오른쪽 영역 (가격) */
+.shop-item > div:last-child, .cost-text {
+    text-align: right;
+    flex-shrink: 0; /* 줄어들지 않음 */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* 이름 스타일 */
 .shop-item strong, .btn-large strong {
     display: block;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     font-weight: bold;
     color: #fff;
-    margin-bottom: 5px;
-    line-height: 1.2;
+    margin-bottom: 3px;
 }
 
-/* 설명 (중간) */
-.shop-item div span, .shop-item div small, .shop-item div[style*="font-size"] {
+/* 설명 텍스트 (보유량, 생산량 등) */
+.shop-item div span, 
+.shop-item div small, 
+.shop-item div[style*="font-size"] {
     font-size: 0.75rem !important;
-    color: #aeb6ce !important;
-    margin: 2px 0 !important;
-    display: block; /* 한 줄씩 나오게 */
+    color: #8892b0 !important; /* 차분한 색상 */
+    margin: 0 !important;
+    line-height: 1.2;
+    display: block;
 }
 
-/* 비용 (하단) */
+/* 비용 텍스트 (오른쪽 강조) */
 .cost-text {
-    font-size: 0.8rem;
-    color: var(--accent-green);
-    margin-top: auto; /* 맨 아래로 */
-    padding-top: 5px;
+    font-size: 0.85rem;
+    color: var(--primary-orange); /* 오렌지색 */
     font-weight: bold;
-    display: block;
-    width: 100%;
 }
 
 /* 업그레이드 버튼 */
-#upgrade-btn { background-color: var(--primary-orange); min-height: 60px; color: white; }
+#upgrade-btn {
+    background-color: var(--accent-green); /* 녹색 */
+    min-height: 50px;
+    color: #fff;
+    justify-content: center; /* 중앙 정렬 */
+    text-align: center;
+}
 
-/* 레벨 뱃지 */
+/* 레벨 뱃지 (Lv.1 등) - 이름 옆에 작게 붙이기 */
 .shop-item span[style*="color:#f39c12"] {
-    position: absolute; top: 5px; right: 5px;
-    font-size: 0.7rem !important; color: #ffd700 !important;
-    background: rgba(0,0,0,0.4); padding: 2px 5px; border-radius: 4px;
+    font-size: 0.7rem !important;
+    color: #ffd700 !important;
+    background: transparent;
+    padding: 0;
+    margin-left: 4px;
+}
+
+/* 수동 버튼 텍스트 (아이콘 + 이름) */
+.btn-large {
+    font-weight: bold;
+    color: #fff;
+    justify-content: center; /* 수동 버튼은 중앙 정렬이 예쁠 수 있음 (선택사항) */
+    /* 만약 수동 버튼도 좌우로 나누고 싶다면 아래 justify-content: space-between 사용 */
 }
 
 .hidden { display: none !important; }
