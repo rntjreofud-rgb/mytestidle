@@ -3,60 +3,133 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Civilization Idle: Modular</title>
+    <title>Melvor Style Idle</title>
+    <!-- 폰트 아이콘 (Font Awesome 등) 대신 간단한 이모지 사용 -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
+
+    <!-- 1. 왼쪽 사이드바 -->
+    <nav class="sidebar">
+        <div class="logo-area">
+            <div style="font-size: 3rem;">🏔️</div>
+            <h1>IDLE CIVILIZATION</h1>
+            <small style="color: #2ecc71;">Demo Version</small>
+        </div>
+
+        <div class="nav-menu">
+            <div class="nav-category">General</div>
+            <div class="nav-item active">
+                <i>🏠</i> 요약 (Overview)
+            </div>
+            
+            <div class="nav-category">Skills</div>
+            <div class="nav-item">
+                <i>🌲</i> 벌목 (Woodcutting)
+            </div>
+            <div class="nav-item">
+                <i>⛏️</i> 채광 (Mining)
+            </div>
+            <div class="nav-item">
+                <i>🔨</i> 건설 (Construction)
+            </div>
+
+            <div class="nav-category">Combat (잠김)</div>
+            <div class="nav-item" style="opacity: 0.5;">
+                <i>⚔️</i> 공격 (Attack)
+            </div>
+        </div>
+    </nav>
+
+    <!-- 2. 메인 콘텐츠 -->
+    <div class="main-wrapper">
+        <!-- 상단 헤더 -->
         <header>
-            <h1>🚀 문명 발전: 지구에서 우주로</h1>
-            <p>모듈화된 시스템으로 더 복잡한 문명을 만드세요.</p>
+            <h2 id="house-name">⛺ 레벨 0: 텐트</h2>
+            <div class="header-status">
+                <span id="message-log">시스템 준비 완료</span>
+            </div>
+            <button style="background:none; border:1px solid white; color:white; padding:5px 10px; border-radius:4px; cursor:pointer;">
+                ☁️ Cloud Save
+            </button>
         </header>
 
-        <section class="resources-panel">
-            <div class="res-box wood">
-                <span>🌲 나무</span>
-                <h3 id="res-wood">0</h3>
-                <small id="mps-wood">+0/초</small>
+        <!-- 스크롤 가능한 콘텐츠 영역 -->
+        <main class="content-area">
+            
+            <!-- 정보 패널 (튜토리얼 박스 느낌) -->
+            <div class="info-panel">
+                <div class="info-text">
+                    <h3 id="house-desc">문명의 시작</h3>
+                    <p>자원을 모아 다음 시대로 발전하세요.</p>
+                </div>
+                <!-- 업그레이드 버튼을 여기로 이동 -->
+                <div style="width: 200px;">
+                    <button id="upgrade-btn">⬆️ 업그레이드</button>
+                </div>
             </div>
-            <div class="res-box stone">
-                <span>🪨 돌</span>
-                <h3 id="res-stone">0</h3>
-                <small id="mps-stone">+0/초</small>
-            </div>
-            <div class="res-box iron">
-                <span>⚙️ 철</span>
-                <h3 id="res-iron">0</h3>
-                <small id="mps-iron">+0/초</small>
-            </div>
-        </section>
 
-        <section class="main-house-area">
-            <div class="house-info">
-                <h2 id="house-name">⛺ 레벨 0: 텐트</h2>
-                <p id="house-desc">설명</p>
+            <!-- 자원 현황 (카드 형태) -->
+            <div class="section-title">
+                <span>🎒 보유 자원 (Inventory)</span>
             </div>
-            <button id="upgrade-btn">⬆️ 업그레이드</button>
-        </section>
-
-        <section class="action-area">
-            <h3>⛏️ 수동 채집</h3>
-            <div class="buttons-grid">
-                <button id="btn-gather-wood" class="gather-btn">🌲 나무 베기</button>
-                <button id="btn-gather-stone" class="gather-btn locked">🪨 돌 캐기</button>
-                <button id="btn-gather-iron" class="gather-btn locked">⚙️ 철광석 캐기</button>
+            
+            <div class="resource-grid">
+                <!-- 나무 -->
+                <div class="res-card wood">
+                    <span>🌲 통나무</span>
+                    <h3 id="res-wood">0</h3>
+                    <small id="mps-wood">+0/초</small>
+                </div>
+                <!-- 돌 -->
+                <div class="res-card stone">
+                    <span>🪨 돌멩이</span>
+                    <h3 id="res-stone">0</h3>
+                    <small id="mps-stone">+0/초</small>
+                </div>
+                <!-- 철 -->
+                <div class="res-card iron">
+                    <span>⚙️ 철광석</span>
+                    <h3 id="res-iron">0</h3>
+                    <small id="mps-iron">+0/초</small>
+                </div>
             </div>
-        </section>
 
-        <section class="shop-area">
-            <h3>🏭 생산 시설 건설</h3>
-            <div id="building-list"></div>
-        </section>
+            <!-- 작업 영역 (2열 배치) -->
+            <div class="action-grid">
+                
+                <!-- 왼쪽: 수동 채집 -->
+                <div class="action-box">
+                    <div class="section-title">🖐️ 수동 작업 (Manual Action)</div>
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <button id="btn-gather-wood" class="btn-large">
+                            <span>🌲</span> 나무 베기
+                        </button>
+                        <button id="btn-gather-stone" class="btn-large locked">
+                            <span>🪨</span> 돌 캐기
+                        </button>
+                        <button id="btn-gather-iron" class="btn-large locked">
+                            <span>⚙️</span> 철광석 캐기
+                        </button>
+                    </div>
+                </div>
 
-        <div id="message-log">시스템 준비 완료.</div>
+                <!-- 오른쪽: 상점 -->
+                <div class="action-box">
+                    <div class="section-title">🏭 생산 시설 구매 (Shop)</div>
+                    <div id="building-list">
+                        <!-- JS가 여기에 건물을 채워넣음 -->
+                    </div>
+                </div>
+
+            </div>
+        </main>
     </div>
 
-    <!-- type="module"이 중요합니다 -->
+    <!-- JS 연결 (모듈 버전인 경우) -->
     <script type="module" src="js/main.js"></script>
+    
+    <!-- 만약 모듈화 이전 단일 파일을 쓴다면 아래 주석 해제 후 사용 -->
+    <!-- <script src="script.js"></script> -->
 </body>
 </html>
