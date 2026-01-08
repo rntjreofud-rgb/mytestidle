@@ -161,41 +161,26 @@ header h2 { margin: 0; font-size: 1rem; color: #fff; }
 .res-card.circuit::after { background-color: #2ecc71; }
 
 /* =========================================
-   5. 버튼 및 그리드 (레이아웃 분리 수정)
+   5. 버튼 및 그리드 (구조 변경 대응 + 완벽한 배치)
    ========================================= */
 
-/* 
-   [수정 1] 전체 레이아웃 (수동작업 박스 vs 공장건설 박스)
-   - 기존: 4열 강제 (오류 원인)
-   - 수정: 화면 반반(1:1) 사용, 꽉 차게 설정
-*/
+/* 1. 그리드 레이아웃: 무조건 4열(4x) 고정 */
+.action-box > div, 
+#building-list, 
+#research-list-container, 
 .action-grid {
     display: grid !important;
-    /* 왼쪽(수동), 오른쪽(공장) 1:1 비율로 넓게 배치 */
-    grid-template-columns: 1fr 1fr !important; 
-    gap: 20px !important;
-    width: 100%;
-}
-
-/* 
-   [수정 2] 버튼 리스트 (실제 버튼들)
-   - 박스 안에서는 4열(4x) 유지
-*/
-.action-box > div, /* 수동 버튼 그룹 */
-#building-list,    /* 건물 리스트 */
-#research-list-container { /* 연구 리스트 */
-    display: grid !important;
     grid-template-columns: repeat(4, 1fr) !important; 
-    gap: 10px !important;
+    gap: 8px !important;
     padding: 0;
     width: 100%;
 }
 
-/* 2. 상점 아이템 (건물/연구) - 박스 스타일 */
+/* 2. 상점 아이템 (박스) */
 .shop-item {
     position: relative !important;
     width: 100%;
-    height: 90px !important;       
+    height: 90px !important;
     
     background-color: var(--bg-button);
     border: 1px solid #444;
@@ -207,82 +192,67 @@ header h2 { margin: 0; font-size: 1rem; color: #fff; }
     cursor: pointer;
     box-shadow: 0 4px 0 rgba(0,0,0,0.2);
     display: block !important;
-    
     transition: transform 0.1s;
-    overflow: hidden; /* 글자 튀어나옴 방지 */
 }
 
-/* 호버/클릭 효과 */
-.shop-item:hover, .btn-large:hover {
+/* 호버 효과 */
+.shop-item:hover {
     background-color: var(--bg-button-hover);
     transform: translateY(-2px);
     z-index: 10;
 }
-.shop-item:active, .btn-large:active {
-    transform: translateY(2px);
-    box-shadow: none;
-}
+.shop-item:active { transform: translateY(2px); box-shadow: none; }
+.shop-item.disabled { opacity: 0.5; background-color: var(--bg-button-disabled); cursor: not-allowed; box-shadow: none; }
 
-/* 비활성 상태 */
-.shop-item.disabled, .btn-large.disabled {
-    opacity: 0.5;
-    background-color: var(--bg-button-disabled);
-    cursor: not-allowed;
-    box-shadow: none;
-}
 
 /* =========================================
-   3. 텍스트 위치 고정 (겹침 방지)
+   3. 내부 요소 배치 (JS 수정 반영)
    ========================================= */
 
-/* [좌측 상단] 이름 */
-.shop-item > div:first-child > div:first-child {
-    position: absolute !important;
+/* [좌측 상단] 이름 (.si-name) */
+.si-name {
+    position: absolute;
     top: 12px;
     left: 12px;
     
-    /* 레벨 자리(70px)를 제외한 공간 사용 */
-    width: calc(100% - 70px) !important;
+    /* ⭐ 이름이 길어지면 여기서 딱 멈춤 (오른쪽 60px 여유) ⭐ */
+    width: calc(100% - 60px); 
     
-    font-size: 0.95rem !important;
+    font-size: 0.95rem;
     font-weight: bold;
     color: #fff;
     text-align: left;
     
     white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis;
+    text-overflow: ellipsis; /* ... 으로 표시 */
 }
 
-/* [우측 상단] 레벨 (Lv.0) */
-.shop-item span[style*="color:#f39c12"] {
-    position: absolute !important;
+/* [우측 상단] 레벨 (.si-level) */
+.si-level {
+    position: absolute;
     top: 10px;
     right: 12px;
     
-    font-size: 0.8rem !important;
-    color: #ffd700 !important;
+    font-size: 0.75rem;
+    color: #ffd700; /* 노란색 */
     background: rgba(0,0,0,0.4);
     padding: 2px 6px;
     border-radius: 4px;
     
-    margin: 0 !important;
-    text-align: right;
-    z-index: 5;
+    z-index: 5; /* 이름보다 위에 표시 */
 }
 
-/* [좌측 하단] 설명 (+1 나무/s) */
-.shop-item > div:first-child > div:last-child {
-    position: absolute !important;
+/* [좌측 하단] 설명 (.si-desc) */
+.si-desc {
+    position: absolute;
     bottom: 12px;
     left: 12px;
     
-    /* 가격 자리(90px)를 제외한 공간 사용 */
-    width: calc(100% - 90px) !important;
+    width: calc(100% - 90px); /* 가격 자리 침범 금지 */
     
-    font-size: 0.75rem !important;
-    color: #aeb6ce !important;
-    margin: 0 !important;
+    font-size: 0.75rem;
+    color: #aeb6ce;
     line-height: 1;
     text-align: left;
     
@@ -291,26 +261,20 @@ header h2 { margin: 0; font-size: 1rem; color: #fff; }
     text-overflow: ellipsis;
 }
 
-/* [우측 하단] 비용 (10 나무) */
-.shop-item > div:last-child {
-    position: absolute !important;
+/* [우측 하단] 비용 (.si-cost) */
+.si-cost {
+    position: absolute;
     bottom: 12px;
     right: 12px;
-    text-align: right;
     
-    /* 비용 텍스트 공간 확보 */
-    min-width: 80px; 
-}
-
-.cost-text {
     font-size: 0.85rem;
     color: var(--primary-orange);
     font-weight: bold;
-    white-space: nowrap;
+    text-align: right;
 }
 
 
-/* 4. 수동 작업 버튼 (.btn-large) */
+/* 4. 수동 작업 버튼 */
 .btn-large {
     width: 100%;
     height: 90px !important;
@@ -329,7 +293,8 @@ header h2 { margin: 0; font-size: 1rem; color: #fff; }
     box-shadow: 0 4px 0 rgba(0,0,0,0.2);
     transition: transform 0.1s;
 }
-.btn-large strong { position: static !important; }
+.btn-large:hover { background-color: var(--bg-button-hover); transform: translateY(-2px); }
+.btn-large:active { transform: translateY(2px); box-shadow: none; }
 
 /* 업그레이드 버튼 */
 #upgrade-btn {
@@ -344,19 +309,11 @@ header h2 { margin: 0; font-size: 1rem; color: #fff; }
     box-shadow: 0 4px 0 rgba(0,0,0,0.2);
     margin-bottom: 10px;
 }
-#upgrade-btn:disabled {
-    background-color: #333;
-    color: #555;
-    cursor: not-allowed;
-    box-shadow: none;
-}
+#upgrade-btn:disabled { background-color: #333; color: #555; cursor: not-allowed; box-shadow: none; }
 
-/* 모바일 대응 (화면 좁을 때 처리) */
+/* 모바일 대응 */
 @media (max-width: 1000px) {
-    /* 화면이 좁아지면 구획을 1열로 변경 */
-    .action-grid { grid-template-columns: 1fr !important; }
-    /* 버튼은 2열로 변경 */
-    .action-box > div, #building-list, #research-list-container {
+    .action-box > div, #building-list, #research-list-container, .action-grid {
         grid-template-columns: repeat(2, 1fr) !important; 
     }
 }

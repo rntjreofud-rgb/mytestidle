@@ -253,9 +253,12 @@ function checkUnlocks() {
     }
 }
 
+/* js/ui.js의 renderShop 함수를 이걸로 완전히 덮어씌워주세요 */
+
 export function renderShop(onBuyCallback, getCostFunc) {
     elements.buildingList.innerHTML = "";
     
+    // 조건 체크 (기존 로직 유지)
     const lv = gameData.houseLevel;
     const wood = gameData.resources.wood || 0;
     const hasLogger = gameData.buildings[0] && gameData.buildings[0].count > 0;
@@ -264,11 +267,8 @@ export function renderShop(onBuyCallback, getCostFunc) {
 
     gameData.buildings.forEach((b, index) => {
         const req = b.reqLevel || 0;
-        if (req === 0.5) {
-            if (!isStoneUnlocked) return; 
-        } else if (req >= 1) {
-            if (lv < req) return; 
-        }
+        if (req === 0.5 && !isStoneUnlocked) return;
+        if (req >= 1 && lv < req) return;
         
         const div = document.createElement('div');
         div.className = `shop-item`;
@@ -299,13 +299,14 @@ export function renderShop(onBuyCallback, getCostFunc) {
              processTxt += `➡ <span style="color:#2ecc71">+${outArr.join(', ')}</span> /s`;
         }
 
+        /* ⭐ 핵심 변경: 복잡한 div 구조 제거 -> 깔끔한 클래스 구조로 변경 ⭐ */
         div.innerHTML = `
-            <div style="flex:1;">
-                <div style="font-weight:bold; font-size:1em;">${b.name} <span style="font-size:0.8em; color:#f39c12;">(Lv.${b.count})</span></div>
-                <div style="font-size:0.8em; margin-top:3px; color:#999;">${processTxt}</div>
-            </div>
-            <div style="text-align:right; font-size:0.9em;"><span class="cost-text">${costTxt}</span></div>
+            <span class="si-name">${b.name}</span>
+            <span class="si-level">Lv.${b.count}</span>
+            <div class="si-desc">${processTxt}</div>
+            <div class="si-cost">${costTxt}</div>
         `;
+        
         div.onclick = () => onBuyCallback(index);
         elements.buildingList.appendChild(div);
     });
