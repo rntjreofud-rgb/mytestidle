@@ -1,8 +1,9 @@
-// js/ui.js 덮어쓰기
+// js/ui.js
 
 import { gameData, houseStages, researchList } from './data.js';
 import * as Logic from './logic.js';
 
+// ... (elements, resNames, formatNumber 등 상단 부분은 그대로 유지) ...
 const elements = {
     viewDashboard: document.getElementById('view-dashboard'),
     viewPower: document.getElementById('view-power'),
@@ -87,11 +88,9 @@ export function log(msg, isImportant = false) {
     }
 }
 
-// ⭐ [수정됨] 생산/소비량 상세 표시 로직
 export function updateScreen(stats) {
     for (let key in gameData.resources) {
         if(key === 'energy' || key === 'energyMax') continue;
-
         let card = document.getElementById(`card-${key}`);
         if (!card) {
             card = createResourceCard(key);
@@ -99,8 +98,6 @@ export function updateScreen(stats) {
         }
         
         const val = gameData.resources[key] || 0;
-        
-        // logic.js에서 {prod, cons} 형태로 받아옴
         const prod = stats[key] ? stats[key].prod : 0;
         const cons = stats[key] ? stats[key].cons : 0;
         const net = prod - cons;
@@ -108,16 +105,11 @@ export function updateScreen(stats) {
         card.querySelector('.res-amount').innerText = formatNumber(val);
         const mpsEl = card.querySelector('.res-mps');
         
-        // 표시 로직:
-        // 1. 생산과 소비가 둘 다 0이 아니면: "+2.0 | -2.0 /s" 형태로 표시
-        // 2. 아니면 기존처럼 "+2.0/s" 표시
-        
         if (prod > 0 && cons > 0) {
-            mpsEl.style.color = "#ecf0f1"; // 흰색
-            mpsEl.style.fontSize = "0.75rem"; // 글씨 살짝 작게
+            mpsEl.style.color = "#ecf0f1";
+            mpsEl.style.fontSize = "0.75rem";
             mpsEl.innerHTML = `<span style="color:#2ecc71">+${formatNumber(prod)}</span> | <span style="color:#e74c3c">-${formatNumber(cons)}</span> /s`;
         } else {
-            // 기존 단순 표시
             let mpsText = Math.abs(net) < 1000 ? Math.abs(net).toFixed(1) : formatNumber(Math.abs(net));
             if(net < 0) {
                 mpsEl.style.color = "#e74c3c";
@@ -156,6 +148,7 @@ function updatePowerUI() {
     }
 }
 
+// ⭐ [수정됨] 연구 트리 렌더링 (선행 연구 체크)
 function renderResearchTab() {
     const container = elements.viewResearch.querySelector('.action-box');
     container.innerHTML = `<div class="section-title">연구 목록</div>`;
@@ -165,7 +158,19 @@ function renderResearchTab() {
     listDiv.style.gap = '10px';
     
     researchList.forEach(r => {
+        // 1. 이미 완료했거나
         const isDone = gameData.researches.includes(r.id);
+        
+        // 2. 선행 연구가 완료되었는지 확인
+        let isUnlocked = true;
+        if (r.reqResearch && !gameData.researches.includes(r.reqResearch)) {
+            isUnlocked = false;
+        }
+
+        // 완료되지 않았는데 잠겨있으면 보여주지 않음 (히든 처리)
+        // 만약 '잠김' 상태로 보여주고 싶으면 이 if문을 수정하면 됨
+        if (!isDone && !isUnlocked) return;
+
         const div = document.createElement('div');
         div.className = `shop-item ${isDone ? 'disabled' : ''}`;
         div.id = `research-${r.id}`;
@@ -182,11 +187,14 @@ function renderResearchTab() {
                 <span class="cost-text" style="${isDone ? 'color:#2ecc71' : ''}">${costTxt}</span>
             </div>
         `;
+        
         if (!isDone) {
             div.onclick = () => {
                 if(Logic.tryBuyResearch(r.id)) {
                     log(`🔬 [연구 완료] ${r.name}`, true);
-                    renderResearchTab();
+                    renderResearchTab(); // 목록 갱신 (다음 연구 해금 등)
+                    // 화면 갱신해서 생산 속도 즉시 반영
+                    updateScreen(Logic.calculateNetMPS()); 
                 } else {
                     log("연구 자원이 부족합니다.");
                 }
@@ -228,7 +236,6 @@ function checkUnlocks() {
     const lv = gameData.houseLevel;
     const wood = gameData.resources.wood || 0;
     
-    // 돌 해금 조건 (reqLevel 0.5에 해당)
     const hasLogger = gameData.buildings[0] && gameData.buildings[0].count > 0;
     const hasPlank = (gameData.resources.plank || 0) > 0;
     const canGatherStone = (lv >= 1 || wood >= 10 || hasLogger || hasPlank);
@@ -254,7 +261,6 @@ function checkUnlocks() {
 export function renderShop(onBuyCallback, getCostFunc) {
     elements.buildingList.innerHTML = "";
     
-    // 조건 체크용 변수들
     const lv = gameData.houseLevel;
     const wood = gameData.resources.wood || 0;
     const hasLogger = gameData.buildings[0] && gameData.buildings[0].count > 0;
@@ -262,7 +268,6 @@ export function renderShop(onBuyCallback, getCostFunc) {
     const isStoneUnlocked = (lv >= 1 || wood >= 10 || hasLogger || hasPlank);
 
     gameData.buildings.forEach((b, index) => {
-        // 건물 등장 조건 체크
         const req = b.reqLevel || 0;
         if (req === 0.5) {
             if (!isStoneUnlocked) return; 

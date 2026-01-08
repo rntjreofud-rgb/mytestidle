@@ -10,35 +10,75 @@ export let gameData = {
     houseLevel: 0,
     researches: [], 
     buildings: [
-        // ⭐ reqLevel 속성 추가됨
-        // reqLevel: 0 -> 처음부터 보임
+        // (기존 건물 데이터와 동일, ID 순서 유지)
         { id: 0, name: "자동 벌목기", cost: { wood: 10 }, inputs: null, outputs: { wood: 1 }, count: 0, reqLevel: 0 },
-        
-        // reqLevel: 0.5 -> 돌이 해금되면 보임 (채석, 제재소, 돌용광로)
         { id: 1, name: "채석 드릴", cost: { wood: 50, plank: 10 }, inputs: null, outputs: { stone: 1 }, count: 0, reqLevel: 0.5 },
-        { id: 6, name: "제재소 (판자)", cost: { wood: 100, stone: 50 }, inputs: { wood: 2 }, outputs: { plank: 1 }, count: 0, reqLevel: 0.5 },
-        { id: 7, name: "돌 용광로 (벽돌)", cost: { stone: 100, wood: 50 }, inputs: { stone: 2 }, outputs: { brick: 1 }, count: 0, reqLevel: 0.5 },
-
-        // reqLevel: 1 -> Lv.1 달성 시 보임 (석탄, 광물 제련)
         { id: 2, name: "석탄 채굴기", cost: { wood: 50, stone: 20 }, inputs: null, outputs: { coal: 1 }, count: 0, reqLevel: 1 },
-        { id: 8, name: "철 용광로 (철판)", cost: { brick: 100, stone: 100 }, inputs: { ironOre: 2, coal: 0.5 }, outputs: { ironPlate: 1 }, count: 0, reqLevel: 1 },
-        { id: 9, name: "구리 용광로 (구리판)", cost: { brick: 100, stone: 100 }, inputs: { copperOre: 2, coal: 0.5 }, outputs: { copperPlate: 1 }, count: 0, reqLevel: 1 },
-
-        // reqLevel: 2 -> Lv.2 달성 시 보임 (전력 시스템, 전기 채굴)
         { id: 3, name: "석탄 발전소", cost: { stone: 100, brick: 20, plank: 20 }, inputs: { coal: 1 }, outputs: { energy: 10 }, count: 0, reqLevel: 2 },
         { id: 4, name: "전기 철광석 채굴기", cost: { brick: 50, gear: 10 }, inputs: { energy: 2 }, outputs: { ironOre: 1 }, count: 0, reqLevel: 2 },
         { id: 5, name: "전기 구리 채굴기", cost: { brick: 50, gear: 10 }, inputs: { energy: 2 }, outputs: { copperOre: 1 }, count: 0, reqLevel: 2 },
+        { id: 6, name: "제재소 (판자)", cost: { wood: 100, stone: 50 }, inputs: { wood: 2 }, outputs: { plank: 1 }, count: 0, reqLevel: 0.5 },
+        { id: 7, name: "돌 용광로 (벽돌)", cost: { stone: 100, wood: 50 }, inputs: { stone: 2 }, outputs: { brick: 1 }, count: 0, reqLevel: 0.5 },
+        { id: 8, name: "철 용광로 (철판)", cost: { brick: 100, stone: 100 }, inputs: { ironOre: 2, coal: 0.5 }, outputs: { ironPlate: 1 }, count: 0, reqLevel: 1 },
+        { id: 9, name: "구리 용광로 (구리판)", cost: { brick: 100, stone: 100 }, inputs: { copperOre: 2, coal: 0.5 }, outputs: { copperPlate: 1 }, count: 0, reqLevel: 1 },
         { id: 10, name: "부품 조립기 (톱니)", cost: { ironPlate: 50, brick: 50 }, inputs: { ironPlate: 2, energy: 1 }, outputs: { gear: 1 }, count: 0, reqLevel: 2 },
         { id: 11, name: "전자 공장 (회로)", cost: { ironPlate: 100, copperPlate: 100, gear: 20 }, inputs: { ironPlate: 1, copperPlate: 2, energy: 2 }, outputs: { circuit: 1 }, count: 0, reqLevel: 2 }
     ]
 };
 
-// ... (researchList, houseStages 등 나머지는 기존과 동일) ...
+// ⭐ 연구 트리 데이터 (reqResearch: 선행 연구 ID)
+// type: 'manual'(클릭버프) | 'building'(건물버프)
+// target: 건물 ID 배열 (어떤 건물이 빨라지는지)
+// value: 배율 (2는 2배, 1.5는 1.5배)
 export const researchList = [
-    { id: "stone_tool", name: "돌 곡괭이 연마", desc: "수동 채집량이 +1 증가합니다.", cost: { wood: 50, stone: 20 }, bonus: 1 },
-    { id: "iron_pickaxe", name: "철제 도구 제작", desc: "수동 채집량이 +2 증가합니다.", cost: { plank: 100, ironPlate: 20 }, bonus: 2 },
-    { id: "mining_drill", name: "강철 드릴 헤드", desc: "수동 채집량이 +5 증가합니다.", cost: { gear: 50, copperPlate: 50 }, bonus: 5 },
-    { id: "laser_mining", name: "레이저 채광 기술", desc: "수동 채집량이 +10 증가합니다.", cost: { circuit: 100, energy: 0 }, bonus: 10 }
+    // 1. 수동 채집 강화 (초반)
+    { 
+        id: "stone_tool", name: "돌 곡괭이 연마", desc: "수동 채집량이 +1 증가합니다.", 
+        cost: { wood: 50, stone: 20 }, type: 'manual', value: 1, reqResearch: null 
+    },
+    
+    // 2. 기초 자동화 (벌목기, 채석드릴 속도 2배) - 선행: 돌 곡괭이
+    { 
+        id: "basic_logistics", name: "기초 물류학", desc: "벌목기와 채석 드릴의 속도가 2배 빨라집니다.", 
+        cost: { plank: 100, stone: 100 }, type: 'building', target: [0, 1], value: 2, reqResearch: "stone_tool" 
+    },
+
+    // 3. 철제 도구 (수동 +2) - 선행: 기초 물류학
+    { 
+        id: "iron_pickaxe", name: "철제 도구 제작", desc: "수동 채집량이 +2 증가합니다.", 
+        cost: { plank: 200, ironPlate: 20 }, type: 'manual', value: 2, reqResearch: "basic_logistics" 
+    },
+
+    // 4. 제련 기술 (용광로 속도 2배) - 선행: 철제 도구
+    { 
+        id: "advanced_smelting", name: "고온 제련법", desc: "모든 용광로의 작업 속도가 2배 빨라집니다.", 
+        cost: { brick: 200, ironPlate: 50 }, type: 'building', target: [7, 8, 9], value: 2, reqResearch: "iron_pickaxe" 
+    },
+
+    // 5. 전력 효율 (발전소 효율 2배 = 석탄1개로 전력 2배 생산이 아니라, 속도가 2배라 전력 생산량 2배)
+    // 선행: 고온 제련법
+    {
+        id: "steam_engine_v2", name: "고압 터빈", desc: "석탄 발전소의 출력이 2배 증가합니다.",
+        cost: { ironPlate: 200, gear: 50 }, type: 'building', target: [3], value: 2, reqResearch: "advanced_smelting"
+    },
+
+    // 6. 고급 채광 (전기 채굴기 속도 2배)
+    {
+        id: "electric_mining", name: "고속 모터", desc: "전기 채굴기의 속도가 2배 증가합니다.",
+        cost: { gear: 100, copperPlate: 100 }, type: 'building', target: [4, 5, 2], value: 2, reqResearch: "steam_engine_v2"
+    },
+
+    // 7. 자동화 2 (조립기 속도 2배)
+    {
+        id: "mass_production", name: "대량 생산", desc: "제재소와 조립 공장의 속도가 2배 증가합니다.",
+        cost: { circuit: 50, gear: 200 }, type: 'building', target: [6, 10, 11], value: 2, reqResearch: "electric_mining"
+    },
+    
+    // 8. 레이저 채광 (최종 수동 버프)
+    { 
+        id: "laser_mining", name: "레이저 채광 기술", desc: "수동 채집량이 +10 증가합니다.", 
+        cost: { circuit: 200, energy: 0 }, type: 'manual', value: 10, reqResearch: "mass_production" 
+    }
 ];
 
 export const houseStages = [
@@ -60,7 +100,6 @@ export function setGameData(newData) {
     }
     gameData.houseLevel = newData.houseLevel || 0;
     gameData.researches = newData.researches || [];
-    
     if (newData.buildings) {
         newData.buildings.forEach((savedB, i) => {
             if (gameData.buildings[i]) {
