@@ -37,7 +37,7 @@
 
         <main class="content-area">
             
-            <!-- 1. 대시보드 뷰 -->
+            <!-- 대시보드 뷰 -->
             <div id="view-dashboard">
                 <div class="info-panel">
                     <div class="info-text">
@@ -52,10 +52,12 @@
                 <div class="section-title">📦 자원 창고 (Inventory)</div>
                 <div class="resource-grid"></div>
 
+                <!-- ⭐ 레이아웃 핵심: 25% vs 75% -->
                 <div class="action-grid">
-                    <div class="action-box">
+                    <!-- 왼쪽: 수동 (25%) -->
+                    <div class="action-box manual-area">
                         <div class="section-title">🖐️ 수동 작업</div>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px;">
+                        <div id="manual-btn-list">
                             <button id="btn-gather-wood" class="btn-large">🌲 나무 베기</button>
                             <button id="btn-gather-stone" class="btn-large hidden">🪨 돌 캐기</button>
                             <button id="btn-gather-coal" class="btn-large hidden" style="border-color:#555;">⚫ 석탄 캐기</button>
@@ -64,17 +66,17 @@
                             <button id="btn-gather-copper" class="btn-large hidden">🥉 구리광석 캐기</button>
                         </div>
                     </div>
-                    <div class="action-box">
+                    <!-- 오른쪽: 공장 (75%) -->
+                    <div class="action-box auto-area">
                         <div class="section-title">🏭 공장 건설 (Automation)</div>
                         <div id="building-list"></div>
                     </div>
                 </div>
             </div>
 
-            <!-- 2. 전력 뷰 -->
+            <!-- 전력 뷰 -->
             <div id="view-power" class="hidden">
                 <div class="section-title">⚡ 전력 네트워크 (Power Grid)</div>
-                
                 <div class="info-panel" style="border-left-color: #f1c40f; flex-direction:column; align-items:stretch;">
                     <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
                         <div>
@@ -89,38 +91,26 @@
                         <div id="power-fill-bar" style="width: 0%; height:100%; background:#2ecc71; transition: width 0.3s, background 0.3s;"></div>
                     </div>
                 </div>
-
-                <div class="action-box">
-                    <div class="section-title">발전소 현황</div>
-                    <p style="color:#777; font-size:0.9rem;">
-                        발전소는 [대시보드 > 공장 건설] 탭에서 건설할 수 있습니다.<br>
-                        석탄 채굴기 등 전력 설비를 건설하면 자동으로 이 화면에 집계됩니다.
-                    </p>
-                </div>
             </div>
 
-            <!-- ⭐ 3. 연구 뷰 (이 부분이 중요합니다!) -->
+            <!-- 연구 뷰 -->
             <div id="view-research" class="hidden">
                 <div class="section-title">🔬 기술 연구 (Research Tree)</div>
                 <div class="info-panel" style="border-left-color: #9b59b6;">
                     <div class="info-text">
                         <h3>연구소</h3>
-                        <!-- 문구 수정됨 -->
                         <p>자원을 투자하여 생산 효율을 높이는 기술을 개발하세요.</p>
                     </div>
                 </div>
-                <!-- 자바스크립트가 여기에 연구 목록을 채워넣습니다 -->
                 <div class="action-box">
-                    <div class="section-title">연구 목록</div>
-                    <!-- 로딩 안됐을 때 보이는 기본 텍스트 -->
-                    <div style="padding:20px; text-align:center; color:#777;">
-                        연구 데이터 불러오는 중...
-                    </div>
+                    <!-- 연구 목록도 공장처럼 넓게 쓰기 위해 auto-area 클래스 재사용 가능하지만 별도로 둠 -->
+                    <div id="research-list-container"></div>
                 </div>
             </div>
 
         </main>
 
+        <!-- 하단 로그 -->
         <section class="system-log-area">
             <div class="log-header">📜 System Log</div>
             <div class="log-content">

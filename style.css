@@ -2,90 +2,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Consolas&display=swap');
 
 :root {
-    /* === 멜버 아이들 컬러 팔레트 === */
-    --bg-main: #1a1a2e;       
-    --bg-sidebar: #11111f;    
-    --bg-panel: #16213e;      
-    
-    --bg-button: #0f3460;     
-    --bg-button-hover: #1f4287; 
-    --bg-button-disabled: #0a1120;
-    
-    --border-color: #2a2a40;
-    
-    --primary-orange: #e94560; 
-    --accent-green: #4ecca3;
-    --accent-blue: #4db5ff;
-    
-    --text-main: #e0e0e0;
-    --text-muted: #8892b0;
-}
-
-* { box-sizing: border-box; }
-
-body {
-    font-family: 'Noto Sans KR', sans-serif;
-    background-color: var(--bg-main);
-    color: var(--text-main);
-    margin: 0; padding: 0;
-    width: 100vw; height: 100vh;
-    display: flex; overflow: hidden;
-    font-size: 13px;
-}
-
-/* === 1. 사이드바 === */
-.sidebar {
-    width: 200px;
-    height: 100%;
-    background-color: var(--bg-sidebar);
-    border-right: 1px solid #000;
-    display: flex; flex-direction: column; flex-shrink: 0;
-    box-shadow: 2px 0 5px rgba(0,0,0,0.3);
-}
-.logo-area { padding: 20px 10px; background-color: #0b0b14; text-align: center; }
-.logo-area h1 { margin: 0; font-size: 1.1rem; color: var(--accent-green); letter-spacing: 1px; }
-.nav-menu { flex: 1; overflow-y: auto; padding: 10px 0; }
-.nav-category { font-size: 0.75rem; color: #556; margin: 15px 0 5px 15px; font-weight: bold; }
-.nav-item { display: flex; align-items: center; padding: 10px 15px; cursor: pointer; color: var(--text-muted); font-size: 0.9rem; transition: 0.2s; }
-.nav-item:hover, .nav-item.active { background-color: var(--bg-panel); color: #fff; border-left: 3px solid var(--primary-orange); }
-.nav-item i { margin-right: 10px; width: 16px; text-align: center; }
-
-/* === 2. 메인 레이아웃 === */
-.main-wrapper { flex: 1; display: flex; flex-direction: column; height: 100%; overflow: hidden; }
-header { background-color: var(--bg-panel); border-bottom: 1px solid var(--border-color); padding: 0 20px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; height: 50px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
-header h2 { margin: 0; font-size: 1rem; color: #fff; }
-.content-area { flex: 1; overflow-y: auto; padding: 20px; background-color: var(--bg-main); }
-
-/* === 3. 패널 및 레이아웃 === */
-.info-panel { background-color: var(--bg-panel); border-left: 4px solid var(--accent-blue); padding: 15px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-.info-text h3 { margin: 0 0 5px 0; font-size: 1.1rem; color: #fff; }
-.action-box { margin-bottom: 25px; }
-.section-title { font-size: 0.9rem; color: #8892b0; margin-bottom: 10px; padding-bottom: 5px; border-bottom: 2px solid var(--bg-panel); font-weight: bold; }
-
-/* === 4. 자원 카드 === */
-.resource-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; margin-bottom: 20px; }
-.res-card { background-color: var(--bg-panel); border: none; padding: 10px 15px; border-radius: 8px; min-height: 70px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
-.res-header { display: flex; justify-content: space-between; margin-bottom: 5px; }
-.res-name { font-size: 0.85rem; color: #aaa; font-weight: bold; }
-.res-amount { font-size: 1.3rem; font-weight: 700; color: #fff; margin: 0; }
-.res-mps { font-size: 0.8rem; color: #8892b0; }
-.res-card::after { content: ''; display: block; height: 3px; width: 100%; margin-top: 8px; border-radius: 2px; }
-.res-card.wood::after { background-color: #27ae60; }
-.res-card.stone::after { background-color: #7f8c8d; }
-.res-card.coal::after { background-color: #34495e; }
-.res-card.ironOre::after { background-color: #95a5a6; }
-.res-card.copperOre::after { background-color: #d35400; }
-.res-card.plank::after { background-color: #f39c12; }
-.res-card.brick::after { background-color: #c0392b; }
-.res-card.ironPlate::after { background-color: #bdc3c7; }
-.res-card.copperPlate::after { background-color: #e67e22; }
-.res-card.gear::after { background-color: #7f8c8d; }
-.res-card.circuit::after { background-color: #2ecc71; }
-
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Consolas&display=swap');
-
-:root {
     --bg-main: #1a1a2e;       
     --bg-sidebar: #11111f;    
     --bg-panel: #16213e;      
@@ -134,10 +50,9 @@ header { background-color: var(--bg-panel); border-bottom: 1px solid var(--borde
 header h2 { margin: 0; font-size: 1rem; color: #fff; }
 .content-area { flex: 1; overflow-y: auto; padding: 20px; background-color: var(--bg-main); }
 
-/* === 패널 === */
+/* === 상단 패널 === */
 .info-panel { background-color: var(--bg-panel); border-left: 4px solid var(--accent-blue); padding: 15px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; border-radius: 8px; }
 .info-text h3 { margin: 0 0 5px 0; font-size: 1.1rem; color: #fff; }
-.action-box { margin-bottom: 25px; }
 .section-title { font-size: 0.9rem; color: #8892b0; margin-bottom: 10px; padding-bottom: 5px; border-bottom: 2px solid var(--bg-panel); font-weight: bold; }
 
 /* === 자원 카드 === */
@@ -148,6 +63,7 @@ header h2 { margin: 0; font-size: 1rem; color: #fff; }
 .res-amount { font-size: 1.3rem; font-weight: 700; color: #fff; margin: 0; }
 .res-mps { font-size: 0.8rem; color: #8892b0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .res-card::after { content: ''; display: block; height: 3px; width: 100%; margin-top: 8px; border-radius: 2px; }
+/* 자원 색상 */
 .res-card.wood::after { background-color: #27ae60; }
 .res-card.stone::after { background-color: #7f8c8d; }
 .res-card.coal::after { background-color: #34495e; }
@@ -160,32 +76,55 @@ header h2 { margin: 0; font-size: 1rem; color: #fff; }
 .res-card.gear::after { background-color: #7f8c8d; }
 .res-card.circuit::after { background-color: #2ecc71; }
 
-/* =========================================
-   5. 버튼 및 그리드 (구조 변경 대응 + 완벽한 배치)
-   ========================================= */
+/* =================================================================
+   ⭐ [핵심 수정] 25 : 75 레이아웃 및 그리드 분할
+   ================================================================= */
 
-/* 1. 그리드 레이아웃: 무조건 4열(4x) 고정 */
-.action-box > div, 
-#building-list, 
-#research-list-container, 
+/* 전체 그리드 컨테이너 */
 .action-grid {
     display: grid !important;
-    grid-template-columns: repeat(4, 1fr) !important; 
-    gap: 8px !important;
-    padding: 0;
+    /* 왼쪽 1.5 비율, 오른쪽 4.5 비율 (약 25% : 75%) */
+    grid-template-columns: 1.5fr 4.5fr !important;
+    gap: 15px !important;
     width: 100%;
+    margin-bottom: 20px;
 }
 
-/* 2. 상점 아이템 (박스) */
-.shop-item {
+/* 구획 박스 스타일 */
+.action-box {
+    background: transparent; /* 배경 투명하게 하여 버튼만 돋보이게 */
+    margin: 0;
+}
+
+/* 1. 왼쪽: 수동 작업 (2열 배치) */
+#manual-btn-list {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important; /* 2개씩 */
+    gap: 8px !important;
+}
+
+/* 2. 오른쪽: 공장 건설 & 연구 목록 (4열 배치) */
+#building-list, 
+#research-list-container {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important; /* 4개씩 */
+    gap: 8px !important;
+}
+
+
+/* =================================================================
+   버튼 디자인 (겹침 방지 적용)
+   ================================================================= */
+
+/* 공통 박스 스타일 */
+.shop-item, .btn-large {
     position: relative !important;
     width: 100%;
-    height: 90px !important;
+    height: 84px !important; /* 높이 넉넉하게 */
     
     background-color: var(--bg-button);
     border: 1px solid #444;
     border-radius: 6px;
-    
     padding: 0 !important;
     margin: 0;
     
@@ -195,127 +134,124 @@ header h2 { margin: 0; font-size: 1rem; color: #fff; }
     transition: transform 0.1s;
 }
 
-/* 호버 효과 */
-.shop-item:hover {
-    background-color: var(--bg-button-hover);
-    transform: translateY(-2px);
-    z-index: 10;
-}
-.shop-item:active { transform: translateY(2px); box-shadow: none; }
-.shop-item.disabled { opacity: 0.5; background-color: var(--bg-button-disabled); cursor: not-allowed; box-shadow: none; }
+.shop-item:hover, .btn-large:hover { background-color: var(--bg-button-hover); transform: translateY(-2px); z-index: 10; }
+.shop-item:active, .btn-large:active { transform: translateY(2px); box-shadow: none; }
+.shop-item.disabled, .btn-large.disabled { opacity: 0.5; background-color: var(--bg-button-disabled); cursor: not-allowed; box-shadow: none; }
 
+/* 
+   텍스트 위치 고정 (이름과 레벨이 절대 만나지 않게 함)
+*/
 
-/* =========================================
-   3. 내부 요소 배치 (JS 수정 반영)
-   ========================================= */
-
-/* [좌측 상단] 이름 (.si-name) */
-.si-name {
-    position: absolute;
-    top: 12px;
-    left: 12px;
+/* [좌측 상단] 이름 */
+.shop-item > div:first-child > div:first-child {
+    position: absolute !important;
+    top: 10px; left: 10px;
     
-    /* ⭐ 이름이 길어지면 여기서 딱 멈춤 (오른쪽 60px 여유) ⭐ */
-    width: calc(100% - 60px); 
+    /* ⭐ 핵심: 오른쪽 70px(레벨 자리) 전까지만 영역 인정 ⭐ */
+    right: 70px; 
     
-    font-size: 0.95rem;
+    text-align: left;
+    font-size: 0.9rem !important;
     font-weight: bold;
     color: #fff;
-    text-align: left;
     
     white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis; /* ... 으로 표시 */
+    text-overflow: ellipsis; /* ... 표시 */
 }
 
-/* [우측 상단] 레벨 (.si-level) */
-.si-level {
-    position: absolute;
-    top: 10px;
-    right: 12px;
+/* [우측 상단] 레벨 (Lv.0) */
+.shop-item span[style*="color:#f39c12"] {
+    position: absolute !important;
+    top: 8px; right: 8px;
     
-    font-size: 0.75rem;
-    color: #ffd700; /* 노란색 */
+    font-size: 0.75rem !important;
+    color: #ffd700 !important;
     background: rgba(0,0,0,0.4);
     padding: 2px 6px;
     border-radius: 4px;
     
-    z-index: 5; /* 이름보다 위에 표시 */
+    /* 텍스트 너비 확보 */
+    min-width: 40px;
+    text-align: center;
+    z-index: 2;
 }
 
-/* [좌측 하단] 설명 (.si-desc) */
-.si-desc {
-    position: absolute;
-    bottom: 12px;
-    left: 12px;
+/* [좌측 하단] 설명 (+1 나무/s) */
+.shop-item > div:first-child > div:last-child {
+    position: absolute !important;
+    bottom: 10px; left: 10px;
+    right: 90px; /* 가격 자리 확보 */
     
-    width: calc(100% - 90px); /* 가격 자리 침범 금지 */
-    
-    font-size: 0.75rem;
-    color: #aeb6ce;
-    line-height: 1;
     text-align: left;
+    font-size: 0.75rem !important;
+    color: #aeb6ce !important;
+    line-height: 1;
     
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-/* [우측 하단] 비용 (.si-cost) */
-.si-cost {
-    position: absolute;
-    bottom: 12px;
-    right: 12px;
-    
-    font-size: 0.85rem;
-    color: var(--primary-orange);
-    font-weight: bold;
+/* [우측 하단] 비용 */
+.shop-item > div:last-child {
+    position: absolute !important;
+    bottom: 10px; right: 10px;
     text-align: right;
+    width: auto;
 }
+.cost-text { font-size: 0.8rem; color: var(--primary-orange); font-weight: bold; }
 
-
-/* 4. 수동 작업 버튼 */
+/* 수동 버튼 (가운데 정렬) */
 .btn-large {
-    width: 100%;
-    height: 90px !important;
-    background-color: var(--bg-button);
-    border: 1px solid #444;
-    border-radius: 6px;
     display: flex !important;
     align-items: center;
     justify-content: center;
     gap: 8px;
-    padding: 0 10px;
-    color: #e0e0e0;
-    font-size: 0.95rem;
-    font-weight: bold;
-    cursor: pointer;
-    box-shadow: 0 4px 0 rgba(0,0,0,0.2);
-    transition: transform 0.1s;
+    color: #e0e0e0; font-weight: bold;
 }
-.btn-large:hover { background-color: var(--bg-button-hover); transform: translateY(-2px); }
-.btn-large:active { transform: translateY(2px); box-shadow: none; }
+.btn-large strong { position: static !important; font-size: 0.95rem; }
 
 /* 업그레이드 버튼 */
 #upgrade-btn {
-    width: 100%;
-    height: 50px;
+    width: 100%; height: 50px;
     background-color: var(--accent-green);
-    color: #fff;
-    border: none;
-    border-radius: 6px;
-    font-weight: bold;
-    cursor: pointer;
+    color: #fff; border: none; border-radius: 6px;
+    font-weight: bold; cursor: pointer;
     box-shadow: 0 4px 0 rgba(0,0,0,0.2);
-    margin-bottom: 10px;
 }
 #upgrade-btn:disabled { background-color: #333; color: #555; cursor: not-allowed; box-shadow: none; }
 
-/* 모바일 대응 */
+/* =========================================
+   6. 하단 로그 (복구됨)
+   ========================================= */
+.system-log-area {
+    height: 150px;
+    background-color: #0a0a0a;
+    border-top: 1px solid #333;
+    display: flex; flex-direction: column; flex-shrink: 0;
+}
+.log-header {
+    background-color: #161620;
+    padding: 5px 15px; font-size: 0.8rem; color: #8892b0; font-weight: bold;
+    border-bottom: 1px solid #222;
+}
+.log-content { flex: 1; overflow-y: auto; padding: 10px; font-family: 'Consolas', monospace; }
+#game-log-list { list-style: none; padding: 0; margin: 0; }
+.log-entry { padding: 3px 0; font-size: 0.85rem; color: #bbb; display: flex; gap: 10px; }
+.log-time { color: #556; min-width: 60px; font-size: 0.75rem; }
+.log-highlight { color: var(--accent-green); }
+
+/* 스크롤바 */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+::-webkit-scrollbar-track { background: #0b0b10; }
+
+/* 반응형 (모바일) */
 @media (max-width: 1000px) {
-    .action-box > div, #building-list, #research-list-container, .action-grid {
-        grid-template-columns: repeat(2, 1fr) !important; 
-    }
+    .action-grid { grid-template-columns: 1fr !important; }
+    #manual-btn-list { grid-template-columns: repeat(3, 1fr) !important; }
+    #building-list, #research-list-container { grid-template-columns: repeat(2, 1fr) !important; }
 }
 
 .hidden { display: none !important; }
