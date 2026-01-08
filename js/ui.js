@@ -1,5 +1,3 @@
-// js/ui.js
-
 import { gameData, houseStages } from './data.js';
 
 const elements = {
@@ -17,14 +15,13 @@ const elements = {
     btns: {
         wood: document.getElementById('btn-gather-wood'),
         stone: document.getElementById('btn-gather-stone'),
-        coal: document.getElementById('btn-gather-coal'), // 신규
+        coal: document.getElementById('btn-gather-coal'),
         ironOre: document.getElementById('btn-gather-iron'),
         copperOre: document.getElementById('btn-gather-copper'),
         plank: document.getElementById('btn-craft-plank')
     },
     buildingList: document.getElementById('building-list'),
     headerLog: document.getElementById('message-log'),
-    // 전력 UI 요소
     powerDisplay: document.getElementById('power-display-text'), 
     powerBar: document.getElementById('power-fill-bar')
 };
@@ -87,7 +84,6 @@ export function log(msg, isImportant = false) {
 }
 
 export function updateScreen(netMPS) {
-    // 자원 표시 (에너지는 제외)
     for (let key in gameData.resources) {
         if(key === 'energy' || key === 'energyMax') continue;
 
@@ -103,7 +99,6 @@ export function updateScreen(netMPS) {
         card.querySelector('.res-amount').innerText = formatNumber(val);
         const mpsEl = card.querySelector('.res-mps');
         
-        // mps 포맷팅
         let mpsText = Math.abs(mps) < 1000 ? Math.abs(mps).toFixed(1) : formatNumber(Math.abs(mps));
         if(mps < 0) {
             mpsEl.style.color = "#e74c3c";
@@ -116,8 +111,6 @@ export function updateScreen(netMPS) {
             mpsEl.innerText = `+0.0 /s`;
         }
     }
-
-    // ⭐ 전력 탭 UI 업데이트
     updatePowerUI();
     checkUnlocks();
 }
@@ -125,23 +118,17 @@ export function updateScreen(netMPS) {
 function updatePowerUI() {
     const prod = gameData.resources.energy || 0;
     const req = gameData.resources.energyMax || 0;
-    
-    // 텍스트 업데이트
     if(elements.powerDisplay) {
         elements.powerDisplay.innerHTML = `
             <span style="color:#2ecc71">${formatNumber(prod)} MW</span> 생산 / 
             <span style="color:#e74c3c">${formatNumber(req)} MW</span> 소비
         `;
     }
-
-    // 게이지 바 업데이트
     if(elements.powerBar) {
         let percent = 100;
         if(req > 0) percent = (prod / req) * 100;
         if(percent > 100) percent = 100;
-        
         elements.powerBar.style.width = `${percent}%`;
-        // 전력 부족하면 빨간색, 충분하면 초록색
         elements.powerBar.style.backgroundColor = (prod >= req) ? '#2ecc71' : '#e74c3c';
     }
 }
@@ -158,11 +145,10 @@ function createResourceCard(key) {
     return div;
 }
 
+// ⭐ [수정된 부분] 잠금 해제 조건 복구
 function checkUnlocks() {
     const lv = gameData.houseLevel;
-    
-    // Lv 1 이상이면 석탄, 철, 구리, 판자 모두 해금
-    const unlocked = (lv >= 1); 
+    const wood = gameData.resources.wood || 0;
 
     const toggle = (el, show) => {
         if(!el) return;
@@ -170,13 +156,17 @@ function checkUnlocks() {
         else el.classList.add('hidden');
     };
 
-    toggle(elements.btns.stone, unlocked);
-    toggle(elements.btns.plank, unlocked);
-    toggle(elements.btns.coal, unlocked); // 석탄
-    toggle(elements.btns.ironOre, unlocked);
-    toggle(elements.btns.copperOre, unlocked);
+    // 1. 돌과 판자는 [레벨 1 이상] OR [나무 10개 이상]이면 무조건 보임
+    const canGatherStone = (lv >= 1 || wood >= 10);
+    toggle(elements.btns.stone, canGatherStone);
+    toggle(elements.btns.plank, canGatherStone);
 
-    // 전력 탭 활성화 (Lv 2 이상)
+    // 2. 석탄, 철, 구리는 Lv 1 이상이면 보임
+    toggle(elements.btns.coal, (lv >= 1));
+    toggle(elements.btns.ironOre, (lv >= 1));
+    toggle(elements.btns.copperOre, (lv >= 1));
+
+    // 3. 전력 탭은 Lv 2 이상
     if(elements.navPower) {
         if(lv >= 2) elements.navPower.style.display = 'flex';
         else elements.navPower.style.display = 'none';
@@ -199,7 +189,7 @@ export function renderShop(onBuyCallback, getCostFunc) {
             for(let k in b.inputs) {
                 let val = b.inputs[k];
                 let name = resNames[k] ? resNames[k].split(' ')[1] : k;
-                if(k === 'energy') name = "⚡"; // 전력 아이콘
+                if(k === 'energy') name = "⚡";
                 inArr.push(`${val}${name}`);
             }
             processTxt += `<span style="color:#e74c3c">-${inArr.join(', ')}</span> `;
@@ -252,18 +242,15 @@ export function updateHouseUI(onUpgrade) {
 
     if (nextStage) {
         const req = nextStage.req;
-        // 요구사항 표시 (전력 조건 제외하거나 별도 표시)
         const reqTxt = Object.entries(req)
-            .filter(([k,v]) => k !== 'energy') // 전력은 텍스트에서 뺌
+            .filter(([k,v]) => k !== 'energy')
             .map(([k,v]) => `${resNames[k].split(' ')[1]} ${formatNumber(v)}`)
             .join(', ');
-        
         elements.upgradeBtn.innerText = `⬆️ ${nextStage.name} (${reqTxt})`;
         elements.upgradeBtn.onclick = () => onUpgrade(nextStage);
-        
         let canUp = true;
         for(let k in req) {
-             if (k === 'energy') continue; // 전력 제외
+             if (k === 'energy') continue;
             if((gameData.resources[k] || 0) < req[k]) canUp = false;
         }
         elements.upgradeBtn.disabled = !canUp;
