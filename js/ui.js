@@ -1,9 +1,6 @@
-// js/ui.js
-
 import { gameData, houseStages, researchList } from './data.js';
 import * as Logic from './logic.js';
 
-// ... (elements, resNames, formatNumber 등 상단 부분은 그대로 유지) ...
 const elements = {
     viewDashboard: document.getElementById('view-dashboard'),
     viewPower: document.getElementById('view-power'),
@@ -96,11 +93,9 @@ export function updateScreen(stats) {
             card = createResourceCard(key);
             elements.resGrid.appendChild(card);
         }
-        
         const val = gameData.resources[key] || 0;
         const prod = stats[key] ? stats[key].prod : 0;
         const cons = stats[key] ? stats[key].cons : 0;
-        const net = prod - cons;
         
         card.querySelector('.res-amount').innerText = formatNumber(val);
         const mpsEl = card.querySelector('.res-mps');
@@ -110,6 +105,7 @@ export function updateScreen(stats) {
             mpsEl.style.fontSize = "0.75rem";
             mpsEl.innerHTML = `<span style="color:#2ecc71">+${formatNumber(prod)}</span> | <span style="color:#e74c3c">-${formatNumber(cons)}</span> /s`;
         } else {
+            let net = prod - cons;
             let mpsText = Math.abs(net) < 1000 ? Math.abs(net).toFixed(1) : formatNumber(Math.abs(net));
             if(net < 0) {
                 mpsEl.style.color = "#e74c3c";
@@ -148,7 +144,6 @@ function updatePowerUI() {
     }
 }
 
-// ⭐ [수정됨] 연구 트리 렌더링 (선행 연구 체크)
 function renderResearchTab() {
     const container = elements.viewResearch.querySelector('.action-box');
     container.innerHTML = `<div class="section-title">연구 목록</div>`;
@@ -157,18 +152,17 @@ function renderResearchTab() {
     listDiv.style.display = 'grid';
     listDiv.style.gap = '10px';
     
+    // ⭐ [안전장치] 데이터가 없으면 빈 배열로 처리
+    if (!gameData.researches) gameData.researches = [];
+
     researchList.forEach(r => {
-        // 1. 이미 완료했거나
         const isDone = gameData.researches.includes(r.id);
         
-        // 2. 선행 연구가 완료되었는지 확인
         let isUnlocked = true;
         if (r.reqResearch && !gameData.researches.includes(r.reqResearch)) {
             isUnlocked = false;
         }
 
-        // 완료되지 않았는데 잠겨있으면 보여주지 않음 (히든 처리)
-        // 만약 '잠김' 상태로 보여주고 싶으면 이 if문을 수정하면 됨
         if (!isDone && !isUnlocked) return;
 
         const div = document.createElement('div');
@@ -192,8 +186,7 @@ function renderResearchTab() {
             div.onclick = () => {
                 if(Logic.tryBuyResearch(r.id)) {
                     log(`🔬 [연구 완료] ${r.name}`, true);
-                    renderResearchTab(); // 목록 갱신 (다음 연구 해금 등)
-                    // 화면 갱신해서 생산 속도 즉시 반영
+                    renderResearchTab();
                     updateScreen(Logic.calculateNetMPS()); 
                 } else {
                     log("연구 자원이 부족합니다.");
@@ -207,6 +200,8 @@ function renderResearchTab() {
 }
 
 function updateResearchButtons() {
+    if (!gameData.researches) gameData.researches = [];
+    
     researchList.forEach(r => {
         if(gameData.researches.includes(r.id)) return;
         const div = document.getElementById(`research-${r.id}`);

@@ -1,5 +1,3 @@
-// js/logic.js
-
 import { gameData, researchList } from './data.js';
 
 export function getBuildingCost(building) {
@@ -11,14 +9,13 @@ export function getBuildingCost(building) {
     return currentCost;
 }
 
-// ⭐ [신규] 건물의 생산 속도 배율 계산
 export function getBuildingMultiplier(buildingId) {
     let multiplier = 1.0;
+    // ⭐ [안전장치] 연구 데이터가 없으면 빈 배열로 취급
+    const completed = gameData.researches || [];
     
-    // 완료된 연구들 확인
     researchList.forEach(r => {
-        if (gameData.researches.includes(r.id)) {
-            // 건물 버프형 연구이고, 이 건물이 대상이라면
+        if (completed.includes(r.id)) {
             if (r.type === 'building' && r.target.includes(buildingId)) {
                 multiplier *= r.value;
             }
@@ -27,7 +24,6 @@ export function getBuildingMultiplier(buildingId) {
     return multiplier;
 }
 
-// UI 표기를 위한 생산/소비량 계산
 export function calculateNetMPS() {
     let stats = {};
     for(let key in gameData.resources) {
@@ -36,7 +32,6 @@ export function calculateNetMPS() {
 
     gameData.buildings.forEach(b => {
         if (b.count > 0) {
-            // ⭐ 건물별 배율 적용
             let speedMult = getBuildingMultiplier(b.id);
 
             if (b.inputs) {
@@ -58,21 +53,18 @@ export function calculateNetMPS() {
     return stats;
 }
 
-// 실제 자원 생산 로직
 export function produceResources(deltaTime) {
     let totalEnergyProd = 0;
     let totalEnergyReq = 0;
 
-    // 1. 전력 생산 (발전소)
+    // 1. 전력 생산
     gameData.buildings.forEach(b => {
         if (b.count > 0 && b.outputs && b.outputs.energy) {
-            // ⭐ 발전소 속도 배율 적용
             let speedMult = getBuildingMultiplier(b.id);
             let fuelEfficiency = 1.0;
 
             if(b.inputs) {
                 for(let res in b.inputs) {
-                    // 연료 소모량도 속도만큼 증가
                     let needed = b.inputs[res] * b.count * speedMult * deltaTime;
                     if((gameData.resources[res] || 0) < needed) {
                         fuelEfficiency = (gameData.resources[res] || 0) / needed;
@@ -84,17 +76,13 @@ export function produceResources(deltaTime) {
                     }
                 }
             }
-            // 전력 생산량도 속도만큼 증가
             totalEnergyProd += (b.outputs.energy * b.count * speedMult) * fuelEfficiency;
         }
     });
 
-    // 2. 전력 요구량 집계
+    // 2. 전력 소모 집계
     gameData.buildings.forEach(b => {
         if (b.count > 0 && b.inputs && b.inputs.energy) {
-            // ⭐ 기계가 빨라지면 전기 소모량도 늘어나는게 팩토리오 고증이지만, 
-            // 게임 난이도 조절을 위해 전기 소모량은 속도에 비례하지 않게 할 수도 있음.
-            // 여기서는 "속도가 빨라지면 전기 더 먹음"으로 구현 (리얼하게)
             let speedMult = getBuildingMultiplier(b.id);
             totalEnergyReq += b.inputs.energy * b.count * speedMult;
         }
@@ -109,29 +97,24 @@ export function produceResources(deltaTime) {
         if (powerFactor > 1) powerFactor = 1.0;
     }
 
-    // 3. 일반 건물 가동
+    // 3. 일반 생산
     gameData.buildings.forEach(b => {
         if (b.count === 0) return;
-        if (b.outputs && b.outputs.energy) return; // 발전소 패스
+        if (b.outputs && b.outputs.energy) return;
 
-        // ⭐ 건물 속도 배율
         let speedMult = getBuildingMultiplier(b.id);
-        let efficiency = 1.0 * speedMult; // 기본 효율에 속도 곱함
+        let efficiency = 1.0 * speedMult;
         
-        // 전력 체크
         if (b.inputs && b.inputs.energy) {
             efficiency *= powerFactor;
         }
 
-        // 재료 체크
         if (b.inputs) {
             let maxPotential = 1.0; 
             for (let res in b.inputs) {
                 if (res === 'energy') continue;
-                // 요구량 = 기본요구 * 개수 * 시간 * (속도 * 전력효율)
                 let required = b.inputs[res] * b.count * deltaTime * efficiency;
                 
-                // required가 0에 가까우면(재료없음) 패스
                 if(required > 0) {
                     if ((gameData.resources[res] || 0) < required) {
                         let ratio = (gameData.resources[res] || 0) / required; 
@@ -144,13 +127,11 @@ export function produceResources(deltaTime) {
             if (efficiency > 0) {
                 for (let res in b.inputs) {
                     if (res === 'energy') continue;
-                    // 속도가 적용된 efficiency를 사용하여 차감
                     gameData.resources[res] -= (b.inputs[res] * b.count * deltaTime) * efficiency;
                 }
             }
         }
 
-        // 결과물 생산
         if (efficiency > 0 && b.outputs) {
             for (let res in b.outputs) {
                 gameData.resources[res] += (b.outputs[res] * b.count * deltaTime) * efficiency;
@@ -159,12 +140,13 @@ export function produceResources(deltaTime) {
     });
 }
 
-// 수동 채집 효율 (연구 반영)
 export function getClickStrength() {
     let strength = 1; 
+    // ⭐ [안전장치]
+    const completed = gameData.researches || [];
+    
     researchList.forEach(r => {
-        if (gameData.researches.includes(r.id)) {
-            // manual 타입만 반영
+        if (completed.includes(r.id)) {
             if (r.type === 'manual') {
                 strength += r.value;
             }
@@ -195,7 +177,7 @@ export function manualGather(type) {
     if (type === 'plank') {
         if (gameData.resources.wood >= 2) {
             gameData.resources.wood -= 2;
-            gameData.resources.plank += 1; // 판자는 항상 1개 (수동)
+            gameData.resources.plank += 1;
             return true;
         }
     }
@@ -203,9 +185,11 @@ export function manualGather(type) {
 }
 
 export function tryBuyResearch(id) {
+    // ⭐ [안전장치] 배열 없으면 생성
+    if (!gameData.researches) gameData.researches = [];
+
     if (gameData.researches.includes(id)) return false;
     
-    // 선행 연구 체크
     const research = researchList.find(r => r.id === id);
     if (!research) return false;
     
@@ -220,6 +204,7 @@ export function tryBuyResearch(id) {
     for (let r in cost) {
         gameData.resources[r] -= cost[r];
     }
+    
     gameData.researches.push(id);
     return true;
 }
