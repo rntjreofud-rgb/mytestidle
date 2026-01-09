@@ -104,7 +104,7 @@ export const researchList = [
 { 
     id: "crushing_tech", 
     name: "광석 분쇄 기술", 
-    desc: "전기 채굴기의 출력 2.5배", 
+    desc: "전기 채굴기(철/구리)의 출력 2.5배", 
     cost: { steel: 500, gear: 1000 }, 
     type: 'building', 
     target: [42, 43], 
@@ -114,7 +114,7 @@ export const researchList = [
     // === [Tier 4: 전기 및 회로 기술] ===
     { id: "copper_wiring", name: "고효율 구리 배선", desc: "전력 소모 건물 효율 +20% (속도 1.2배)", cost: { copperPlate: 1000, circuit: 100 }, type: 'building', target: [4, 5, 11], value: 1.2, reqResearch: "steam_power" },
     { id: "integrated_circuit", name: "집적 회로 설계", desc: "회로 공장 속도 2.5배", cost: { circuit: 500, plastic: 200 }, type: 'building', target: [11], value: 2.5, reqResearch: "copper_wiring" },
-    { id: "electric_motor", name: "고속 전기 모터", desc: "기초 채굴기(석탄/철/구리) 속도 2배", cost: { gear: 1000, circuit: 300 }, type: 'building', target: [2, 4, 5], value: 2, reqResearch: "integrated_circuit" },
+    { id: "electric_motor", name: "고속 전기 모터", desc: "기초 채석 제제소 가마 속도 2배", cost: { gear: 1000, circuit: 300 }, type: 'building', target: [2, 4, 5], value: 2, reqResearch: "integrated_circuit" },
 
     // === [Tier 5: 화학 및 정유 공정] ===
     { id: "oil_refining", name: "원유 분별 증류", desc: "원유 시추기 속도 2배", cost: { steel: 500, circuit: 500 }, type: 'building', target: [13], value: 2, reqResearch: "integrated_circuit" },
