@@ -51,14 +51,14 @@ export let gameData = {
     { id: 22, name: "배터리 화학 공장", cost: { plastic: 500, circuit: 500 }, inputs: { stone: 10, sulfur: 2, energy: 25 }, outputs: { battery: 1 }, count: 0, reqLevel: 16 }, // 집 Lv.19 대비
     { id: 46, name: "원유 발전소", cost: { steel: 800, copperPlate: 500, gear: 300 }, inputs: { oil: 2 }, outputs: { energy: 250 }, count: 0, reqLevel: 15 },
     // === TIER 4: 석유 및 고급 소재 (Lv.20 ~ 30) ===
-    { id: 25, name: "티타늄 채굴 드릴", cost: { steel: 2000, circuit: 1000 }, inputs: { energy: 60 }, outputs: { titaniumOre: 2 }, count: 0, reqLevel: 20 }, // 집 Lv.21 대비
+    { id: 25, name: "티타늄 채굴 드릴", cost: { steel: 2000, circuit: 1000 }, inputs: { energy: 60 }, outputs: { titaniumOre: 2 }, count: 0, reqLevel: 19 }, // 
     { id: 20, name: "원유 시추 펌프", cost: { steel: 1000, circuit: 500 }, inputs: { energy: 20 }, outputs: { oil: 5 }, count: 0, reqLevel: 13 }, // 집 Lv.14 대비 하향
     { id: 21, name: "석유 정제 시설", cost: { steel: 2000, copperPlate: 1000 }, inputs: { oil: 10, energy: 30 }, outputs: { plastic: 2, sulfur: 1 }, count: 0, reqLevel: 13 }, // 집 Lv.14 대비 하향
-    { id: 24, name: "고급 조립 라인", cost: { steel: 5000, circuit: 2000 }, inputs: { circuit: 5, plastic: 5, energy: 80 }, outputs: { advCircuit: 1 }, count: 0, reqLevel: 22 }, // 집 Lv.23 대비
-    { id: 35, name: "로켓 연료 정제소", cost: { oil: 10000, sulfur: 5000 }, inputs: { oil: 50, sulfur: 30, energy: 200 }, outputs: { rocketFuel: 2 }, count: 0, reqLevel: 25 }, // 집 Lv.26 대비
-    { id: 33, name: "AI 연산 서버", cost: { processor: 200, battery: 1000 }, inputs: { processor: 5, energy: 500 }, outputs: { aiCore: 1 }, count: 0, reqLevel: 28 }, // 집 Lv.29 대비
+    { id: 24, name: "고급 조립 라인", cost: { steel: 5000, circuit: 2000 }, inputs: { circuit: 5, plastic: 5, energy: 80 }, outputs: { advCircuit: 1 }, count: 0, reqLevel: 21 }, // 집 Lv.23 대비
+    { id: 35, name: "로켓 연료 정제소", cost: { oil: 10000, sulfur: 5000 }, inputs: { oil: 50, sulfur: 30, energy: 200 }, outputs: { rocketFuel: 2 }, count: 0, reqLevel: 24 }, // 집 Lv.26 대비
+    { id: 33, name: "AI 연산 서버", cost: { processor: 200, battery: 1000 }, inputs: { processor: 5, energy: 500 }, outputs: { aiCore: 1 }, count: 0, reqLevel: 27 }, // 집 Lv.29 대비
     { id: 23, name: "태양광 패널 농장", cost: { glass: 2000, circuit: 2000 }, inputs: null, outputs: { energy: 400 }, count: 0, reqLevel: 25 },
-    { id: 26, name: "티타늄 제련소", cost: { titaniumOre: 1000, steel: 5000 }, inputs: { titaniumOre: 3, coal: 10, energy: 100 }, outputs: { titaniumPlate: 1 }, count: 0, reqLevel: 25 },
+    { id: 26, name: "티타늄 제련소", cost: { titaniumOre: 1000, steel: 5000 }, inputs: { titaniumOre: 3, coal: 10, energy: 100 }, outputs: { titaniumPlate: 1 }, count: 0, reqLevel: 24 },
     { 
     id: 36, 
     name: "퀀텀 컴퓨터 메인프레임", 
