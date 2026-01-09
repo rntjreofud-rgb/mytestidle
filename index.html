@@ -30,9 +30,14 @@
             <div class="header-status">
                 <span id="message-log">시스템 가동.</span>
             </div>
-            <div>
-                <button onclick="localStorage.removeItem('civIdleModularSave');location.reload()" style="background:#e74c3c; border:none; color:white; padding:5px; cursor:pointer;">초기화</button>
-            </div>
+             <div style="display: flex; gap: 5px;">
+             <!-- 파일 가져오기용 숨겨진 input -->
+              <input type="file" id="import-file" style="display:none" accept=".json">
+        
+                   <button id="btn-export" style="background:#3498db; border:none; color:white; padding:5px 10px; cursor:pointer; border-radius:4px;">내보내기</button>
+                   <button id="btn-import" style="background:#9b59b6; border:none; color:white; padding:5px 10px; cursor:pointer; border-radius:4px;">가져오기</button>
+                     <button onclick="localStorage.removeItem('civIdleModularSave');location.reload()" style="background:#e74c3c; border:none; color:white; padding:5px 10px; cursor:pointer; border-radius:4px;">초기화</button>
+              </div>
         </header>
 
         <main class="content-area">

@@ -30,6 +30,34 @@ function setupEvents() {
     UI.uiElements.btns.ironOre.addEventListener('click', () => handleGather('ironOre'));
     UI.uiElements.btns.copperOre.addEventListener('click', () => handleGather('copperOre'));
     UI.uiElements.btns.plank.addEventListener('click', () => handleGather('plank'));
+
+    // 파일 내보내기 버튼
+    document.getElementById('btn-export').addEventListener('click', () => {
+        Storage.exportToFile();
+        UI.log("세이브 데이터를 파일로 저장했습니다.");
+    });
+
+    // 파일 가져오기 버튼 (클릭 시 파일 선택창 열기)
+    const fileInput = document.getElementById('import-file');
+    document.getElementById('btn-import').addEventListener('click', () => {
+        fileInput.click();
+    });
+
+    // 파일이 선택되었을 때 처리
+    fileInput.addEventListener('change', (e) => {
+        if (e.target.files.length > 0) {
+            Storage.importFromFile(e.target.files[0])
+                .then(() => {
+                    alert("데이터를 성공적으로 불러왔습니다. 게임을 다시 시작합니다.");
+                    location.reload(); // 데이터 동기화를 위해 새로고침
+                })
+                .catch(err => {
+                    alert(err);
+                });
+        }
+    });
+
+
 }
 
 function handleGather(type) {
