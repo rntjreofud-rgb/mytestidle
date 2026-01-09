@@ -113,6 +113,7 @@ function checkDiscovery() {
     });
 }
 
+
 export function updateScreen(stats) {
     checkDiscovery();
     for (let key in gameData.resources) {

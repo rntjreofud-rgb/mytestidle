@@ -33,6 +33,7 @@ export function calculateNetMPS() {
     return stats;
 }
 
+
 export function produceResources(deltaTime) {
     let totalEnergyProd = 0, totalEnergyReq = 0;
     gameData.buildings.forEach(b => {

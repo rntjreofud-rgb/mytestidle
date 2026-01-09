@@ -18,6 +18,7 @@ function init() {
     setInterval(() => Storage.saveGame(), 10000);
 }
 
+
 function setupEvents() {
     if(UI.uiElements.navDashboard) UI.uiElements.navDashboard.addEventListener('click', () => UI.switchTab('dashboard'));
     if(UI.uiElements.navPower) UI.uiElements.navPower.addEventListener('click', () => UI.switchTab('power'));

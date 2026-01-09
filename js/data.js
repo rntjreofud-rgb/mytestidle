@@ -16,7 +16,7 @@ export let gameData = {
         // 시스템 수치 (비저장/실시간 계산)
         energy: 0, energyMax: 0 
     },
-    // [2] 발견된 자원 목록 (나무, 돌, 판자는 기본 해금)
+    // ⭐ 'plank'를 기본 해금 목록에 추가합니다.
     unlockedResources: ['wood', 'stone', 'plank'], 
     houseLevel: 0,
     researches: [], 

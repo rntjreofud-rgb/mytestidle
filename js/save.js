@@ -23,6 +23,7 @@ export function loadGame() {
     return false;
 }
 
+
 export function resetGame() {
     localStorage.removeItem(SAVE_KEY);
     location.reload();
