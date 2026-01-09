@@ -55,68 +55,91 @@ export function calculateNetMPS() {
 
 
 export function produceResources(deltaTime) {
-    // 1. 전력망 연산 (발전기 우선 순위)
     let totalEnergyProd = 0;
     let totalEnergyReq = 0;
 
+    // --- 1단계: 전력 생산 시설(발전기) 연산 ---
     gameData.buildings.forEach(b => {
         if (b.count > 0 && b.outputs && b.outputs.energy) {
-            let speedMult = getBuildingMultiplier(b.id);
+            let speedMult = getBuildingMultiplier(b.id); // 연구에 의한 속도 배수
+            let consMult = getBuildingConsumptionMultiplier(b.id); // ⭐ 연구에 의한 소모량 감소 배수 (0.5 등)
             let inputEfficiency = 1.0;
             
+            // 발전기 재료(석탄, 원유 등) 체크 및 소모
             if(b.inputs) {
                 for(let res in b.inputs) {
-                    let needed = b.inputs[res] * b.count * speedMult * deltaTime;
+                    if (res === 'energy') continue; // 발전기가 전기를 먹는 경우는 제외 (혹시 있다면)
+                    
+                    // ⭐ 소모량 감소(consMult)가 적용된 실제 필요량 계산
+                    let needed = (b.inputs[res] * consMult) * b.count * speedMult * deltaTime;
                     if((gameData.resources[res] || 0) < needed) {
+                        // 재료 부족 시 효율 감소
                         inputEfficiency = Math.min(inputEfficiency, (gameData.resources[res] || 0) / needed);
                     }
                 }
-                // 자원 소모
+                // 실제 재료 소모 적용
                 for(let res in b.inputs) {
-                    gameData.resources[res] = Math.max(0, gameData.resources[res] - (b.inputs[res] * b.count * speedMult * deltaTime * inputEfficiency));
+                    if (res === 'energy') continue;
+                    let actualConsume = (b.inputs[res] * consMult) * b.count * speedMult * deltaTime * inputEfficiency;
+                    gameData.resources[res] = Math.max(0, gameData.resources[res] - actualConsume);
                 }
             }
+            // 전력 생산량 합산 (생산량은 속도에만 영향을 받음)
             totalEnergyProd += (b.outputs.energy * b.count * speedMult) * inputEfficiency;
         }
     });
 
-    // 2. 부하 계산
+    // --- 2단계: 전체 전력 요구량 계산 ---
     gameData.buildings.forEach(b => {
         if (b.count > 0 && b.inputs && b.inputs.energy) {
-            totalEnergyReq += b.inputs.energy * b.count * getBuildingMultiplier(b.id);
+            let speedMult = getBuildingMultiplier(b.id);
+            // 전력 소모량도 재료 소모 감소 연구의 영향을 받게 하려면 consMult를 여기서도 곱합니다.
+            let consMult = getBuildingConsumptionMultiplier(b.id); 
+            totalEnergyReq += (b.inputs.energy * consMult) * b.count * speedMult;
         }
     });
 
+    // 전력망 상태 저장
     gameData.resources.energy = totalEnergyProd;
     gameData.resources.energyMax = totalEnergyReq;
+    
+    // 전력 공급률 계산 (1.0이면 100%, 미만이면 공장 속도 저하)
     let powerFactor = totalEnergyReq > 0 ? Math.min(1.0, totalEnergyProd / totalEnergyReq) : 1.0;
 
-    // 3. 일반 생산 시설 가동
+    // --- 3단계: 일반 생산 시설 가동 ---
     gameData.buildings.forEach(b => {
+        // 건물이 없거나 전력 생산 시설이면 건너뜀 (이미 1단계에서 처리)
         if (b.count === 0 || (b.outputs && b.outputs.energy)) return;
 
         let speedMult = getBuildingMultiplier(b.id);
+        let consMult = getBuildingConsumptionMultiplier(b.id); // ⭐ 소모량 감소 배수 적용
+        
+        // 최종 효율 = 연구 속도 * 전력 공급률
         let efficiency = speedMult * (b.inputs && b.inputs.energy ? powerFactor : 1.0);
 
         if (b.inputs) {
             let inputEfficiency = 1.0;
+            // 재료(철광석, 판자 등) 부족 여부 확인
             for (let res in b.inputs) {
                 if (res === 'energy') continue;
-                let needed = b.inputs[res] * b.count * deltaTime * efficiency;
+                
+                // ⭐ 필요 재료 계산 시 consMult(0.7 등)를 곱해 소모량을 줄임
+                let needed = (b.inputs[res] * consMult) * b.count * deltaTime * efficiency;
                 if(needed > 0 && (gameData.resources[res] || 0) < needed) {
                     inputEfficiency = Math.min(inputEfficiency, (gameData.resources[res] || 0) / needed);
                 }
             }
             efficiency *= inputEfficiency;
 
-            // 자원 실제 소모
+            // 실제 재료 차감
             for (let res in b.inputs) {
                 if (res === 'energy') continue;
-                gameData.resources[res] = Math.max(0, gameData.resources[res] - (b.inputs[res] * b.count * deltaTime * efficiency));
+                let actualConsume = (b.inputs[res] * consMult) * b.count * deltaTime * efficiency;
+                gameData.resources[res] = Math.max(0, gameData.resources[res] - actualConsume);
             }
         }
 
-        // 자원 실제 생산
+        // 실제 자원 생산 (생산량은 소모량 감소 연구와 상관없이 동일)
         if (efficiency > 0 && b.outputs) {
             for (let res in b.outputs) {
                 if (res === 'energy') continue;
@@ -227,4 +250,19 @@ export function tryUpgradeHouse(nextStage) {
     }
     gameData.houseLevel++;
     return true;
+}
+
+export function getBuildingConsumptionMultiplier(buildingId) {
+    let multiplier = 1.0;
+    const completed = gameData.researches || [];
+    
+    researchList.forEach(r => {
+        if (completed.includes(r.id)) {
+            // 타입이 'consumption'인 연구만 찾아서 곱함 (0.5면 소모량 절반)
+            if (r.type === 'consumption' && r.target.includes(buildingId)) {
+                multiplier *= r.value;
+            }
+        }
+    });
+    return multiplier;
 }

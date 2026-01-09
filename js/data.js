@@ -99,7 +99,6 @@ export const researchList = [
     { id: "basic_logistics", name: "기초 물류학", desc: "수동 벌목 캠프 속도 2배", cost: { plank: 50, stone: 50 }, type: 'building', target: [0], value: 2, reqResearch: "stone_tool" },
     { id: "quarry_tech", name: "채석 기술", desc: "자동 벌목기 속도 2배", cost: { plank: 100, coal: 50 }, type: 'building', target: [1], value: 2, reqResearch: "basic_logistics" },
     { id: "furnace_bellows", name: "용광로 송풍기", desc: "기초 철/구리 용광로 속도 2배", cost: { stone: 200, coal: 100 }, type: 'building', target: [6, 7], value: 2, reqResearch: "quarry_tech" },
-
     // === [Tier 3: 금속 및 기계 공학] ===
     { id: "iron_working", name: "철제 도구 제작", desc: "수동 채집량 +5", cost: { ironPlate: 100, gear: 50 }, type: 'manual', value: 5, reqResearch: "furnace_bellows" },
     { id: "hardened_steel", name: "강철 강화 공정", desc: "풍력 발전기 및 조립대 효율 2배", cost: { ironPlate: 300, brick: 200 }, type: 'building', target: [8, 9], value: 2, reqResearch: "iron_working" },
@@ -110,12 +109,25 @@ export const researchList = [
     { id: "mining_drill_bit", name: "강화 드릴 비트", desc: "모든 채굴기(노천/전기) 속도 2배", cost: { ironPlate: 500, gear: 200 }, type: 'building', target: [40, 41, 42, 43, 44, 45, 3, 25, 28], value: 2, reqResearch: "basic_logistics" },
     { id: "mineral_scanner", name: "지질 스캐너", desc: "기초 광산(철/구리) 채굴 속도 2배", cost: { copperPlate: 1000, circuit: 200 }, type: 'building', target: [40, 41], value: 2, reqResearch: "mining_drill_bit" },
     { id: "crushing_tech", name: "광석 분쇄 기술", desc: "전기 채굴기(철/구리) 출력 2.5배", cost: { steel: 500, gear: 1000 }, type: 'building', target: [42, 43], value: 2.5, reqResearch: "mineral_scanner" },
+    { id: "smelting_upgrade", name: "고성능 용광로 개조", desc: "기초 철/구리 용광로의 생산 속도 3.5배 증가", cost: { steel: 1500, circuit: 500 }, type: 'building', target: [6, 7], value: 3.5, reqResearch: "furnace_bellows" },
+    //효율성 연구라인
+    // 1. 용광로 재료 절감 (철광석/구리광석 50% 절약)
+    { id: "lean_smelting", name: "린 제련 공정", desc: "철/구리 용광로의 재료 소모량 50% 감소", cost: { ironPlate: 2000, gear: 1000 }, type: 'consumption', target: [6, 7], value: 0.5, reqResearch: "smelting_upgrade" },
+    // 2. 강철 재료 절감 (철판/석탄 30% 절약)
+    { id: "steel_optimization", name: "강철 배합 최적화", desc: "강철 제련소의 재료 소모량 30% 감소", cost: { steel: 5000, circuit: 1000 }, type: 'consumption', target: [13], value: 0.7, reqResearch: "steel_refinement" },
+
+    // 3. 원유 정제 효율화 (원유 소모량 40% 절약)
+    { id: "oil_recovery", name: "원유 회수 시스템", desc: "석유 정제 및 원유 발전소 소모량 40% 감소", cost: { plastic: 5000, advCircuit: 1000 }, type: 'consumption', target: [21, 46], value: 0.6, reqResearch: "oil_combustion" },
+
+    // 4. 전자 부품 미세화 (구리판/플라스틱 절약)
+    { id: "component_mini", name: "부품 미세화 기술", desc: "회로 및 프로세서 공장 재료 소모 25% 감소", cost: { processor: 1000, optics: 1000 }, type: 'consumption', target: [15, 31, 24], value: 0.75, reqResearch: "integrated_circuit" },
+
     { id: "coal_mining_tech", name: "탄층 탐사 최적화", desc: "모든 석탄 채굴기 속도 2.5배 증가", cost: { gear: 1000, ironPlate: 2000 }, type: 'building', target: [3, 44], value: 2.5, reqResearch: "mining_drill_bit" },
     // === [Tier 4: 전기 및 회로 기술] ===
     { id: "copper_wiring", name: "고효율 구리 배선", desc: "회로 공장 속도 1.5배", cost: { copperPlate: 1000, circuit: 100 }, type: 'building', target: [15], value: 1.5, reqResearch: "steam_power" },
     { id: "integrated_circuit", name: "집적 회로 설계", desc: "회로 공장 속도 추가 2.5배", cost: { circuit: 500, plastic: 200 }, type: 'building', target: [15], value: 2.5, reqResearch: "copper_wiring" },
     { id: "electric_motor", name: "고속 전기 모터", desc: "채석/제재소/가마 속도 2배", cost: { gear: 1000, circuit: 300 }, type: 'building', target: [2, 4, 5], value: 2, reqResearch: "integrated_circuit" },
-
+    { id: "steel_refinement", name: "고급 강철 제련법", desc: "강철 제련소의 생산 효율 3배 증가", cost: { steel: 2000, advCircuit: 500 }, type: 'building', target: [13], value: 3, reqResearch: "sulfuric_acid" },
     // === [Tier 5: 화학 및 정유 공정] ===
     { id: "oil_refining", name: "원유 분별 증류", desc: "원유 시추기 속도 2배", cost: { steel: 500, circuit: 500 }, type: 'building', target: [20], value: 2, reqResearch: "integrated_circuit" },
     { id: "polymer_science", name: "고분자 화학", desc: "석유 정제 시설 속도 2배", cost: { oil: 1000, plastic: 500 }, type: 'building', target: [21], value: 2, reqResearch: "oil_refining" },
