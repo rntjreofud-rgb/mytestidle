@@ -35,10 +35,10 @@ export let gameData = {
     { id: 44, name: "전기 석탄 채굴기", cost: { copperPlate: 200, gear: 50 }, inputs: { energy: 20 }, outputs: { coal: 2 }, count: 0, reqLevel: 8},
 
     // === TIER 3: 금속 공학 (Lv.10 ~ 20) ===
-    { id: 13, name: "강철 제련소", cost: { ironPlate: 300, brick: 300 }, inputs: { ironPlate: 4, coal: 5, energy: 10 }, outputs: { steel: 2 }, count: 0, reqLevel: 10 }, // 집 Lv.11 대비
+    { id: 13, name: "강철 제련소", cost: { ironPlate: 300, brick: 300 }, inputs: { ironPlate: 4, coal: 5, energy: 10 }, outputs: { steel: 2 }, count: 0, reqLevel: 8 }, // 집 Lv.11 대비
     { id: 18, name: "유리 용해로", cost: { brick: 500, stone: 500 }, inputs: { stone: 5, coal: 2 }, outputs: { glass: 2 }, count: 0, reqLevel: 10 }, // 집 Lv.12 대비
     { id: 14, name: "화력 발전소", cost: { steel: 100, copperPlate: 100 }, inputs: { coal: 3 }, outputs: { energy: 50 }, count: 0, reqLevel: 12 },
-    { id: 15, name: "자동화 회로 공장", cost: { steel: 200, copperPlate: 300 }, inputs: { copperPlate: 3, energy: 8 }, outputs: { circuit: 1 }, count: 0, reqLevel: 12 },
+    { id: 15, name: "자동화 회로 공장", cost: { steel: 200, copperPlate: 300 }, inputs: { copperPlate: 3, energy: 8 }, outputs: { circuit: 1 }, count: 0, reqLevel: 9 }, // 집 Lv.10 대비
     { id: 27, name: "정밀 렌즈 가공기", cost: { glass: 500, steel: 500 }, inputs: { glass: 4, energy: 20 }, outputs: { optics: 1 }, count: 0, reqLevel: 15 },
     { id: 31, name: "반도체 클린룸", cost: { circuit: 1000, glass: 500 }, inputs: { circuit: 4, plastic: 10, energy: 100 }, outputs: { processor: 1 }, count: 0, reqLevel: 18 }, // 집 Lv.19 대비
     { id: 22, name: "배터리 화학 공장", cost: { plastic: 500, circuit: 500 }, inputs: { stone: 10, sulfur: 2, energy: 25 }, outputs: { battery: 1 }, count: 0, reqLevel: 18 }, // 집 Lv.19 대비
