@@ -58,7 +58,7 @@ export let gameData = {
     { id: 35, name: "로켓 연료 정제소", cost: { oil: 10000, sulfur: 5000 }, inputs: { oil: 50, sulfur: 30, energy: 200 }, outputs: { rocketFuel: 2 }, count: 0, reqLevel: 24 }, // 집 Lv.26 대비
     { id: 33, name: "AI 연산 서버", cost: { processor: 200, battery: 1000 }, inputs: { processor: 5, energy: 500 }, outputs: { aiCore: 1 }, count: 0, reqLevel: 27 }, // 집 Lv.29 대비
     { id: 23, name: "태양광 패널 농장", cost: { glass: 2000, circuit: 2000 }, inputs: null, outputs: { energy: 400 }, count: 0, reqLevel: 25 },
-    { id: 26, name: "티타늄 제련소", cost: { titaniumOre: 1000, steel: 5000 }, inputs: { titaniumOre: 3, coal: 10, energy: 100 }, outputs: { titaniumPlate: 1 }, count: 0, reqLevel: 24 },
+    { id: 26, name: "티타늄 제련소", cost: { titaniumOre: 1000, steel: 5000 }, inputs: { titaniumOre: 3, coal: 10, energy: 100 }, outputs: { titaniumPlate: 1 }, count: 0, reqLevel: 20 },
     { 
     id: 36, 
     name: "퀀텀 컴퓨터 메인프레임", 
