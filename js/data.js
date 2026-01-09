@@ -9,6 +9,7 @@ export let gameData = {
         rocketFuel: 0, nanobots: 0, warpCore: 0,
         energy: 0, energyMax: 0 
     },
+    
     // ⭐ 'plank'를 기본 해금 목록에 추가합니다.
     unlockedResources: ['wood', 'stone', 'plank'], 
     houseLevel: 0,

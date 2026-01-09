@@ -53,6 +53,7 @@ export function calculateNetMPS() {
     return stats;
 }
 
+
 export function produceResources(deltaTime) {
     // 1. 전력망 연산 (발전기 우선 순위)
     let totalEnergyProd = 0;
