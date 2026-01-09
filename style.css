@@ -65,17 +65,44 @@ header h2 { margin: 0; font-size: 1rem; color: #fff; }
 .res-amount { font-size: 1.3rem; font-weight: 700; color: #fff; margin: 0; }
 .res-mps { font-size: 0.8rem; color: #8892b0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .res-card::after { content: ''; display: block; height: 3px; width: 100%; margin-top: 8px; border-radius: 2px; }
+/* --- 기존 자원 --- */
 .res-card.wood::after { background-color: #27ae60; }
 .res-card.stone::after { background-color: #7f8c8d; }
-.res-card.coal::after { background-color: #34495e; }
-.res-card.ironOre::after { background-color: #95a5a6; }
+.res-card.coal::after { background-color: #2c3e50; }
+.res-card.ironOre::after { background-color: #bdc3c7; }
 .res-card.copperOre::after { background-color: #d35400; }
-.res-card.plank::after { background-color: #f39c12; }
+
+/* --- 1차/2차 가공품 --- */
+.res-card.plank::after { background-color: #e67e22; }
 .res-card.brick::after { background-color: #c0392b; }
-.res-card.ironPlate::after { background-color: #bdc3c7; }
-.res-card.copperPlate::after { background-color: #e67e22; }
-.res-card.gear::after { background-color: #7f8c8d; }
-.res-card.circuit::after { background-color: #2ecc71; }
+.res-card.ironPlate::after { background-color: #ecf0f1; }
+.res-card.copperPlate::after { background-color: #f39c12; }
+.res-card.glass::after { background-color: #a29bfe; }
+.res-card.sulfur::after { background-color: #f1c40f; }
+.res-card.steel::after { background-color: #4b6584; }
+.res-card.concrete::after { background-color: #95a5a6; }
+
+/* --- 산업/전기 부품 --- */
+.res-card.gear::after { background-color: #636e72; }
+.res-card.circuit::after { background-color: #26de81; }
+.res-card.advCircuit::after { background-color: #eb4d4b; }
+.res-card.processor::after { background-color: #0984e3; }
+.res-card.battery::after { background-color: #fed330; }
+
+/* --- 고급 소재 및 연료 --- */
+.res-card.oil::after { background-color: #2d3436; } /* 검은색 원유 */
+.res-card.titaniumOre::after { background-color: #00cec9; }
+.res-card.titaniumPlate::after { background-color: #81ecec; }
+.res-card.uraniumOre::after { background-color: #badc58; } /* 방사능 연두색 */
+.res-card.fuelCell::after { background-color: #6ab04c; }
+.res-card.optics::after { background-color: #7ed6df; }
+
+/* --- 엔드게임 자원 --- */
+.res-card.nanobots::after { background-color: #686de0; }
+.res-card.aiCore::after { background-color: #a29bfe; }
+.res-card.rocketFuel::after { background-color: #ff793f; }
+.res-card.advAlloy::after { background-color: #485460; }
+.res-card.warpCore::after { background-color: #be2edd; } /* 보라색 우주 에너지 */
 
 /* =================================================================
    ⭐ [핵심 수정] 레이아웃 비율 재조정 (남는 공간 활용)

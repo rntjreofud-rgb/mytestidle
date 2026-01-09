@@ -2,11 +2,18 @@
 
 export let gameData = {
     resources: { 
+        // 원재료
         wood: 0, stone: 0, coal: 0, ironOre: 0, copperOre: 0, oil: 0, titaniumOre: 0, uraniumOre: 0,
+        // 1차 가공품
         plank: 0, brick: 0, ironPlate: 0, copperPlate: 0, glass: 0, sulfur: 0,
+        // 2차 가공품
         steel: 0, plastic: 0, concrete: 0, battery: 0, fuelCell: 0,
-        gear: 0, circuit: 0, advCircuit: 0, processor: 0, aiCore: 0,
-        rocketFuel: 0, nanobots: 0, warpCore: 0,
+        // 부품 및 하이테크 (여기 누락된 것들 추가됨)
+        gear: 0, circuit: 0, advCircuit: 0, processor: 0, optics: 0, titaniumPlate: 0,
+        // 최종 단계 자원
+        aiCore: 0, nanobots: 0, advAlloy: 0, rocketFuel: 0, warpCore: 0,
+        quantumData: 0, gravityModule: 0,
+        // 시스템
         energy: 0, energyMax: 0 
     },
     // ⭐ 'plank'를 기본 해금 목록에 추가합니다.

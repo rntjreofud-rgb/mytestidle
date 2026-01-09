@@ -40,7 +40,9 @@ const resNames = {
     concrete: "🏢 콘크리트", battery: "🔋 배터리", fuelCell: "☢️ 연료봉",
     gear: "⚙️ 톱니", circuit: "📟 회로", advCircuit: "🔴 고급회로", 
     processor: "🔵 프로세서", aiCore: "🧠 AI코어", rocketFuel: "🚀 로켓연료", 
-    nanobots: "🤖 나노봇", warpCore: "🌀 워프코어", energy: "⚡ 전력"
+    nanobots: "🤖 나노봇", warpCore: "🌀 워프코어", energy: "⚡ 전력",
+    titaniumPlate: "💎 티타늄판", optics: "🔭 광학렌즈", advAlloy: "🛡️ 고급합금",
+    quantumData: "💾 양자데이터", gravityModule: "🛸 중력모듈"
 };
 
 function formatNumber(num) {
