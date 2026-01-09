@@ -128,6 +128,12 @@ function checkResourceDiscovery() {
 
 export function updateScreen(stats) {
     checkResourceDiscovery();
+
+    // 현재 전력 상태 확인
+    const powerProd = gameData.resources.energy || 0;
+    const powerReq = gameData.resources.energyMax || 0;
+    const isPowerShort = powerProd < powerReq; // 전력 부족 여부
+
     for (let key in gameData.resources) {
         if(key === 'energy' || key === 'energyMax') continue;
         if (!gameData.unlockedResources.includes(key)) continue;
@@ -137,19 +143,26 @@ export function updateScreen(stats) {
             card = createResourceCard(key);
             elements.resGrid.appendChild(card);
         }
+
         const val = gameData.resources[key] || 0;
-        const prod = stats[key] ? stats[key].prod : 0;
-        const cons = stats[key] ? stats[key].cons : 0;
-        const net = prod - cons;
+        const net = (stats[key].prod - stats[key].cons);
+        
         card.querySelector('.res-amount').innerText = formatNumber(val);
         const mpsEl = card.querySelector('.res-mps');
-        if (prod > 0 && cons > 0) {
-            mpsEl.innerHTML = `<span style="color:#2ecc71">+${formatNumber(prod)}</span>|<span style="color:#e74c3c">-${formatNumber(cons)}</span>/s`;
+
+        // 전력이 부족한 상태라면 경고 메시지 추가
+        let powerWarning = isPowerShort ? `<span style="color:#f1c40f; font-size:0.7rem;"> [⚡부족]</span>` : "";
+
+        if (stats[key].prod > 0 && stats[key].cons > 0) {
+            mpsEl.innerHTML = `<span style="color:#2ecc71">+${formatNumber(stats[key].prod)}</span>|<span style="color:#e74c3c">-${formatNumber(stats[key].cons)}</span>/s${powerWarning}`;
         } else {
-            let mpsText = Math.abs(net) < 1000 ? Math.abs(net).toFixed(1) : formatNumber(Math.abs(net));
+            let mpsText = Math.abs(net) < 10 ? net.toFixed(1) : formatNumber(net);
             if(net < 0) { mpsEl.style.color = "#e74c3c"; mpsEl.innerText = `▼ ${mpsText}/s`; }
             else if(net > 0) { mpsEl.style.color = "#2ecc71"; mpsEl.innerText = `▲ ${mpsText}/s`; }
             else { mpsEl.style.color = "#7f8c8d"; mpsEl.innerText = `+0.0/s`; }
+            
+            // 전력 부족 시 텍스트 뒤에 경고 아이콘 추가
+            if (isPowerShort && net !== 0) mpsEl.innerHTML += powerWarning;
         }
     }
     updatePowerUI();

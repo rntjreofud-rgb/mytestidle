@@ -30,31 +30,40 @@ export function calculateNetMPS() {
         stats[key] = { prod: 0, cons: 0 };
     }
 
+    // 현재 전력 공급률 계산
+    const totalProd = gameData.resources.energy || 0;
+    const totalReq = gameData.resources.energyMax || 0;
+    const powerFactor = totalReq > 0 ? Math.min(1.0, totalProd / totalReq) : 1.0;
+
     gameData.buildings.forEach(b => {
         if (b.count > 0) {
             let speedMult = getBuildingMultiplier(b.id);
-            let consMult = getBuildingConsumptionMultiplier(b.id); // ⭐ 추가: 소모량 감소 배수
+            let consMult = getBuildingConsumptionMultiplier(b.id);
+            let energyEff = getEnergyEfficiencyMultiplier(b.id);
+
+            // ⭐ 전력을 사용하는 건물은 powerFactor만큼 효율이 떨어짐
+            let currentEfficiency = speedMult;
+            if (b.inputs && b.inputs.energy) {
+                currentEfficiency *= powerFactor;
+            }
 
             if (b.inputs) {
                 for (let res in b.inputs) {
                     if(res !== 'energy') {
-                        // ⭐ 소모량 통계에 consMult를 곱해줍니다.
-                        stats[res].cons += (b.inputs[res] * consMult) * b.count * speedMult;
+                        // 통계에 실시간 효율(powerFactor) 반영
+                        stats[res].cons += (b.inputs[res] * consMult) * b.count * currentEfficiency;
                     }
                 }
             }
-            if (b.outputs) {
+            if (b.outputs && !b.outputs.energy) { // 전력 생산 시설은 제외
                 for (let res in b.outputs) {
-                    if(res !== 'energy') {
-                        stats[res].prod += b.outputs[res] * b.count * speedMult;
-                    }
+                    stats[res].prod += b.outputs[res] * b.count * currentEfficiency;
                 }
             }
         }
     });
     return stats;
 }
-
 
 export function produceResources(deltaTime) {
     let totalEnergyProd = 0;
