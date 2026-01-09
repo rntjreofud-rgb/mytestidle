@@ -13,18 +13,21 @@ export let gameData = {
     unlockedResources: ['wood', 'stone', 'plank'], 
     houseLevel: 0,
     researches: [], 
-    buildings: [
+   buildings: [
         // === TIER 1: 원시 및 기초 (Lv.0 ~ 10) ===
         { id: 0, name: "수동 벌목 캠프", cost: { wood: 10 }, inputs: null, outputs: { wood: 0.5 }, count: 0, reqLevel: 0 },
-        { id: 1, name: "자동 벌목기", cost: { wood: 50, stone: 10 }, inputs: null, outputs: { wood: 2 }, count: 0, reqLevel: 2 },
+        { id: 1, name: "자동 벌목기", cost: { wood: 50, stone: 10 }, inputs: null, outputs: { wood: 2 }, count: 0, reqLevel: 0.5 }, // 더 빨리 등장
         { id: 2, name: "채석 작업장", cost: { wood: 100, plank: 10 }, inputs: null, outputs: { stone: 1 }, count: 0, reqLevel: 0.5 },
-        { id: 3, name: "석탄 노천 채굴장", cost: { stone: 100, plank: 20 }, inputs: null, outputs: { coal: 1 }, count: 0, reqLevel: 3 },
-        { id: 4, name: "증기압 제재소", cost: { plank: 50, coal: 10 }, inputs: { wood: 3 }, outputs: { plank: 2 }, count: 0, reqLevel: 4 },
-        { id: 5, name: "원시 흙 가마", cost: { stone: 50 }, inputs: { stone: 2, wood: 1 }, outputs: { brick: 1 }, count: 0, reqLevel: 1 },
-        { id: 6, name: "기초 철광소", cost: { brick: 50, stone: 100 }, inputs: { ironOre: 2, coal: 1 }, outputs: { ironPlate: 1 }, count: 0, reqLevel: 5 },
-        { id: 7, name: "기초 구리광소", cost: { brick: 50, stone: 100 }, inputs: { copperOre: 2, coal: 1 }, outputs: { copperPlate: 1 }, count: 0, reqLevel: 5 },
-        { id: 8, name: "풍력 발전기", cost: { plank: 100, ironPlate: 20 }, inputs: null, outputs: { energy: 5 }, count: 0, reqLevel: 8 },
-        { id: 9, name: "기계식 조립대", cost: { ironPlate: 50, gear: 10 }, inputs: { ironPlate: 2 }, outputs: { gear: 1 }, count: 0, reqLevel: 9 },
+        { id: 3, name: "석탄 노천 채굴장", cost: { stone: 100, plank: 20 }, inputs: null, outputs: { coal: 1 }, count: 0, reqLevel: 1 }, // 레벨 1에 석탄 가능
+        { id: 4, name: "증기압 제재소", cost: { plank: 50, coal: 10 }, inputs: { wood: 3 }, outputs: { plank: 2 }, count: 0, reqLevel: 1 },
+        { id: 5, name: "원시 흙 가마", cost: { stone: 50 }, inputs: { stone: 2, wood: 1 }, outputs: { brick: 1 }, count: 0, reqLevel: 0.5 },
+        
+        // ⭐ 철 용광로와 광물 건물을 레벨 4로 하향 조정 (5레벨 업그레이드 가능하게)
+        { id: 6, name: "기초 철 용광로", cost: { brick: 50, stone: 100 }, inputs: { ironOre: 2, coal: 1 }, outputs: { ironPlate: 1 }, count: 0, reqLevel: 4 },
+        { id: 7, name: "기초 구리 용광로", cost: { brick: 50, stone: 100 }, inputs: { copperOre: 2, coal: 1 }, outputs: { copperPlate: 1 }, count: 0, reqLevel: 4 },
+        
+        { id: 8, name: "풍력 발전기", cost: { plank: 100, ironPlate: 20 }, inputs: null, outputs: { energy: 5 }, count: 0, reqLevel: 5 },
+        { id: 9, name: "기계식 조립대", cost: { ironPlate: 50, gear: 10 }, inputs: { ironPlate: 2 }, outputs: { gear: 1 }, count: 0, reqLevel: 5 },
 
         // === TIER 2: 산업 혁명 (Lv.10 ~ 25) ===
         { id: 10, name: "심부 채석 드릴", cost: { ironPlate: 200, gear: 50 }, inputs: { energy: 2 }, outputs: { stone: 5 }, count: 0, reqLevel: 10 },
@@ -41,7 +44,7 @@ export let gameData = {
         // === TIER 3: 석유 및 고분자 (Lv.25 ~ 35) ===
         { id: 20, name: "원유 시추 펌프", cost: { steel: 1000, circuit: 100 }, inputs: { energy: 20 }, outputs: { oil: 5 }, count: 0, reqLevel: 26 },
         { id: 21, name: "석유 정제 시설", cost: { steel: 2000, copperPlate: 1000 }, inputs: { oil: 10, energy: 30 }, outputs: { plastic: 2, sulfur: 1 }, count: 0, reqLevel: 28 },
-        { id: 22, name: "배터리 화학 공장", cost: { plastic: 500, circuit: 200 }, inputs: { lead: 5, sulfur: 2, energy: 25 }, outputs: { battery: 1 }, count: 0, reqLevel: 30 },
+        { id: 22, name: "배터리 화학 공장", cost: { plastic: 500, circuit: 200 }, inputs: { stone: 10, sulfur: 2, energy: 25 }, outputs: { battery: 1 }, count: 0, reqLevel: 30 },
         { id: 23, name: "태양광 패널 농장", cost: { glass: 1000, circuit: 500 }, inputs: null, outputs: { energy: 150 }, count: 0, reqLevel: 32 },
         { id: 24, name: "고급 조립 라인", cost: { steel: 5000, circuit: 1000 }, inputs: { circuit: 5, plastic: 5, energy: 40 }, outputs: { advCircuit: 1 }, count: 0, reqLevel: 33 },
         { id: 25, name: "티타늄 채굴 드릴", cost: { steel: 8000, advCircuit: 200 }, inputs: { energy: 60 }, outputs: { titaniumOre: 2 }, count: 0, reqLevel: 34 },
