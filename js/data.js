@@ -42,7 +42,7 @@ export let gameData = {
     { id: 27, name: "정밀 렌즈 가공기", cost: { glass: 500, steel: 500 }, inputs: { glass: 4, energy: 20 }, outputs: { optics: 1 }, count: 0, reqLevel: 15 },
     { id: 31, name: "반도체 클린룸", cost: { circuit: 1000, glass: 500 }, inputs: { circuit: 4, plastic: 10, energy: 100 }, outputs: { processor: 1 }, count: 0, reqLevel: 18 }, // 집 Lv.19 대비
     { id: 22, name: "배터리 화학 공장", cost: { plastic: 500, circuit: 500 }, inputs: { stone: 10, sulfur: 2, energy: 25 }, outputs: { battery: 1 }, count: 0, reqLevel: 18 }, // 집 Lv.19 대비
-
+    { id: 46, name: "원유 발전소", cost: { steel: 800, copperPlate: 500, gear: 300 }, inputs: { oil: 2 }, outputs: { energy: 180 }, count: 0, reqLevel: 15 },
     // === TIER 4: 석유 및 고급 소재 (Lv.20 ~ 30) ===
     { id: 25, name: "티타늄 채굴 드릴", cost: { steel: 2000, circuit: 1000 }, inputs: { energy: 60 }, outputs: { titaniumOre: 2 }, count: 0, reqLevel: 20 }, // 집 Lv.21 대비
     { id: 20, name: "원유 시추 펌프", cost: { steel: 1000, circuit: 500 }, inputs: { energy: 20 }, outputs: { oil: 5 }, count: 0, reqLevel: 13 }, // 집 Lv.14 대비 하향
@@ -96,7 +96,16 @@ export const researchList = [
     { id: "oil_refining", name: "원유 분별 증류", desc: "원유 시추기 속도 2배", cost: { steel: 500, circuit: 500 }, type: 'building', target: [20], value: 2, reqResearch: "integrated_circuit" },
     { id: "polymer_science", name: "고분자 화학", desc: "석유 정제 시설 속도 2배", cost: { oil: 1000, plastic: 500 }, type: 'building', target: [21], value: 2, reqResearch: "oil_refining" },
     { id: "sulfuric_acid", name: "황산 제련법", desc: "강철 제련소 속도 3배", cost: { sulfur: 500, steel: 1000 }, type: 'building', target: [13], value: 3, reqResearch: "polymer_science" },
-
+    { 
+    id: "oil_combustion", 
+    name: "원유 연소 최적화", 
+    desc: "원유 발전소의 전력 출력 2배", 
+    cost: { steel: 2000, circuit: 500 }, 
+    type: 'building', 
+    target: [46], 
+    value: 2, 
+    reqResearch: "oil_refining" 
+},
     // === [Tier 6: 첨단 재료 및 티타늄] ===
     { id: "titanium_alloy", name: "티타늄 합금", desc: "티타늄 채굴기/제련소 속도 2배", cost: { steel: 5000, advCircuit: 200 }, type: 'building', target: [25, 26], value: 2, reqResearch: "sulfuric_acid" },
     { id: "high_precision", name: "나노미터 정밀도", desc: "고급 조립 라인 속도 2배", cost: { advCircuit: 1000, gear: 5000 }, type: 'building', target: [24], value: 2, reqResearch: "titanium_alloy" },
@@ -110,7 +119,7 @@ export const researchList = [
     { id: "rocket_dynamics", name: "로켓 역학", desc: "로켓 연료 정제소 속도 2배", cost: { rocketFuel: 100, processor: 500 }, type: 'building', target: [35], value: 2, reqResearch: "supercomputing" },
     { id: "cryogenic_fuel", name: "극저온 연료 냉각", desc: "로켓 연료 정제소 속도 추가 3배", cost: { rocketFuel: 1000, titaniumOre: 10000 }, type: 'building', target: [35], value: 3, reqResearch: "rocket_dynamics" },
     { id: "nanotech_click", name: "분자 분해 장치", desc: "수동 채집량 +100", cost: { processor: 2000, titaniumOre: 20000 }, type: 'manual', value: 100, reqResearch: "cryogenic_fuel" },
-    { id: "final_prep", name: "지구 이별 준비", desc: "모든 주요 건물 속도 1.2배", cost: { rocketFuel: 5000, processor: 5000, steel: 50000 }, type: 'building', target: [0,1,2,3,4,5,6,7,8,9,13,14,15,16,18,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,38,39,40,41,42,43,44,45], value: 1.2, reqResearch: "nanotech_click" }
+    { id: "final_prep", name: "지구 이별 준비", desc: "모든 주요 건물 속도 1.2배", cost: { rocketFuel: 5000, processor: 5000, steel: 50000 }, type: 'building', target: [0,1,2,3,4,5,6,7,8,9,13,14,15,16,18,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,38,39,40,41,42,43,44,45,46], value: 1.2, reqResearch: "nanotech_click" }
 ];
 
 export const houseStages = [
