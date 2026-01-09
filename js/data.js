@@ -180,7 +180,7 @@ export const houseStages = [
     { name: "전력 수신탑", desc: "외부로부터 전력을 끌어옵니다.", req: { copperPlate: 500, circuit: 50 } },
     { name: "강철 프레임", desc: "집의 하중을 철골이 견디게 합니다.", req: { steel: 100, gear: 100 } },
     { name: "유리 온실", desc: "자체적으로 식량을 조달합니다.", req: { glass: 500, wood: 10000, steel: 500 } },
-
+    { name: "정밀 공작소", desc: "미세한 기계 장치를 만들 수 있습니다.", req: { gear: 500, steel: 300 } },
 // 14레벨 -> 15레벨 업그레이드 (플라스틱 공장이 13렙에 이미 열려있음)
     { name: "화학 실험실", desc: "각종 원소를 정제하기 시작합니다.", req: { plastic: 500, sulfur: 200 } },
 
