@@ -105,7 +105,7 @@ export const researchList = [
      { 
     id: "stone_excavation", 
     name: "채석 공법 개선", 
-    desc: "채석 작업장(ID 2)의 돌 생산량 3배 증가", 
+    desc: "채석 작업장의 돌 생산량 3배 증가", 
     cost: { plank: 500, ironPlate: 200 }, 
     type: 'building', 
     target: [2], 
