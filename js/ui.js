@@ -232,8 +232,7 @@ function createResourceCard(key) {
 }
 
 function checkUnlocks() {
-    // 현재 발견/해금된 자원 목록을 가져옴
-    const discovered = gameData.unlockedResources || ['wood', 'stone'];
+    const discovered = gameData.unlockedResources || ['wood', 'stone', 'plank'];
 
     const toggle = (el, show) => {
         if(!el) return;
@@ -241,17 +240,13 @@ function checkUnlocks() {
         else el.classList.add('hidden');
     };
 
-    // [중요] 버튼의 노출 여부를 레벨이 아닌 '자원 해금 상태'에 동기화합니다.
-    // checkResourceDiscovery() 함수가 건물의 요구사항을 읽어 자동으로 discovered에 추가해줍니다.
-    
-    toggle(elements.btns.wood, true); // 나무는 항상 보임
+    toggle(elements.btns.wood, true);
     toggle(elements.btns.stone, discovered.includes('stone'));
-    toggle(elements.btns.plank, discovered.includes('plank'));
+    toggle(elements.btns.plank, discovered.includes('plank')); // 이제 기본 해금되어 보이게 됩니다.
     toggle(elements.btns.coal, discovered.includes('coal'));
     toggle(elements.btns.ironOre, discovered.includes('ironOre'));
     toggle(elements.btns.copperOre, discovered.includes('copperOre'));
 
-    // 전력 탭은 발전소(ID 14번 혹은 3번 등) 관련 건물을 지을 수 있는 레벨이 되면 노출
     if(elements.navPower) {
         elements.navPower.style.display = (gameData.houseLevel >= 2) ? 'flex' : 'none';
     }

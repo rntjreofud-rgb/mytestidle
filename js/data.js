@@ -9,7 +9,8 @@ export let gameData = {
         rocketFuel: 0, nanobots: 0, warpCore: 0,
         energy: 0, energyMax: 0 
     },
-    unlockedResources: ['wood', 'stone'], 
+    // ⭐ 'plank'를 기본 해금 목록에 추가합니다.
+    unlockedResources: ['wood', 'stone', 'plank'], 
     houseLevel: 0,
     researches: [], 
     buildings: [
@@ -182,7 +183,7 @@ export function setGameData(newData) {
     gameData.houseLevel = newData.houseLevel || 0;
     gameData.researches = newData.researches || [];
     // ⭐ 세이브 파일에서 해금 목록 불러오기 (없으면 기본값)
-    gameData.unlockedResources = newData.unlockedResources || ['wood', 'stone'];
+    gameData.unlockedResources = newData.unlockedResources || ['wood', 'stone', 'plank'];
 
     if (newData.buildings) {
         newData.buildings.forEach((savedB) => {

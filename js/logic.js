@@ -142,30 +142,28 @@ export function getClickStrength() {
 
 export function manualGather(type) {
     const amount = getClickStrength(); 
-    const discovered = gameData.unlockedResources || ['wood', 'stone'];
+    const discovered = gameData.unlockedResources || ['wood', 'stone', 'plank'];
 
-    // 1. 나무는 언제나 가능
+    // 발견되지 않은 자원이면 무시
+    if (!discovered.includes(type)) return false;
+
+    // 1. 나무 채집
     if (type === 'wood') {
         gameData.resources.wood += amount;
         return true;
     }
 
-    // 2. 나머지는 '발견(해금)'된 상태여야만 가능
-    if (!discovered.includes(type)) {
-        return false; 
-    }
-
-    // 3. 자원별 특이사항 처리
+    // 2. ⭐ 판자 제작 (나무 2개 소모하여 1개 획득)
     if (type === 'plank') {
         if (gameData.resources.wood >= 2) {
             gameData.resources.wood -= 2;
-            gameData.resources.plank += 1;
+            gameData.resources.plank += 1; // 제작은 클릭 강화 수치를 적용하지 않는 것이 일반적입니다.
             return true;
         }
-        return false;
+        return false; // 나무 부족 시 실패
     }
 
-    // 4. 일반 자원들 (stone, coal, ironOre, copperOre 등)
+    // 3. 기타 일반 자원 (돌, 석탄 등)
     if (gameData.resources[type] !== undefined) {
         gameData.resources[type] += amount;
         return true;
