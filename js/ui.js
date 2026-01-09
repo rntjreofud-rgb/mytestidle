@@ -218,6 +218,14 @@ function checkUnlocks() {
     toggle(elements.btns.ironOre, discovered.includes('ironOre'));
     toggle(elements.btns.copperOre, discovered.includes('copperOre'));
     if(elements.navPower) elements.navPower.style.display = (gameData.houseLevel >= 2) ? 'flex' : 'none';
+    if(elements.navPower) {
+    const isPowerUnlocked = (gameData.houseLevel >= 5); // 풍력 발전기 등장 시점
+    elements.navPower.style.display = isPowerUnlocked ? 'flex' : 'none';
+    if(isPowerUnlocked && !elements.navPower.classList.contains('unlocked-flash')) {
+        elements.navPower.classList.add('unlocked-flash');
+        log("⚡ 전력 관리 시스템이 활성화되었습니다!", true);
+    }
+}
 }
 
 export function renderShop(onBuyCallback, getCostFunc) {
