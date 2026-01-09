@@ -48,7 +48,7 @@ export let gameData = {
     { id: 15, name: "자동화 회로 공장", cost: { steel: 200, copperPlate: 300 }, inputs: { copperPlate: 3, energy: 8 }, outputs: { circuit: 1 }, count: 0, reqLevel: 9 }, // 집 Lv.10 대비
     { id: 27, name: "정밀 렌즈 가공기", cost: { glass: 500, steel: 500 }, inputs: { glass: 4, energy: 20 }, outputs: { optics: 1 }, count: 0, reqLevel: 14 },
     { id: 31, name: "반도체 클린룸", cost: { circuit: 1000, glass: 500 }, inputs: { circuit: 4, plastic: 10, optics: 2, energy: 100 }, outputs: { processor: 1 }, count: 0, reqLevel: 18 }, // 집 Lv.19 대비
-    { id: 22, name: "배터리 화학 공장", cost: { plastic: 500, circuit: 500 }, inputs: { stone: 10, sulfur: 2, energy: 25 }, outputs: { battery: 1 }, count: 0, reqLevel: 18 }, // 집 Lv.19 대비
+    { id: 22, name: "배터리 화학 공장", cost: { plastic: 500, circuit: 500 }, inputs: { stone: 10, sulfur: 2, energy: 25 }, outputs: { battery: 1 }, count: 0, reqLevel: 16 }, // 집 Lv.19 대비
     { id: 46, name: "원유 발전소", cost: { steel: 800, copperPlate: 500, gear: 300 }, inputs: { oil: 2 }, outputs: { energy: 250 }, count: 0, reqLevel: 15 },
     // === TIER 4: 석유 및 고급 소재 (Lv.20 ~ 30) ===
     { id: 25, name: "티타늄 채굴 드릴", cost: { steel: 2000, circuit: 1000 }, inputs: { energy: 60 }, outputs: { titaniumOre: 2 }, count: 0, reqLevel: 20 }, // 집 Lv.21 대비
