@@ -115,13 +115,10 @@ function checkDiscovery() {
 
 export function updateScreen(stats) {
     checkDiscovery();
-
-    // 자원 카드 갱신 루프
     for (let key in gameData.resources) {
         if(key === 'energy' || key === 'energyMax') continue;
-        
-        // 해금되지 않은 자원은 스킵
-        if (!gameData.unlockedResources.includes(key)) continue;
+        const isEssential = ['wood', 'stone', 'plank'].includes(key);
+        if (!isEssential && !gameData.unlockedResources.includes(key)) continue;
 
         let card = document.getElementById(`card-${key}`);
         if (!card) {
@@ -130,30 +127,27 @@ export function updateScreen(stats) {
         }
         
         const val = gameData.resources[key] || 0;
-        const prod = stats[key]?.prod || 0;
-        const cons = stats[key]?.cons || 0;
+        const prod = stats[key] ? stats[key].prod : 0;
+        const cons = stats[key] ? stats[key].cons : 0;
         const net = prod - cons;
         
-        card.querySelector('.res-amount').innerText = formatNumber(val);
+        // ⭐ 이 부분이 오류의 핵심이었습니다. 클래스 이름 확인
+        const amountEl = card.querySelector('.res-amount');
+        if (amountEl) amountEl.innerText = formatNumber(val);
+
         const mpsEl = card.querySelector('.res-mps');
-        
-        if (prod > 0 && cons > 0) {
-            mpsEl.innerHTML = `<span style="color:#2ecc71">+${formatNumber(prod)}</span>|<span style="color:#e74c3c">-${formatNumber(cons)}</span>/s`;
-        } else {
-            mpsEl.style.color = net < 0 ? "#e74c3c" : (net > 0 ? "#2ecc71" : "#7f8c8d");
-            mpsEl.innerText = `${net >= 0 ? '▲' : '▼'} ${formatNumber(Math.abs(net))}/s`;
+        if (mpsEl) {
+            if (prod > 0 && cons > 0) {
+                mpsEl.innerHTML = `<span style="color:#2ecc71">+${formatNumber(prod)}</span>|<span style="color:#e74c3c">-${formatNumber(cons)}</span>/s`;
+            } else {
+                let mpsText = Math.abs(net) < 1000 ? Math.abs(net).toFixed(1) : formatNumber(Math.abs(net));
+                if(net < 0) { mpsEl.style.color = "#e74c3c"; mpsEl.innerText = `▼ ${mpsText}/s`; }
+                else if(net > 0) { mpsEl.style.color = "#2ecc71"; mpsEl.innerText = `▲ ${mpsText}/s`; }
+                else { mpsEl.style.color = "#7f8c8d"; mpsEl.innerText = `+0.0/s`; }
+            }
         }
     }
-
-    // 전력 UI
-    const p = gameData.resources.energy || 0;
-    const r = gameData.resources.energyMax || 0;
-    if(elements.powerDisplay) elements.powerDisplay.innerHTML = `<span style="color:#2ecc71">${formatNumber(p)} MW</span> / <span style="color:#e74c3c">${formatNumber(r)} MW</span>`;
-    if(elements.powerBar) {
-        elements.powerBar.style.width = `${Math.min(100, r > 0 ? (p / r) * 100 : 100)}%`;
-        elements.powerBar.style.backgroundColor = p >= r ? '#2ecc71' : '#e74c3c';
-    }
-
+    updatePowerUI();
     if(!elements.viewResearch.classList.contains('hidden')) updateResearchButtons();
     checkUnlocks();
 }
@@ -162,9 +156,10 @@ function createResourceCard(key) {
     const div = document.createElement('div');
     div.className = `res-card ${key}`;
     div.id = `card-${key}`;
+    // ⭐ h3에 res-amount 클래스를 명확히 추가함
     div.innerHTML = `
         <div class="res-header"><span class="res-name">${resNames[key] || key}</span></div>
-        <div class="res-body"><h3>0</h3></div>
+        <div class="res-body"><h3 class="res-amount">0</h3></div>
         <div class="res-footer"><small class="res-mps">+0/s</small></div>
     `;
     return div;

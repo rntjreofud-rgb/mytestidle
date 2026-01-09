@@ -77,15 +77,31 @@ export function manualGather(type) {
         const r = researchList.find(res => res.id === rid);
         if(r && r.type === 'manual') strength += r.value;
     });
-    if (type === 'wood') { gameData.resources.wood += strength; return true; }
+
+    // ⭐ 나무는 발견 여부 무시하고 언제든 채집 가능하게 방어
+    if (type === 'wood') {
+        gameData.resources.wood = (gameData.resources.wood || 0) + strength;
+        return true;
+    }
+    
+    // 판자 제작
     if (type === 'plank') {
-        if (gameData.resources.wood >= 2) { gameData.resources.wood -= 2; gameData.resources.plank += 1; return true; }
+        if ((gameData.resources.wood || 0) >= 2) {
+            gameData.resources.wood -= 2;
+            gameData.resources.plank = (gameData.resources.plank || 0) + 1;
+            return true;
+        }
         return false;
     }
+
     const discovered = gameData.unlockedResources || ['wood', 'stone', 'plank'];
     if (!discovered.includes(type)) return false;
-    gameData.resources[type] += strength;
-    return true;
+
+    if (gameData.resources[type] !== undefined) {
+        gameData.resources[type] = (gameData.resources[type] || 0) + strength;
+        return true;
+    }
+    return false;
 }
 
 export function tryBuyResearch(id) {
