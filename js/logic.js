@@ -33,11 +33,13 @@ export function calculateNetMPS() {
     gameData.buildings.forEach(b => {
         if (b.count > 0) {
             let speedMult = getBuildingMultiplier(b.id);
+            let consMult = getBuildingConsumptionMultiplier(b.id); // ⭐ 추가: 소모량 감소 배수
 
             if (b.inputs) {
                 for (let res in b.inputs) {
                     if(res !== 'energy') {
-                        stats[res].cons += b.inputs[res] * b.count * speedMult;
+                        // ⭐ 소모량 통계에 consMult를 곱해줍니다.
+                        stats[res].cons += (b.inputs[res] * consMult) * b.count * speedMult;
                     }
                 }
             }
