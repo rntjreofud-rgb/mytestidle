@@ -306,7 +306,11 @@ export function renderShop(onBuyCallback, getCostFunc) {
         let costTxt = Object.entries(cost).map(([k, v]) => `${formatNumber(v)}${resNames[k].split(' ')[1]}`).join(' ');
 
         let speedMult = Logic.getBuildingMultiplier(b.id);
-        let inArr = b.inputs ? Object.entries(b.inputs).map(([k,v]) => `${formatNumber(v * speedMult)}${k === 'energy' ? '⚡' : resNames[k].split(' ')[1]}`) : [];
+        // ⭐ [추가] 소모량 감소 연구 배수 가져오기
+        let consMult = Logic.getBuildingConsumptionMultiplier(b.id);
+
+        // ⭐ [수정] 소모량(inArr) 계산식 뒤에 * consMult 를 추가함
+        let inArr = b.inputs ? Object.entries(b.inputs).map(([k,v]) => `${formatNumber(v * speedMult * consMult)}${k === 'energy' ? '⚡' : resNames[k].split(' ')[1]}`) : [];
         let outArr = b.outputs ? Object.entries(b.outputs).map(([k,v]) => `${formatNumber(v * speedMult)}${k === 'energy' ? '⚡' : resNames[k].split(' ')[1]}`) : [];
         
         let processTxt = "";
