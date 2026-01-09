@@ -142,30 +142,35 @@ export function getClickStrength() {
 
 export function manualGather(type) {
     const amount = getClickStrength(); 
+    const discovered = gameData.unlockedResources || ['wood', 'stone'];
 
+    // 1. 나무는 언제나 가능
     if (type === 'wood') {
         gameData.resources.wood += amount;
         return true;
     }
-    if (type === 'stone') {
-        if (gameData.houseLevel >= 1 || gameData.resources.wood >= 10) {
-            gameData.resources.stone += amount;
-            return true;
-        }
-        return false;
+
+    // 2. 나머지는 '발견(해금)'된 상태여야만 가능
+    if (!discovered.includes(type)) {
+        return false; 
     }
-    if (['coal', 'ironOre', 'copperOre'].includes(type)) {
-        if (gameData.houseLevel < 1) return false;
-        gameData.resources[type] += amount;
-        return true;
-    }
+
+    // 3. 자원별 특이사항 처리
     if (type === 'plank') {
         if (gameData.resources.wood >= 2) {
             gameData.resources.wood -= 2;
             gameData.resources.plank += 1;
             return true;
         }
+        return false;
     }
+
+    // 4. 일반 자원들 (stone, coal, ironOre, copperOre 등)
+    if (gameData.resources[type] !== undefined) {
+        gameData.resources[type] += amount;
+        return true;
+    }
+
     return false;
 }
 

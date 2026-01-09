@@ -232,11 +232,8 @@ function createResourceCard(key) {
 }
 
 function checkUnlocks() {
-    const lv = gameData.houseLevel;
-    const wood = gameData.resources.wood || 0;
-    const hasLogger = (gameData.buildings[0] && gameData.buildings[0].count > 0) || (gameData.buildings[1] && gameData.buildings[1].count > 0);
-    const hasPlank = (gameData.resources.plank || 0) > 0;
-    const canGatherStone = (lv >= 1 || wood >= 10 || hasLogger || hasPlank);
+    // 현재 발견/해금된 자원 목록을 가져옴
+    const discovered = gameData.unlockedResources || ['wood', 'stone'];
 
     const toggle = (el, show) => {
         if(!el) return;
@@ -244,13 +241,20 @@ function checkUnlocks() {
         else el.classList.add('hidden');
     };
 
-    toggle(elements.btns.stone, canGatherStone);
-    toggle(elements.btns.plank, canGatherStone);
-    toggle(elements.btns.coal, (lv >= 1));
-    toggle(elements.btns.ironOre, (lv >= 1));
-    toggle(elements.btns.copperOre, (lv >= 1));
+    // [중요] 버튼의 노출 여부를 레벨이 아닌 '자원 해금 상태'에 동기화합니다.
+    // checkResourceDiscovery() 함수가 건물의 요구사항을 읽어 자동으로 discovered에 추가해줍니다.
+    
+    toggle(elements.btns.wood, true); // 나무는 항상 보임
+    toggle(elements.btns.stone, discovered.includes('stone'));
+    toggle(elements.btns.plank, discovered.includes('plank'));
+    toggle(elements.btns.coal, discovered.includes('coal'));
+    toggle(elements.btns.ironOre, discovered.includes('ironOre'));
+    toggle(elements.btns.copperOre, discovered.includes('copperOre'));
 
-    if(elements.navPower) elements.navPower.style.display = (lv >= 2) ? 'flex' : 'none';
+    // 전력 탭은 발전소(ID 14번 혹은 3번 등) 관련 건물을 지을 수 있는 레벨이 되면 노출
+    if(elements.navPower) {
+        elements.navPower.style.display = (gameData.houseLevel >= 2) ? 'flex' : 'none';
+    }
 }
 
 export function renderShop(onBuyCallback, getCostFunc) {
