@@ -177,11 +177,17 @@ function updatePowerUI() {
     // 상단 요약 텍스트 및 바 업데이트 (기존 로직)
     if(elements.powerDisplay) elements.powerDisplay.innerHTML = `<span style="color:#2ecc71">${formatNumber(prod)} MW</span> 생산 / <span style="color:#e74c3c">${formatNumber(req)} MW</span> 소비`;
     if(elements.powerBar) {
-        let percent = req > 0 ? (prod / req) * 100 : 100;
-        elements.powerBar.style.width = `${Math.min(100, percent)}%`;
-        elements.powerBar.style.backgroundColor = (prod >= req) ? '#2ecc71' : '#f1c40f'; // 부족할 때 노랑/주황색
-        if (percent < 100) elements.powerBar.style.backgroundColor = '#e74c3c'; // 심각하게 부족할 때 빨간색
+    let percent = req > 0 ? (prod / req) * 100 : 100;
+    elements.powerBar.style.width = `${Math.min(100, percent)}%`;
+    
+    if (prod < req) {
+        elements.powerBar.classList.add('power-low');
+        elements.powerBar.style.backgroundColor = '#e74c3c';
+    } else {
+        elements.powerBar.classList.remove('power-low');
+        elements.powerBar.style.backgroundColor = '#2ecc71';
     }
+}
 
     // --- 상세 내역 렌더링 시작 ---
     const container = document.getElementById('power-breakdown-container');

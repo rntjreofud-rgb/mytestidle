@@ -157,6 +157,16 @@ header h2 { margin: 0; font-size: 1rem; color: #fff; }
     text-transform: uppercase;
 }
 
+@keyframes blink-red {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+.power-low {
+    animation: blink-red 0.8s infinite;
+    box-shadow: 0 0 10px #e74c3c;
+}
 
 /* =================================================================
    버튼 디자인 (글자 잘림/겹침 방지 강화)
@@ -312,3 +322,101 @@ header h2 { margin: 0; font-size: 1rem; color: #fff; }
 
 
 .hidden { display: none !important; }
+
+/* 휴대폰/태블릿 대응 (화면 너비 768px 이하) */
+@media (max-width: 768px) {
+    body {
+        flex-direction: column; /* 사이드바와 메인을 세로로 배치 */
+        overflow-y: auto;      /* 전체 페이지 스크롤 허용 */
+    }
+
+    /* 1. 사이드바를 상단 바 형태로 변경 */
+    .sidebar {
+        width: 100%;
+        height: auto;
+        border-right: none;
+        border-bottom: 1px solid #000;
+        position: sticky; /* 상단에 고정 */
+        top: 0;
+        z-index: 1000;
+    }
+
+    .logo-area {
+        padding: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .logo-area div { font-size: 1.5rem !important; } /* 로고 이모지 크기 축소 */
+    .logo-area h1 { font-size: 0.9rem; }
+    .logo-area small { display: none; } /* IDLE GAME 텍스트 숨김 */
+
+    /* 2. 메뉴 아이템을 가로로 배치 */
+    .nav-menu {
+        display: flex;
+        overflow-x: auto; /* 가로 스크롤 허용 */
+        padding: 0;
+        white-space: nowrap;
+        background-color: var(--bg-sidebar);
+    }
+
+    .nav-category { display: none; } /* 'Control Center', 'Systems' 분류 텍스트 숨김 */
+
+    .nav-item {
+        flex: 1;
+        justify-content: center;
+        padding: 12px 15px;
+        border-left: none;
+        border-bottom: 3px solid transparent;
+        font-size: 0.8rem;
+    }
+
+    .nav-item.active {
+        border-left: none;
+        border-bottom: 3px solid var(--primary-orange);
+    }
+
+    /* 3. 메인 콘텐츠 영역 조정 */
+    .main-wrapper {
+        height: auto;
+        overflow: visible;
+    }
+
+    .content-area {
+        padding: 10px;
+        overflow: visible;
+    }
+
+    header {
+        height: auto;
+        padding: 10px;
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
+
+    /* 4. 그리드 시스템 1열로 강제 전환 */
+    .resource-grid {
+        grid-template-columns: repeat(2, 1fr); /* 자원 카드는 2열로 */
+    }
+
+    .action-grid {
+        grid-template-columns: 1fr !important; /* 수동/자동 영역 세로 배치 */
+    }
+
+    #manual-btn-list {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+
+    #building-list, #research-list-container {
+        grid-template-columns: 1fr !important; /* 건물/연구는 보기 편하게 1열로 */
+    }
+
+    /* 5. 하단 로그 영역 */
+    .system-log-area {
+        height: 120px;
+        position: relative;
+    }
+}
