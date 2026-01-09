@@ -1,3 +1,5 @@
+// js/ui.js
+
 import { gameData, houseStages, researchList } from './data.js';
 import * as Logic from './logic.js';
 
@@ -29,16 +31,25 @@ const elements = {
     powerBar: document.getElementById('power-fill-bar')
 };
 
+// ⭐ 모든 자원 이름 및 이모지 매핑 (data.js의 모든 자원 포함)
 const resNames = {
-    wood: "🌲나무", stone: "🪨돌", coal: "⚫석탄", ironOre: "⚙️철광", copperOre: "🥉구리광", 
-    plank: "🪵판자", brick: "🧱벽돌", ironPlate: "⬜철판", copperPlate: "🟧구리판", 
-    concrete: "🏢콘크리트", gear: "⚙️톱니", steel: "🏗️강철", circuit: "📟회로", energy: "⚡전력"
+    wood: "🌲 나무", stone: "🪨 돌", coal: "⚫ 석탄", 
+    ironOre: "⚙️ 철광", copperOre: "🥉 구리광", oil: "🛢️ 원유", 
+    titaniumOre: "💎 티타늄광", uraniumOre: "💚 우라늄광",
+    plank: "🪵 판자", brick: "🧱 벽돌", ironPlate: "⬜ 철판", 
+    copperPlate: "🟧 구리판", glass: "🍷 유리", sulfur: "💛 유황", 
+    concrete: "🏢 콘크리트", steel: "🏗️ 강철", plastic: "🧪 플라스틱", 
+    battery: "🔋 배터리", fuelCell: "☢️ 연료봉", gear: "⚙️ 톱니", 
+    circuit: "📟 회로", advCircuit: "🔴 고급회로", processor: "🔵 프로세서", 
+    optics: "🔭 광학렌즈", aiCore: "🧠 AI코어", rocketFuel: "🚀 로켓연료", 
+    nanobots: "🤖 나노봇", advAlloy: "🛡️ 고급합금", warpCore: "🌀 워프코어",
+    energy: "⚡ 전력"
 };
 
 function formatNumber(num) {
     if (num == null || isNaN(num)) return "0";
     if (num < 1000) return Math.floor(num).toLocaleString();
-    const suffixes = ["k", "m", "b", "t"];
+    const suffixes = ["k", "m", "b", "t", "q"];
     const suffixNum = Math.floor(("" + Math.floor(num)).length / 3);
     let shortValue = parseFloat((num / Math.pow(1000, suffixNum)).toPrecision(3));
     return shortValue + suffixes[suffixNum - 1];
@@ -47,26 +58,54 @@ function formatNumber(num) {
 export function switchTab(tabName) {
     [elements.viewDashboard, elements.viewPower, elements.viewResearch].forEach(v => v.classList.add('hidden'));
     [elements.navDashboard, elements.navPower, elements.navResearch].forEach(n => n.classList.remove('active'));
-    if (tabName === 'dashboard') { elements.viewDashboard.classList.remove('hidden'); elements.navDashboard.classList.add('active'); renderShop(cachedBuyCallback, Logic.getBuildingCost); }
-    else if (tabName === 'power') { elements.viewPower.classList.remove('hidden'); elements.navPower.classList.add('active'); }
-    else if (tabName === 'research') { elements.viewResearch.classList.remove('hidden'); elements.navResearch.classList.add('active'); renderResearchTab(); }
+    
+    if (tabName === 'dashboard') {
+        elements.viewDashboard.classList.remove('hidden');
+        elements.navDashboard.classList.add('active');
+        renderShop(cachedBuyCallback, Logic.getBuildingCost);
+    } else if (tabName === 'power') {
+        elements.viewPower.classList.remove('hidden');
+        elements.navPower.classList.add('active');
+    } else if (tabName === 'research') {
+        elements.viewResearch.classList.remove('hidden');
+        elements.navResearch.classList.add('active');
+        renderResearchTab();
+    }
 }
 
 export function log(msg, isImportant = false) {
-    if(elements.headerLog) { elements.headerLog.innerText = msg; elements.headerLog.style.opacity = 1; setTimeout(() => { elements.headerLog.style.opacity = 0.5; }, 3000); }
+    if(elements.headerLog) {
+        elements.headerLog.innerText = msg;
+        elements.headerLog.style.opacity = 1;
+        setTimeout(() => { elements.headerLog.style.opacity = 0.5; }, 3000);
+    }
     if(elements.logList) {
         const li = document.createElement('li');
         li.className = 'log-entry';
-        li.innerHTML = `<span class="log-time">${new Date().toLocaleTimeString('ko-KR', {hour12:false})}</span><span class="${isImportant?'log-highlight':''}">${msg}</span>`;
+        const time = new Date().toLocaleTimeString('ko-KR', { hour12: false });
+        const highlight = isImportant ? 'log-highlight' : '';
+        li.innerHTML = `<span class="log-time">${time}</span><span class="${highlight}">${msg}</span>`;
         elements.logList.prepend(li);
         if (elements.logList.children.length > 50) elements.logList.removeChild(elements.logList.lastChild);
     }
 }
 
+// ⭐ 자원 해금 시스템 (Discovery Logic)
 function checkDiscovery() {
     if(!gameData.unlockedResources) gameData.unlockedResources = ['wood', 'stone', 'plank'];
+    
+    // 1. 현재 보유량이 0.1개 이상이면 무조건 해금
+    for (let key in gameData.resources) {
+        if (gameData.resources[key] >= 0.1 && !gameData.unlockedResources.includes(key)) {
+            gameData.unlockedResources.push(key);
+            log(`✨ 새로운 자원 발견: ${resNames[key] || key}`, true);
+        }
+    }
+
+    // 2. 현재 상점에 보이는 건물의 입/출력 자원이면 해금
+    const isStone = (gameData.houseLevel >= 1 || (gameData.resources.wood || 0) >= 10);
     gameData.buildings.forEach(b => {
-        const isVisible = (b.reqLevel === 0.5 && (gameData.houseLevel >= 1 || (gameData.resources.wood || 0) >= 10)) || (gameData.houseLevel >= b.reqLevel);
+        const isVisible = (b.reqLevel === 0.5 && isStone) || (gameData.houseLevel >= b.reqLevel);
         if (isVisible) {
             if (b.inputs) Object.keys(b.inputs).forEach(k => { if(!gameData.unlockedResources.includes(k)) gameData.unlockedResources.push(k); });
             if (b.outputs) Object.keys(b.outputs).forEach(k => { if(!gameData.unlockedResources.includes(k)) gameData.unlockedResources.push(k); });
@@ -76,23 +115,45 @@ function checkDiscovery() {
 
 export function updateScreen(stats) {
     checkDiscovery();
+
+    // 자원 카드 갱신 루프
     for (let key in gameData.resources) {
         if(key === 'energy' || key === 'energyMax') continue;
+        
+        // 해금되지 않은 자원은 스킵
         if (!gameData.unlockedResources.includes(key)) continue;
+
         let card = document.getElementById(`card-${key}`);
-        if (!card) { card = createResourceCard(key); elements.resGrid.appendChild(card); }
-        const prod = stats[key]?.prod || 0, cons = stats[key]?.cons || 0, net = prod - cons;
-        card.querySelector('.res-amount').innerText = formatNumber(gameData.resources[key]);
+        if (!card) {
+            card = createResourceCard(key);
+            elements.resGrid.appendChild(card);
+        }
+        
+        const val = gameData.resources[key] || 0;
+        const prod = stats[key]?.prod || 0;
+        const cons = stats[key]?.cons || 0;
+        const net = prod - cons;
+        
+        card.querySelector('.res-amount').innerText = formatNumber(val);
         const mpsEl = card.querySelector('.res-mps');
-        if (prod > 0 && cons > 0) mpsEl.innerHTML = `<span style="color:#2ecc71">+${formatNumber(prod)}</span>|<span style="color:#e74c3c">-${formatNumber(cons)}</span>/s`;
-        else {
+        
+        if (prod > 0 && cons > 0) {
+            mpsEl.innerHTML = `<span style="color:#2ecc71">+${formatNumber(prod)}</span>|<span style="color:#e74c3c">-${formatNumber(cons)}</span>/s`;
+        } else {
             mpsEl.style.color = net < 0 ? "#e74c3c" : (net > 0 ? "#2ecc71" : "#7f8c8d");
             mpsEl.innerText = `${net >= 0 ? '▲' : '▼'} ${formatNumber(Math.abs(net))}/s`;
         }
     }
-    const p = gameData.resources.energy || 0, r = gameData.resources.energyMax || 0;
+
+    // 전력 UI
+    const p = gameData.resources.energy || 0;
+    const r = gameData.resources.energyMax || 0;
     if(elements.powerDisplay) elements.powerDisplay.innerHTML = `<span style="color:#2ecc71">${formatNumber(p)} MW</span> / <span style="color:#e74c3c">${formatNumber(r)} MW</span>`;
-    if(elements.powerBar) { elements.powerBar.style.width = `${Math.min(100, r>0?(p/r)*100:100)}%`; elements.powerBar.style.backgroundColor = p >= r ? '#2ecc71' : '#e74c3c'; }
+    if(elements.powerBar) {
+        elements.powerBar.style.width = `${Math.min(100, r > 0 ? (p / r) * 100 : 100)}%`;
+        elements.powerBar.style.backgroundColor = p >= r ? '#2ecc71' : '#e74c3c';
+    }
+
     if(!elements.viewResearch.classList.contains('hidden')) updateResearchButtons();
     checkUnlocks();
 }
@@ -101,32 +162,63 @@ function createResourceCard(key) {
     const div = document.createElement('div');
     div.className = `res-card ${key}`;
     div.id = `card-${key}`;
-    div.innerHTML = `<div class="res-header"><span class="res-name">${resNames[key]||key}</span></div><div class="res-body"><h3>0</h3></div><div class="res-footer"><small class="res-mps">+0/s</small></div>`;
+    div.innerHTML = `
+        <div class="res-header"><span class="res-name">${resNames[key] || key}</span></div>
+        <div class="res-body"><h3>0</h3></div>
+        <div class="res-footer"><small class="res-mps">+0/s</small></div>
+    `;
     return div;
 }
 
 function checkUnlocks() {
-    const disc = gameData.unlockedResources;
+    const disc = gameData.unlockedResources || ['wood', 'stone', 'plank'];
     const toggle = (el, show) => { if(el) show ? el.classList.remove('hidden') : el.classList.add('hidden'); };
+    
+    toggle(elements.btns.wood, true);
     toggle(elements.btns.stone, disc.includes('stone'));
     toggle(elements.btns.plank, disc.includes('plank'));
     toggle(elements.btns.coal, disc.includes('coal'));
     toggle(elements.btns.ironOre, disc.includes('ironOre'));
     toggle(elements.btns.copperOre, disc.includes('copperOre'));
+    
     if(elements.navPower) elements.navPower.style.display = (gameData.houseLevel >= 2) ? 'flex' : 'none';
 }
 
 export function renderResearchTab() {
     const container = document.getElementById('research-list-container');
+    if(!container) return;
     container.innerHTML = "";
+    
     researchList.forEach(r => {
-        const isDone = gameData.researches.includes(r.id), isUn = r.reqResearch ? gameData.researches.includes(r.reqResearch) : true;
+        const isDone = gameData.researches.includes(r.id);
+        const isUn = r.reqResearch ? gameData.researches.includes(r.reqResearch) : true;
         if (!isDone && !isUn) return;
+
         const div = document.createElement('div');
         div.className = `shop-item ${isDone ? 'done disabled' : ''}`;
-        let cost = Object.entries(r.cost).map(([k, v]) => `${formatNumber(v)}${resNames[k]?.split(')')[0].slice(-2)||k}`).join(' ');
-        div.innerHTML = `<span class="si-name">${r.name}</span><span class="si-level">${isDone?'✓':''}</span><div class="si-desc">${r.desc}</div><div class="si-cost">${isDone?'완료':cost}</div>`;
-        if (!isDone) div.onclick = () => { if(Logic.tryBuyResearch(r.id)) { log(`🔬 연구 완료: ${r.name}`, true); renderResearchTab(); renderShop(cachedBuyCallback, Logic.getBuildingCost); } };
+        div.id = `research-${r.id}`;
+        
+        let cost = Object.entries(r.cost).map(([k, v]) => {
+            const name = resNames[k] ? resNames[k].split(')')[0].slice(-2) : k;
+            return `${formatNumber(v)}${name}`;
+        }).join(' ');
+
+        div.innerHTML = `
+            <span class="si-name">${r.name}</span>
+            <span class="si-level">${isDone ? '✓' : ''}</span>
+            <div class="si-desc">${r.desc}</div>
+            <div class="si-cost">${isDone ? '완료' : cost}</div>
+        `;
+        
+        if (!isDone) {
+            div.onclick = () => {
+                if(Logic.tryBuyResearch(r.id)) {
+                    log(`🔬 연구 완료: ${r.name}`, true);
+                    renderResearchTab();
+                    renderShop(cachedBuyCallback, Logic.getBuildingCost);
+                }
+            };
+        }
         container.appendChild(div);
     });
 }
@@ -144,16 +236,33 @@ function updateResearchButtons() {
 export function renderShop(onBuyCallback, getCostFunc) {
     if(onBuyCallback) cachedBuyCallback = onBuyCallback;
     elements.buildingList.innerHTML = "";
+    
     const isStone = (gameData.houseLevel >= 1 || (gameData.resources.wood || 0) >= 10);
+    
     gameData.buildings.forEach((b, index) => {
         if ((b.reqLevel === 0.5 && !isStone) || (b.reqLevel >= 1 && gameData.houseLevel < b.reqLevel)) return;
+        
         const div = document.createElement('div');
         div.className = `shop-item`;
-        const costObj = getCostFunc(b), costTxt = Object.entries(costObj).map(([k, v]) => `${formatNumber(v)}${resNames[k]?.slice(-2)||k}`).join(' ');
+        div.id = `build-${index}`;
+        
+        const costObj = getCostFunc(b);
+        const costTxt = Object.entries(costObj).map(([k, v]) => {
+            const name = resNames[k] ? resNames[k].slice(-2) : k;
+            return `${formatNumber(v)}${name}`;
+        }).join(' ');
+        
         let speed = Logic.getBuildingMultiplier(b.id);
         let inT = b.inputs ? Object.entries(b.inputs).map(([k,v]) => `${formatNumber(v*speed)}${k==='energy'?'⚡':resNames[k]?.slice(-2)}`).join(',') : "";
         let outT = b.outputs ? Object.entries(b.outputs).map(([k,v]) => `${formatNumber(v*speed)}${k==='energy'?'⚡':resNames[k]?.slice(-2)}`).join(',') : "";
-        div.innerHTML = `<span class="si-name">${b.name}</span><span class="si-level">Lv.${b.count}</span><div class="si-desc">${inT?'-'+inT+' ':''}➡${outT}/s</div><div class="si-cost">${costTxt}</div>`;
+        
+        div.innerHTML = `
+            <span class="si-name">${b.name}</span>
+            <span class="si-level">Lv.${b.count}</span>
+            <div class="si-desc">${inT ? '-' + inT + ' ' : ''}➡${outT}/s</div>
+            <div class="si-cost">${costTxt}</div>
+        `;
+        
         div.onclick = () => { if(cachedBuyCallback) cachedBuyCallback(index); };
         elements.buildingList.appendChild(div);
     });
@@ -171,17 +280,25 @@ export function updateShopButtons(getCostFunc) {
 }
 
 export function updateHouseUI(onUpgrade) {
-    const next = houseStages[gameData.houseLevel + 1], curr = houseStages[gameData.houseLevel];
+    const next = houseStages[gameData.houseLevel + 1];
+    const curr = houseStages[gameData.houseLevel];
     elements.houseName.innerText = `Lv.${gameData.houseLevel} ${curr.name}`;
     elements.houseDesc.innerText = curr.desc;
+    
     if (next) {
-        const reqT = Object.entries(next.req).map(([k,v]) => `${resNames[k]?.slice(-2)}${formatNumber(v)}`).join(',');
+        const reqT = Object.entries(next.req).map(([k,v]) => {
+            const name = resNames[k] ? resNames[k].slice(-2) : k;
+            return `${name}${formatNumber(v)}`;
+        }).join(',');
         elements.upgradeBtn.innerText = `⬆️ ${next.name} (${reqT})`;
         elements.upgradeBtn.onclick = () => onUpgrade(next);
         let can = true;
         for(let k in next.req) if((gameData.resources[k] || 0) < next.req[k]) can = false;
         elements.upgradeBtn.disabled = !can;
-    } else { elements.upgradeBtn.innerText = "🚀 완료"; elements.upgradeBtn.disabled = true; }
+    } else {
+        elements.upgradeBtn.innerText = "🚀 탈출 완료";
+        elements.upgradeBtn.disabled = true;
+    }
 }
 
 export const uiElements = elements;

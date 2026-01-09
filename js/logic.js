@@ -45,7 +45,7 @@ export function produceResources(deltaTime) {
                 }
                 for(let res in b.inputs) gameData.resources[res] = Math.max(0, gameData.resources[res] - (b.inputs[res] * b.count * speedMult * deltaTime * fuelEff));
             }
-            totalEnergyProd += (b.outputs.energy * b.count * speedMult) * fuelEff;
+            totalEnergyProd += (b.outputs.energy * b.count) * speedMult * fuelEff;
         }
     });
     gameData.buildings.forEach(b => {
@@ -77,13 +77,13 @@ export function manualGather(type) {
         const r = researchList.find(res => res.id === rid);
         if(r && r.type === 'manual') strength += r.value;
     });
-    const discovered = gameData.unlockedResources || ['wood', 'stone', 'plank'];
-    if (!discovered.includes(type) && type !== 'wood') return false;
     if (type === 'wood') { gameData.resources.wood += strength; return true; }
     if (type === 'plank') {
         if (gameData.resources.wood >= 2) { gameData.resources.wood -= 2; gameData.resources.plank += 1; return true; }
         return false;
     }
+    const discovered = gameData.unlockedResources || ['wood', 'stone', 'plank'];
+    if (!discovered.includes(type)) return false;
     gameData.resources[type] += strength;
     return true;
 }
