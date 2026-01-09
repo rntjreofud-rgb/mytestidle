@@ -59,7 +59,24 @@ export let gameData = {
     { id: 33, name: "AI 연산 서버", cost: { processor: 200, battery: 1000 }, inputs: { processor: 5, energy: 500 }, outputs: { aiCore: 1 }, count: 0, reqLevel: 28 }, // 집 Lv.29 대비
     { id: 23, name: "태양광 패널 농장", cost: { glass: 2000, circuit: 2000 }, inputs: null, outputs: { energy: 400 }, count: 0, reqLevel: 25 },
     { id: 26, name: "티타늄 제련소", cost: { titaniumOre: 1000, steel: 5000 }, inputs: { titaniumOre: 3, coal: 10, energy: 100 }, outputs: { titaniumPlate: 1 }, count: 0, reqLevel: 25 },
-
+    { 
+    id: 36, 
+    name: "퀀텀 컴퓨터 메인프레임", 
+    cost: { processor: 1000, advCircuit: 2000, titaniumPlate: 5000 }, 
+    inputs: { energy: 1000 }, 
+    outputs: { quantumData: 10 }, 
+    count: 0, 
+    reqLevel: 35 
+},
+{ 
+    id: 37, 
+    name: "중력 제어 연구소", 
+    cost: { nanobots: 1000, advAlloy: 2000, titaniumPlate: 10000 }, 
+    inputs: { energy: 5000, quantumData: 5 }, 
+    outputs: { gravityModule: 1 }, 
+    count: 0, 
+    reqLevel: 37 
+},
     // === TIER 5: 원자력 및 우주 기술 (Lv.30 ~ 50) ===
     { id: 28, name: "우라늄 채굴기", cost: { titaniumPlate: 2000, advCircuit: 500 }, inputs: { energy: 150 }, outputs: { uraniumOre: 1 }, count: 0, reqLevel: 32 },
     { id: 29, name: "원심 분리기", cost: { steel: 10000, gear: 5000 }, inputs: { uraniumOre: 10, energy: 200 }, outputs: { fuelCell: 1 }, count: 0, reqLevel: 35 },
@@ -162,21 +179,40 @@ export const houseStages = [
     // 10~19: 산업화
     { name: "전력 수신탑", desc: "외부로부터 전력을 끌어옵니다.", req: { copperPlate: 500, circuit: 50 } },
     { name: "강철 프레임", desc: "집의 하중을 철골이 견디게 합니다.", req: { steel: 100, gear: 100 } },
-    { name: "유리 온실", desc: "자체적으로 식량을 조달합니다.", req: { glass: 50, wood: 1000 } },
-    { name: "정밀 공작소", desc: "미세한 기계 장치를 만들 수 있습니다.", req: { gear: 500, steel: 300 } },
-    { name: "화학 실험실", desc: "각종 원소를 정제하기 시작합니다.", req: { plastic: 100, sulfur: 50 } },
-    { name: "공조 시스템", desc: "내부 공기를 정화하고 순환시킵니다.", req: { circuit: 200, copperPlate: 1000 } },
-    { name: "방사능 차폐 외벽", desc: "두꺼운 콘크리트로 외벽을 감쌉니다.", req: { concrete: 500, steel: 500 } },
-    { name: "자동화 창고 관리실", desc: "로봇 팔이 자원을 분류합니다.", req: { advCircuit: 50, gear: 1000 } },
-    { name: "백업 배터리실", desc: "정전에 대비해 에너지를 저장합니다.", req: { battery: 100, copperPlate: 2000, sulfur: 500 } },
-    { name: "연산 처리 센터", desc: "복잡한 비행 경로를 계산합니다.", req: { processor: 20, circuit: 1000 } },
+    { name: "유리 온실", desc: "자체적으로 식량을 조달합니다.", req: { glass: 500, wood: 10000, steel: 500 } },
 
-    // 20~29: 개조
-    { name: "밀폐형 선체 코팅", desc: "진공 상태를 견디도록 집을 코팅합니다.", req: { plastic: 1000, steel: 2000 } },
-    { name: "외부 관측 창", desc: "강화 유리로 밖을 내다봅니다.", req: { glass: 500, titaniumPlate: 100 } },
-    { name: "열 차폐 타일", desc: "대기권 진입 시 열을 차단합니다.", req: { brick: 5000, concrete: 2000 } },
-    { name: "데이터 송신 안테나", desc: "지구 밖과 통신을 시도합니다.", req: { advCircuit: 200, copperPlate: 5000 } },
-    { name: "추진체 탱크 기초", desc: "거대한 연료통 자리를 잡습니다.", req: { steel: 5000, concrete: 5000 } },
+// 14레벨 -> 15레벨 업그레이드 (플라스틱 공장이 13렙에 이미 열려있음)
+    { name: "화학 실험실", desc: "각종 원소를 정제하기 시작합니다.", req: { plastic: 500, sulfur: 200 } },
+
+// 15레벨 -> 16레벨 업그레이드 (광학 렌즈 공장이 15렙에 딱 열림)
+    { name: "공조 시스템", desc: "내부 공기를 정화하고 순환시킵니다.", req: { optics: 50, circuit: 1000, gear: 5000 } },
+
+// 16레벨 -> 17레벨 업그레이드 (프로세서 아직 없음! 콘크리트와 강철로 진행)
+    { name: "방사능 차폐 외벽", desc: "두꺼운 콘크리트로 외벽을 감쌉니다.", req: { concrete: 5000, steel: 10000 } },
+
+// 17레벨 -> 18레벨 업그레이드 (아직 프로세서 못 만듦! 배터리와 구리판으로 진행)
+    { name: "백업 배터리실", desc: "정전에 대비해 에너지를 저장합니다.", req: { battery: 500, copperPlate: 10000, sulfur: 2000 } },
+
+// 18레벨 -> 19레벨 업그레이드 (⭐ 프로세서 공장이 18렙에 열렸으므로 이제 사용 가능!)
+    { name: "자동화 창고 관리실", desc: "로봇 팔이 자원을 분류합니다.", req: { processor: 50, gear: 20000 } },
+
+// 19레벨 -> 20레벨 업그레이드
+    { name: "연산 처리 센터", desc: "복잡한 비행 경로를 계산합니다.", req: { processor: 200, circuit: 10000 } },
+
+// 20레벨 -> 21레벨 업그레이드 (티타늄 드릴이 20렙에 열림)
+    { name: "밀폐형 선체 코팅", desc: "진공 상태를 견디도록 집을 코팅합니다.", req: { titaniumOre: 500, plastic: 20000 } },
+
+// 21레벨 -> 22레벨 업그레이드 (티타늄 제련소가 21렙에 열림)
+    { name: "외부 관측 창", desc: "강화 유리로 밖을 내다봅니다.", req: { titaniumPlate: 200, glass: 5000 } },
+
+// 22레벨 -> 23레벨 업그레이드 (⭐ 고급 회로 공장이 22렙에 열렸으므로 이제 사용 가능!)
+    { name: "데이터 송신 안테나", desc: "지구 밖과 통신을 시도합니다.", req: { advCircuit: 100, copperPlate: 50000 } },
+
+// 23레벨 -> 24레벨 업그레이드
+    { name: "열 차폐 타일", desc: "대기권 진입 시 열을 차단합니다.", req: { brick: 50000, concrete: 30000 } },
+
+// 24레벨 -> 25레벨 업그레이드
+    { name: "추진체 탱크 기초", desc: "거대한 연료통 자리를 잡습니다.", req: { steel: 100000, concrete: 100000 } },
     { name: "생명 유지 장치 v2", desc: "수개월의 비행을 견딜 수 있습니다.", req: { processor: 100, battery: 500 } },
     { name: "보조 스러스터", desc: "집의 방향을 틀 수 있는 소형 엔진입니다.", req: { gear: 5000, rocketFuel: 100 } },
     { name: "중력 제어 장치", desc: "내부 중력을 일정하게 유지합니다.", req: { circuit: 10000, advCircuit: 500 } },
