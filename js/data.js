@@ -128,6 +128,15 @@ export const researchList = [
     { id: "integrated_circuit", name: "집적 회로 설계", desc: "회로 공장 속도 추가 2.5배", cost: { circuit: 500, plastic: 200 }, type: 'building', target: [15], value: 2.5, reqResearch: "copper_wiring" },
     { id: "electric_motor", name: "고속 전기 모터", desc: "채석/제재소/가마 속도 2배", cost: { gear: 1000, circuit: 300 }, type: 'building', target: [2, 4, 5], value: 2, reqResearch: "integrated_circuit" },
     { id: "steel_refinement", name: "고급 강철 제련법", desc: "강철 제련소의 생산 효율 3배 증가", cost: { steel: 2000, advCircuit: 500 }, type: 'building', target: [13], value: 3, reqResearch: "sulfuric_acid" },
+
+    { id: "low_power_ic", name: "저전력 회로 설계", desc: "모든 조립 및 회로 공장의 전기 소모 20% 감소", cost: { circuit: 1000, copperPlate: 5000 }, type: 'energyEff', target: [9, 15, 24, 31], value: 0.8, reqResearch: "integrated_circuit" },
+
+    // 2단계: 스마트 그리드 연산 (채굴 시설 전기 소모 30% 감소)
+    { id: "smart_mining", name: "스마트 그리드 제어", desc: "모든 전기 채굴 시설의 전기 소모 30% 감소", cost: { processor: 500, advCircuit: 1000 }, type: 'energyEff', target: [42, 43, 44, 45, 25, 28], value: 0.7, reqResearch: "low_power_ic" },
+
+    // 3단계: 초전도 코일 이식 (모든 중공업 시설 전기 소모 50% 감소)
+    { id: "superconductor_wire", name: "초전도 코일 이식", desc: "중공업 및 제련 시설의 전기 소모 50% 감소", cost: { nanobots: 500, titaniumPlate: 2000 }, type: 'energyEff', target: [13, 21, 26, 32, 34], value: 0.5, reqResearch: "titanium_alloy" },
+
     // === [Tier 5: 화학 및 정유 공정] ===
     { id: "oil_refining", name: "원유 분별 증류", desc: "원유 시추기 속도 2배", cost: { steel: 500, circuit: 500 }, type: 'building', target: [20], value: 2, reqResearch: "integrated_circuit" },
     { id: "polymer_science", name: "고분자 화학", desc: "석유 정제 시설 속도 2배", cost: { oil: 1000, plastic: 500 }, type: 'building', target: [21], value: 2, reqResearch: "oil_refining" },

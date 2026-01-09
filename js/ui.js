@@ -308,9 +308,14 @@ export function renderShop(onBuyCallback, getCostFunc) {
         let speedMult = Logic.getBuildingMultiplier(b.id);
         // ⭐ [추가] 소모량 감소 연구 배수 가져오기
         let consMult = Logic.getBuildingConsumptionMultiplier(b.id);
+        let energyEff = Logic.getEnergyEfficiencyMultiplier(b.id); // ⭐ 추가
 
         // ⭐ [수정] 소모량(inArr) 계산식 뒤에 * consMult 를 추가함
-        let inArr = b.inputs ? Object.entries(b.inputs).map(([k,v]) => `${formatNumber(v * speedMult * consMult)}${k === 'energy' ? '⚡' : resNames[k].split(' ')[1]}`) : [];
+        let inArr = b.inputs ? Object.entries(b.inputs).map(([k,v]) => {
+        let finalVal = v * speedMult * consMult;
+         if (k === 'energy') finalVal *= energyEff; // ⭐ 전력일 때만 전기효율 배수 추가 적용
+        return `${formatNumber(finalVal)}${k === 'energy' ? '⚡' : resNames[k].split(' ')[1]}`;
+        }) : [];
         let outArr = b.outputs ? Object.entries(b.outputs).map(([k,v]) => `${formatNumber(v * speedMult)}${k === 'energy' ? '⚡' : resNames[k].split(' ')[1]}`) : [];
         
         let processTxt = "";
