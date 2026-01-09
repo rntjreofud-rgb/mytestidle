@@ -158,11 +158,58 @@ export function updateScreen(stats) {
 function updatePowerUI() {
     const prod = gameData.resources.energy || 0;
     const req = gameData.resources.energyMax || 0;
+    
+    // 상단 요약 텍스트 및 바 업데이트 (기존 로직)
     if(elements.powerDisplay) elements.powerDisplay.innerHTML = `<span style="color:#2ecc71">${formatNumber(prod)} MW</span> 생산 / <span style="color:#e74c3c">${formatNumber(req)} MW</span> 소비`;
     if(elements.powerBar) {
         let percent = req > 0 ? (prod / req) * 100 : 100;
         elements.powerBar.style.width = `${Math.min(100, percent)}%`;
-        elements.powerBar.style.backgroundColor = (prod >= req) ? '#2ecc71' : '#e74c3c';
+        elements.powerBar.style.backgroundColor = (prod >= req) ? '#2ecc71' : '#f1c40f'; // 부족할 때 노랑/주황색
+        if (percent < 100) elements.powerBar.style.backgroundColor = '#e74c3c'; // 심각하게 부족할 때 빨간색
+    }
+
+    // --- 상세 내역 렌더링 시작 ---
+    const container = document.getElementById('power-breakdown-container');
+    if (!container) return;
+
+    let html = `<table style="width:100%; border-collapse: collapse; font-size: 0.85rem;">
+                <tr style="border-bottom: 1px solid #444; color: #8892b0;">
+                    <th style="text-align:left; padding: 5px;">건물명</th>
+                    <th style="text-align:right; padding: 5px;">개수</th>
+                    <th style="text-align:right; padding: 5px;">에너지 (MW)</th>
+                </tr>`;
+
+    gameData.buildings.forEach(b => {
+        if (b.count > 0) {
+            const speedMult = Logic.getBuildingMultiplier(b.id);
+            
+            // 1. 생산 건물인 경우
+            if (b.outputs && b.outputs.energy) {
+                const totalProd = b.outputs.energy * b.count * speedMult;
+                html += `<tr>
+                    <td style="padding: 5px;">${b.name}</td>
+                    <td style="text-align:right; padding: 5px;">${b.count}</td>
+                    <td style="text-align:right; padding: 5px; color:#2ecc71;">+${formatNumber(totalProd)}</td>
+                </tr>`;
+            }
+            
+            // 2. 소비 건물인 경우
+            if (b.inputs && b.inputs.energy) {
+                const totalCons = b.inputs.energy * b.count * speedMult;
+                html += `<tr>
+                    <td style="padding: 5px;">${b.name}</td>
+                    <td style="text-align:right; padding: 5px;">${b.count}</td>
+                    <td style="text-align:right; padding: 5px; color:#e74c3c;">-${formatNumber(totalCons)}</td>
+                </tr>`;
+            }
+        }
+    });
+
+    html += `</table>`;
+    
+    // 변화가 있을 때만 DOM 업데이트 (성능 최적화)
+    if (container.innerHTML !== html) {
+        container.innerHTML = html;
     }
 }
 

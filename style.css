@@ -269,5 +269,19 @@ header h2 { margin: 0; font-size: 1rem; color: #fff; }
     /* 공장 버튼은 2열 */
     #building-list, #research-list-container { grid-template-columns: repeat(2, 1fr) !important; }
 }
+/* =================================================================
+   ⭐ [핵심 수정] 전력 상세 내역 스크롤 가능 영역
+   ================================================================= */
+#power-breakdown-container {
+    max-height: 300px; /* 원하는 높이로 조절 */
+    overflow-y: auto;
+    border: 1px solid var(--border-color);
+}
+
+#power-breakdown-container td {
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+
 
 .hidden { display: none !important; }
