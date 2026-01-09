@@ -33,7 +33,7 @@ export let gameData = {
     { id: 42, name: "전기 철 채굴기", cost: { ironPlate: 200, gear: 50 }, inputs: { energy: 15 }, outputs: { ironOre: 2 }, count: 0, reqLevel: 7},
     { id: 43, name: "전기 구리 채굴기", cost: { ironPlate: 200, gear: 50 }, inputs: { energy: 15 }, outputs: { copperOre: 2 }, count: 0, reqLevel: 7},
     { id: 44, name: "전기 석탄 채굴기", cost: { copperPlate: 200, gear: 50 }, inputs: { energy: 20 }, outputs: { coal: 2 }, count: 0, reqLevel: 8},
-    { id: 45, name: "전기 석재 채굴기", cost: { copperPlate: 200, gear: 50 }, inputs: { energy: 20 }, outputs: { coal: 2 }, count: 0, reqLevel: 9},
+    { id: 45, name: "전기 석재 채굴기", cost: { copperPlate: 200, gear: 50 }, inputs: { energy: 20 }, outputs: { stone: 2 }, count: 0, reqLevel: 9},
     // === TIER 3: 금속 공학 (Lv.10 ~ 20) ===
     { id: 13, name: "강철 제련소", cost: { ironPlate: 300, brick: 300 }, inputs: { ironPlate: 4, coal: 5, energy: 10 }, outputs: { steel: 2 }, count: 0, reqLevel: 8 }, // 집 Lv.11 대비
     { id: 18, name: "유리 용해로", cost: { brick: 500, stone: 500 }, inputs: { stone: 5, coal: 2 }, outputs: { glass: 2 }, count: 0, reqLevel: 10 }, // 집 Lv.12 대비
