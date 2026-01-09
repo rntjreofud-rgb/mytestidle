@@ -38,6 +38,36 @@ const resNames = {
     nanobots: "🤖 나노봇", warpCore: "🌀 워프코어", energy: "⚡ 전력"
 };
 
+function checkResourceDiscovery() {
+    for (let key in gameData.resources) {
+        if (key === 'energy' || key === 'energyMax') continue;
+
+        // 이미 해금된 것은 패스
+        if (gameData.unlockedResources.includes(key)) continue;
+
+        // 1. 자원을 0.1개 이상 보유하게 되면 해금 (발견)
+        if (gameData.resources[key] > 0) {
+            gameData.unlockedResources.push(key);
+            log(`✨ 새로운 자원 발견: ${resNames[key].split(' ')[1]}`, true);
+            continue;
+        }
+
+        // 2. 현재 지을 수 있는 건물의 소모/생산 목록에 포함되어 있으면 해금 (예고)
+        gameData.buildings.forEach(b => {
+            // 건물이 상점에 나타날 조건이 충족되었을 때
+            const req = b.reqLevel || 0;
+            const isVisible = (req === 0.5 && (gameData.houseLevel >= 1 || gameData.resources.wood >= 10)) || (gameData.houseLevel >= req);
+            
+            if (isVisible) {
+                if (b.inputs && b.inputs[key] !== undefined) gameData.unlockedResources.push(key);
+                if (b.outputs && b.outputs[key] !== undefined) gameData.unlockedResources.push(key);
+            }
+        });
+    }
+}
+
+
+
 function formatNumber(num) {
     if (num == null) return "0";
     if (num < 1000) return Math.floor(num).toLocaleString();
@@ -88,43 +118,45 @@ export function log(msg, isImportant = false) {
 }
 
 export function updateScreen(stats) {
+    // ⭐ 자원 해금 상태 먼저 확인
+    checkResourceDiscovery();
+
     for (let key in gameData.resources) {
         if(key === 'energy' || key === 'energyMax') continue;
+
+        // ⭐ 해금된 자원만 카드를 만듦
+        if (!gameData.unlockedResources.includes(key)) {
+            const existingCard = document.getElementById(`card-${key}`);
+            if (existingCard) existingCard.classList.add('hidden');
+            continue;
+        }
+
         let card = document.getElementById(`card-${key}`);
         if (!card) {
             card = createResourceCard(key);
             elements.resGrid.appendChild(card);
         }
+        card.classList.remove('hidden'); // 발견되면 보임
+        
         const val = gameData.resources[key] || 0;
         const prod = stats[key] ? stats[key].prod : 0;
         const cons = stats[key] ? stats[key].cons : 0;
+        const net = prod - cons;
         
         card.querySelector('.res-amount').innerText = formatNumber(val);
         const mpsEl = card.querySelector('.res-mps');
         
         if (prod > 0 && cons > 0) {
-            mpsEl.style.color = "#ecf0f1";
-            mpsEl.style.fontSize = "0.75rem";
-            mpsEl.innerHTML = `<span style="color:#2ecc71">+${formatNumber(prod)}</span> | <span style="color:#e74c3c">-${formatNumber(cons)}</span> /s`;
+            mpsEl.innerHTML = `<span style="color:#2ecc71">+${formatNumber(prod)}</span>|<span style="color:#e74c3c">-${formatNumber(cons)}</span>/s`;
         } else {
-            let net = prod - cons;
             let mpsText = Math.abs(net) < 1000 ? Math.abs(net).toFixed(1) : formatNumber(Math.abs(net));
-            if(net < 0) {
-                mpsEl.style.color = "#e74c3c";
-                mpsEl.innerText = `▼ ${mpsText} /s`;
-            } else if(net > 0) {
-                mpsEl.style.color = "#2ecc71";
-                mpsEl.innerText = `▲ ${mpsText} /s`;
-            } else {
-                mpsEl.style.color = "#7f8c8d";
-                mpsEl.innerText = `+0.0 /s`;
-            }
+            if(net < 0) { mpsEl.style.color = "#e74c3c"; mpsEl.innerText = `▼ ${mpsText}/s`; }
+            else if(net > 0) { mpsEl.style.color = "#2ecc71"; mpsEl.innerText = `▲ ${mpsText}/s`; }
+            else { mpsEl.style.color = "#7f8c8d"; mpsEl.innerText = `+0.0/s`; }
         }
     }
     updatePowerUI();
-    if(!elements.viewResearch.classList.contains('hidden')) {
-        updateResearchButtons();
-    }
+    if(!elements.viewResearch.classList.contains('hidden')) renderResearchTab();
     checkUnlocks();
 }
 

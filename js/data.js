@@ -2,19 +2,14 @@
 
 export let gameData = {
     resources: { 
-        // [원자재]
         wood: 0, stone: 0, coal: 0, ironOre: 0, copperOre: 0, oil: 0, titaniumOre: 0, uraniumOre: 0,
-        // [1차 가공]
         plank: 0, brick: 0, ironPlate: 0, copperPlate: 0, glass: 0, sulfur: 0,
-        // [2차 가공/화학]
         steel: 0, plastic: 0, concrete: 0, battery: 0, fuelCell: 0,
-        // [정밀 부품]
         gear: 0, circuit: 0, advCircuit: 0, processor: 0, aiCore: 0,
-        // [우주 부품]
         rocketFuel: 0, nanobots: 0, warpCore: 0,
-        // [시스템]
         energy: 0, energyMax: 0 
     },
+    unlockedResources: ['wood', 'stone'], 
     houseLevel: 0,
     researches: [], 
     buildings: [
@@ -186,12 +181,13 @@ export function setGameData(newData) {
     }
     gameData.houseLevel = newData.houseLevel || 0;
     gameData.researches = newData.researches || [];
+    // ⭐ 세이브 파일에서 해금 목록 불러오기 (없으면 기본값)
+    gameData.unlockedResources = newData.unlockedResources || ['wood', 'stone'];
+
     if (newData.buildings) {
-        newData.buildings.forEach((savedB, i) => {
+        newData.buildings.forEach((savedB) => {
             const currentB = gameData.buildings.find(b => b.id === savedB.id);
-            if (currentB) {
-                currentB.count = savedB.count;
-            }
+            if (currentB) currentB.count = savedB.count;
         });
     }
 }
