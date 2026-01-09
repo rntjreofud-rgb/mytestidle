@@ -46,7 +46,7 @@ export let gameData = {
     // === TIER 4: 석유 및 고급 소재 (Lv.20 ~ 30) ===
     { id: 25, name: "티타늄 채굴 드릴", cost: { steel: 2000, circuit: 1000 }, inputs: { energy: 60 }, outputs: { titaniumOre: 2 }, count: 0, reqLevel: 20 }, // 집 Lv.21 대비
     { id: 20, name: "원유 시추 펌프", cost: { steel: 1000, circuit: 500 }, inputs: { energy: 20 }, outputs: { oil: 5 }, count: 0, reqLevel: 13 }, // 집 Lv.14 대비 하향
-    { id: 21, name: "석유 정제 시설", cost: { steel: 2000, copperPlate: 1000 }, inputs: { oil: 10, energy: 30 }, outputs: { plastic: 2, sulfur: 1 }, count: 0, reqLevel: 14 }, // 집 Lv.14 대비 하향
+    { id: 21, name: "석유 정제 시설", cost: { steel: 2000, copperPlate: 1000 }, inputs: { oil: 10, energy: 30 }, outputs: { plastic: 2, sulfur: 1 }, count: 0, reqLevel: 13 }, // 집 Lv.14 대비 하향
     { id: 24, name: "고급 조립 라인", cost: { steel: 5000, circuit: 2000 }, inputs: { circuit: 5, plastic: 5, energy: 80 }, outputs: { advCircuit: 1 }, count: 0, reqLevel: 22 }, // 집 Lv.23 대비
     { id: 35, name: "로켓 연료 정제소", cost: { oil: 10000, sulfur: 5000 }, inputs: { oil: 50, sulfur: 20, energy: 200 }, outputs: { rocketFuel: 2 }, count: 0, reqLevel: 25 }, // 집 Lv.26 대비
     { id: 33, name: "AI 연산 서버", cost: { processor: 200, battery: 1000 }, inputs: { processor: 5, energy: 500 }, outputs: { aiCore: 1 }, count: 0, reqLevel: 28 }, // 집 Lv.29 대비
