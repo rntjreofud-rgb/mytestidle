@@ -45,7 +45,17 @@ const resNames = {
 
 function formatNumber(num) {
     if (num == null || isNaN(num)) return "0";
-    if (num < 1000) return Math.floor(num).toLocaleString();
+    
+    // 1000 미만의 작은 숫자 처리
+    if (num < 1000) {
+        if (num === 0) return "0";
+        // 소숫점이 있고 10보다 작은 경우 (예: 0.8, 1.5 등) 소숫점 1자리까지 표시
+        if (num < 10 && num % 1 !== 0) return num.toFixed(1); 
+        // 그 외에는 반올림하여 정수로 표시
+        return Math.round(num).toLocaleString();
+    }
+
+    // 1000 이상의 큰 숫자 처리 (k, m, b... 접미사)
     const suffixes = ["k", "m", "b", "t", "q"];
     const suffixNum = Math.floor(("" + Math.floor(num)).length / 3);
     let shortValue = parseFloat((suffixNum != 0 ? (num / Math.pow(1000, suffixNum)) : num).toPrecision(3));
