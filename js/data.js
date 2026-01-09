@@ -80,7 +80,7 @@ export const researchList = [
     { id: "iron_working", name: "철제 도구 제작", desc: "수동 채집량 +5", cost: { ironPlate: 100, gear: 50 }, type: 'manual', value: 5, reqResearch: "furnace_bellows" },
     { id: "hardened_steel", name: "강철 강화 공정", desc: "철/구리 용광로 속도 2배", cost: { ironPlate: 300, brick: 200 }, type: 'building', target: [8, 9], value: 2, reqResearch: "iron_working" },
     { id: "gearbox_opt", name: "변속기 최적화", desc: "부품 조립기 속도 2배", cost: { gear: 200, ironPlate: 200 }, type: 'building', target: [10], value: 2, reqResearch: "hardened_steel" },
-    { id: "steam_power", name: "증기압 조절", desc: "석탄 발전소 출력 2배", cost: { ironPlate: 500, copperPlate: 200 }, type: 'building', target: [3], value: 2, reqResearch: "hardened_steel" },
+    { id: "steam_power", name: "증기압 조절", desc: "석탄 발전소 출력 2배", cost: { ironPlate: 500, copperPlate: 200 }, type: 'building', target: [14], value: 2, reqResearch: "hardened_steel" },
     { 
     id: "mining_drill_bit", 
     name: "강화 드릴 비트", 
