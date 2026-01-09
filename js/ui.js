@@ -1,3 +1,5 @@
+// js/ui.js 전체 교체
+
 import { gameData, houseStages, researchList } from './data.js';
 import * as Logic from './logic.js';
 
@@ -38,40 +40,10 @@ const resNames = {
     nanobots: "🤖 나노봇", warpCore: "🌀 워프코어", energy: "⚡ 전력"
 };
 
-function checkResourceDiscovery() {
-    for (let key in gameData.resources) {
-        if (key === 'energy' || key === 'energyMax') continue;
-
-        // 이미 해금된 것은 패스
-        if (gameData.unlockedResources.includes(key)) continue;
-
-        // 1. 자원을 0.1개 이상 보유하게 되면 해금 (발견)
-        if (gameData.resources[key] > 0) {
-            gameData.unlockedResources.push(key);
-            log(`✨ 새로운 자원 발견: ${resNames[key].split(' ')[1]}`, true);
-            continue;
-        }
-
-        // 2. 현재 지을 수 있는 건물의 소모/생산 목록에 포함되어 있으면 해금 (예고)
-        gameData.buildings.forEach(b => {
-            // 건물이 상점에 나타날 조건이 충족되었을 때
-            const req = b.reqLevel || 0;
-            const isVisible = (req === 0.5 && (gameData.houseLevel >= 1 || gameData.resources.wood >= 10)) || (gameData.houseLevel >= req);
-            
-            if (isVisible) {
-                if (b.inputs && b.inputs[key] !== undefined) gameData.unlockedResources.push(key);
-                if (b.outputs && b.outputs[key] !== undefined) gameData.unlockedResources.push(key);
-            }
-        });
-    }
-}
-
-
-
 function formatNumber(num) {
-    if (num == null) return "0";
+    if (num == null || isNaN(num)) return "0";
     if (num < 1000) return Math.floor(num).toLocaleString();
-    const suffixes = ["k", "m", "b", "t"];
+    const suffixes = ["k", "m", "b", "t", "q"];
     const suffixNum = Math.floor(("" + Math.floor(num)).length / 3);
     let shortValue = parseFloat((suffixNum != 0 ? (num / Math.pow(1000, suffixNum)) : num).toPrecision(3));
     if (shortValue % 1 != 0) shortValue = shortValue.toFixed(1);
@@ -79,24 +51,24 @@ function formatNumber(num) {
 }
 
 export function switchTab(tabName) {
-    if(elements.viewDashboard) elements.viewDashboard.classList.add('hidden');
-    if(elements.viewPower) elements.viewPower.classList.add('hidden');
-    if(elements.viewResearch) elements.viewResearch.classList.add('hidden');
-    
-    if(elements.navDashboard) elements.navDashboard.classList.remove('active');
-    if(elements.navPower) elements.navPower.classList.remove('active');
-    if(elements.navResearch) elements.navResearch.classList.remove('active');
+    elements.viewDashboard.classList.add('hidden');
+    elements.viewPower.classList.add('hidden');
+    elements.viewResearch.classList.add('hidden');
+    elements.navDashboard.classList.remove('active');
+    elements.navPower.classList.remove('active');
+    elements.navResearch.classList.remove('active');
 
     if (tabName === 'dashboard') {
         elements.viewDashboard.classList.remove('hidden');
         elements.navDashboard.classList.add('active');
+        renderShop(window.handleBuyBuilding, Logic.getBuildingCost);
     } else if (tabName === 'power') {
         elements.viewPower.classList.remove('hidden');
         elements.navPower.classList.add('active');
     } else if (tabName === 'research') {
         elements.viewResearch.classList.remove('hidden');
         elements.navResearch.classList.add('active');
-        renderResearchTab();
+        renderResearchTab(); // 탭을 켤 때만 새로 그림 (무한루프 방지)
     }
 }
 
@@ -117,26 +89,41 @@ export function log(msg, isImportant = false) {
     }
 }
 
+// ⭐ 발견된 자원 체크 (순차 표시용)
+function checkResourceDiscovery() {
+    if(!gameData.unlockedResources) gameData.unlockedResources = ['wood', 'stone'];
+    for (let key in gameData.resources) {
+        if (key === 'energy' || key === 'energyMax') continue;
+        if (gameData.unlockedResources.includes(key)) continue;
+
+        if (gameData.resources[key] > 0) {
+            gameData.unlockedResources.push(key);
+            continue;
+        }
+
+        gameData.buildings.forEach(b => {
+            const req = b.reqLevel || 0;
+            const isVisible = (req === 0.5 && (gameData.houseLevel >= 1 || (gameData.resources.wood || 0) >= 10)) || (gameData.houseLevel >= req);
+            if (isVisible) {
+                if (b.inputs && b.inputs[key] !== undefined) gameData.unlockedResources.push(key);
+                if (b.outputs && b.outputs[key] !== undefined) gameData.unlockedResources.push(key);
+            }
+        });
+    }
+}
+
 export function updateScreen(stats) {
-    // ⭐ 자원 해금 상태 먼저 확인
     checkResourceDiscovery();
 
     for (let key in gameData.resources) {
         if(key === 'energy' || key === 'energyMax') continue;
-
-        // ⭐ 해금된 자원만 카드를 만듦
-        if (!gameData.unlockedResources.includes(key)) {
-            const existingCard = document.getElementById(`card-${key}`);
-            if (existingCard) existingCard.classList.add('hidden');
-            continue;
-        }
+        if (!gameData.unlockedResources.includes(key)) continue;
 
         let card = document.getElementById(`card-${key}`);
         if (!card) {
             card = createResourceCard(key);
             elements.resGrid.appendChild(card);
         }
-        card.classList.remove('hidden'); // 발견되면 보임
         
         const val = gameData.resources[key] || 0;
         const prod = stats[key] ? stats[key].prod : 0;
@@ -156,7 +143,11 @@ export function updateScreen(stats) {
         }
     }
     updatePowerUI();
-    if(!elements.viewResearch.classList.contains('hidden')) renderResearchTab();
+    
+    // ⭐ 중요: 매 프레임 그리지 않고 버튼 상태만 업데이트
+    if(!elements.viewResearch.classList.contains('hidden')) {
+        updateResearchButtons();
+    }
     checkUnlocks();
 }
 
@@ -164,81 +155,61 @@ function updatePowerUI() {
     const prod = gameData.resources.energy || 0;
     const req = gameData.resources.energyMax || 0;
     if(elements.powerDisplay) {
-        elements.powerDisplay.innerHTML = `
-            <span style="color:#2ecc71">${formatNumber(prod)} MW</span> 생산 / 
-            <span style="color:#e74c3c">${formatNumber(req)} MW</span> 소비
-        `;
+        elements.powerDisplay.innerHTML = `<span style="color:#2ecc71">${formatNumber(prod)} MW</span> 생산 / <span style="color:#e74c3c">${formatNumber(req)} MW</span> 소비`;
     }
     if(elements.powerBar) {
-        let percent = 100;
-        if(req > 0) percent = (prod / req) * 100;
-        if(percent > 100) percent = 100;
-        elements.powerBar.style.width = `${percent}%`;
+        let percent = req > 0 ? (prod / req) * 100 : 100;
+        elements.powerBar.style.width = `${Math.min(100, percent)}%`;
         elements.powerBar.style.backgroundColor = (prod >= req) ? '#2ecc71' : '#e74c3c';
     }
 }
 
-function renderResearchTab() {
-    const container = elements.viewResearch.querySelector('.action-box');
-    container.innerHTML = `<div class="section-title">기술 계통도 (Research Tree)</div>`;
+// ⭐ 연구 탭 그리기 (필요할 때만 호출)
+export function renderResearchTab() {
+    const container = elements.viewResearch.querySelector('#research-list-container') || elements.viewResearch.querySelector('.action-box');
+    container.innerHTML = "";
     
-    const listDiv = document.createElement('div');
-    listDiv.id = 'research-list-container';
-    
-    // 안전장치
     if (!gameData.researches) gameData.researches = [];
 
     researchList.forEach(r => {
         const isDone = gameData.researches.includes(r.id);
-        
-        // 선행 연구 체크
-        let isUnlocked = true;
-        if (r.reqResearch && !gameData.researches.includes(r.reqResearch)) {
-            isUnlocked = false;
-        }
+        let isUnlocked = r.reqResearch ? gameData.researches.includes(r.reqResearch) : true;
 
-        // 잠겨있고 완료도 안 된 연구는 아예 안 보여줌 (테크트리 발견의 재미)
         if (!isDone && !isUnlocked) return;
 
         const div = document.createElement('div');
-        // 클래스 부여 (연구 완료 시 .done 추가)
         div.className = `shop-item ${isDone ? 'done disabled' : ''}`;
         div.id = `research-${r.id}`;
         
         let costTxt = Object.entries(r.cost).map(([k, v]) => `${formatNumber(v)}${resNames[k].split(' ')[1]}`).join(' ');
-        
+
         div.innerHTML = `
             <span class="si-name">${r.name}</span>
             <span class="si-level">${isDone ? '✓' : ''}</span>
             <div class="si-desc">${r.desc}</div>
-            <div class="si-cost">${isDone ? '<span class="research-done-tag">연구 완료</span>' : costTxt}</div>
+            <div class="si-cost">${isDone ? '연구 완료' : costTxt}</div>
         `;
         
         if (!isDone) {
-            div.onclick = () => {
+            div.onclick = (e) => {
+                e.stopPropagation();
                 if(Logic.tryBuyResearch(r.id)) {
                     log(`🔬 [연구 완료] ${r.name}`, true);
-                    renderResearchTab(); // 즉시 리스트 갱신
-                    updateScreen(Logic.calculateNetMPS()); // 속도 즉시 반영
+                    renderResearchTab(); // 완료 후 즉시 다시 그림
                 } else {
-                    log("연구 자원이 부족합니다.");
+                    log("연구 자원이 부족하거나 선행 연구가 필요합니다.");
                 }
             };
         }
-        listDiv.appendChild(div);
+        container.appendChild(div);
     });
-    
-    container.appendChild(listDiv);
     updateResearchButtons();
 }
 
 function updateResearchButtons() {
-    if (!gameData.researches) gameData.researches = [];
-    
     researchList.forEach(r => {
-        if(gameData.researches.includes(r.id)) return;
         const div = document.getElementById(`research-${r.id}`);
-        if(!div) return;
+        if(!div || gameData.researches.includes(r.id)) return;
         let canBuy = true;
         for(let k in r.cost) {
             if((gameData.resources[k] || 0) < r.cost[k]) canBuy = false;
@@ -263,8 +234,7 @@ function createResourceCard(key) {
 function checkUnlocks() {
     const lv = gameData.houseLevel;
     const wood = gameData.resources.wood || 0;
-    
-    const hasLogger = gameData.buildings[0] && gameData.buildings[0].count > 0;
+    const hasLogger = (gameData.buildings[0] && gameData.buildings[0].count > 0) || (gameData.buildings[1] && gameData.buildings[1].count > 0);
     const hasPlank = (gameData.resources.plank || 0) > 0;
     const canGatherStone = (lv >= 1 || wood >= 10 || hasLogger || hasPlank);
 
@@ -280,65 +250,36 @@ function checkUnlocks() {
     toggle(elements.btns.ironOre, (lv >= 1));
     toggle(elements.btns.copperOre, (lv >= 1));
 
-    if(elements.navPower) {
-        if(lv >= 2) elements.navPower.style.display = 'flex';
-        else elements.navPower.style.display = 'none';
-    }
+    if(elements.navPower) elements.navPower.style.display = (lv >= 2) ? 'flex' : 'none';
 }
-
-/* js/ui.js의 renderShop 함수를 이걸로 완전히 덮어씌워주세요 */
 
 export function renderShop(onBuyCallback, getCostFunc) {
     elements.buildingList.innerHTML = "";
-    
-    const lv = gameData.houseLevel;
     const wood = gameData.resources.wood || 0;
-    const hasLogger = gameData.buildings[0] && gameData.buildings[0].count > 0;
-    const hasPlank = (gameData.resources.plank || 0) > 0;
-    const isStoneUnlocked = (lv >= 1 || wood >= 10 || hasLogger || hasPlank);
+    const isStoneUnlocked = (gameData.houseLevel >= 1 || wood >= 10 || (gameData.buildings[0] && gameData.buildings[0].count > 0));
 
     gameData.buildings.forEach((b, index) => {
         const req = b.reqLevel || 0;
         if (req === 0.5 && !isStoneUnlocked) return;
-        if (req >= 1 && lv < req) return;
+        if (req >= 1 && gameData.houseLevel < req) return;
         
         const div = document.createElement('div');
         div.className = `shop-item`;
         div.id = `build-${index}`;
-        
         const cost = getCostFunc(b);
-        let costTxt = Object.entries(cost).map(([k, v]) => `${formatNumber(v)} ${resNames[k].split(' ')[1]}`).join(', ');
+        let costTxt = Object.entries(cost).map(([k, v]) => `${formatNumber(v)}${resNames[k].split(' ')[1]}`).join(' ');
 
         let processTxt = "";
         if (b.inputs) {
-            let inArr = [];
-            for(let k in b.inputs) {
-                let val = b.inputs[k];
-                let name = resNames[k] ? resNames[k].split(' ')[1] : k;
-                if(k === 'energy') name = "⚡";
-                inArr.push(`${val}${name}`);
-            }
-            processTxt += `<span style="color:#e74c3c">-${inArr.join(', ')}</span> `;
+            let inArr = Object.entries(b.inputs).map(([k,v]) => `${v}${k === 'energy' ? '⚡' : resNames[k].split(' ')[1]}`);
+            processTxt += `<span style="color:#e74c3c">-${inArr.join(',')}</span> `;
         }
         if (b.outputs) {
-             let outArr = [];
-             for(let k in b.outputs) {
-                let val = b.outputs[k];
-                let name = resNames[k] ? resNames[k].split(' ')[1] : k;
-                if(k === 'energy') name = "⚡";
-                outArr.push(`${val}${name}`);
-             }
-             processTxt += `➡ <span style="color:#2ecc71">+${outArr.join(', ')}</span> /s`;
+             let outArr = Object.entries(b.outputs).map(([k,v]) => `${v}${k === 'energy' ? '⚡' : resNames[k].split(' ')[1]}`);
+             processTxt += `➡<span style="color:#2ecc71">+${outArr.join(',')}</span>/s`;
         }
 
-        /* ⭐ 수정됨: 이름과 레벨을 묶지 않고 따로 배치 ⭐ */
-        div.innerHTML = `
-            <span class="si-name">${b.name}</span>
-            <span class="si-level">Lv.${b.count}</span>
-            <div class="si-desc">${processTxt}</div>
-            <div class="si-cost">${costTxt}</div>
-        `;
-        
+        div.innerHTML = `<span class="si-name">${b.name}</span><span class="si-level">Lv.${b.count}</span><div class="si-desc">${processTxt}</div><div class="si-cost">${costTxt}</div>`;
         div.onclick = () => onBuyCallback(index);
         elements.buildingList.appendChild(div);
     });
@@ -351,34 +292,26 @@ export function updateShopButtons(getCostFunc) {
         if(!div) return;
         const cost = getCostFunc(b);
         let canBuy = true;
-        for(let k in cost) {
-            if((gameData.resources[k] || 0) < cost[k]) canBuy = false;
-        }
+        for(let k in cost) { if((gameData.resources[k] || 0) < cost[k]) canBuy = false; }
         if (canBuy) div.classList.remove('disabled');
         else div.classList.add('disabled');
     });
 }
 
 export function updateHouseUI(onUpgrade) {
-    if (gameData.houseLevel >= houseStages.length) return;
     const nextStage = houseStages[gameData.houseLevel + 1];
     const currentStage = houseStages[gameData.houseLevel];
-
     if(elements.houseName) elements.houseName.innerText = `Lv.${gameData.houseLevel} ${currentStage.name}`;
     if(elements.houseDesc) elements.houseDesc.innerText = currentStage.desc;
 
     if (nextStage) {
-        const req = nextStage.req;
-        const reqTxt = Object.entries(req)
-            .filter(([k,v]) => k !== 'energy')
-            .map(([k,v]) => `${resNames[k].split(' ')[1]} ${formatNumber(v)}`)
-            .join(', ');
+        const reqTxt = Object.entries(nextStage.req).filter(([k,v]) => k !== 'energy').map(([k,v]) => `${resNames[k].split(' ')[1]}${formatNumber(v)}`).join(',');
         elements.upgradeBtn.innerText = `⬆️ ${nextStage.name} (${reqTxt})`;
         elements.upgradeBtn.onclick = () => onUpgrade(nextStage);
         let canUp = true;
-        for(let k in req) {
-             if (k === 'energy') continue;
-            if((gameData.resources[k] || 0) < req[k]) canUp = false;
+        for(let k in nextStage.req) {
+            if (k === 'energy') { if((gameData.resources.energy || 0) < nextStage.req[k]) canUp = false; }
+            else { if((gameData.resources[k] || 0) < nextStage.req[k]) canUp = false; }
         }
         elements.upgradeBtn.disabled = !canUp;
     } else {

@@ -170,22 +170,23 @@ export function manualGather(type) {
 }
 
 export function tryBuyResearch(id) {
-    // ⭐ [안전장치] 배열 없으면 생성
     if (!gameData.researches) gameData.researches = [];
-
     if (gameData.researches.includes(id)) return false;
     
     const research = researchList.find(r => r.id === id);
     if (!research) return false;
     
-    if (research.reqResearch) {
-        if (!gameData.researches.includes(research.reqResearch)) return false;
+    // 선행 연구 체크 (안전장치)
+    if (research.reqResearch && !gameData.researches.includes(research.reqResearch)) {
+        return false;
     }
 
     const cost = research.cost;
     for (let r in cost) {
         if ((gameData.resources[r] || 0) < cost[r]) return false;
     }
+    
+    // 소모
     for (let r in cost) {
         gameData.resources[r] -= cost[r];
     }
