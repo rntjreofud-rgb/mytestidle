@@ -2,122 +2,178 @@
 
 export let gameData = {
     resources: { 
-        wood: 0, stone: 0, coal: 0, ironOre: 0, copperOre: 0,
-        plank: 0, brick: 0, ironPlate: 0, copperPlate: 0,
-        gear: 0, circuit: 0,
+        // [원자재]
+        wood: 0, stone: 0, coal: 0, ironOre: 0, copperOre: 0, oil: 0, titaniumOre: 0, uraniumOre: 0,
+        // [1차 가공]
+        plank: 0, brick: 0, ironPlate: 0, copperPlate: 0, glass: 0, sulfur: 0,
+        // [2차 가공/화학]
+        steel: 0, plastic: 0, concrete: 0, battery: 0, fuelCell: 0,
+        // [정밀 부품]
+        gear: 0, circuit: 0, advCircuit: 0, processor: 0, aiCore: 0,
+        // [우주 부품]
+        rocketFuel: 0, nanobots: 0, warpCore: 0,
+        // [시스템]
         energy: 0, energyMax: 0 
     },
     houseLevel: 0,
     researches: [], 
     buildings: [
-        // (기존 건물 데이터와 동일, ID 순서 유지)
-        { id: 0, name: "자동 벌목기", cost: { wood: 10 }, inputs: null, outputs: { wood: 1 }, count: 0, reqLevel: 0 },
-        { id: 1, name: "채석 드릴", cost: { wood: 50, plank: 10 }, inputs: null, outputs: { stone: 1 }, count: 0, reqLevel: 0.5 },
-        { id: 2, name: "석탄 채굴기", cost: { wood: 50, stone: 20 }, inputs: null, outputs: { coal: 1 }, count: 0, reqLevel: 1 },
-        { id: 3, name: "석탄 발전소", cost: { stone: 100, brick: 20, plank: 20 }, inputs: { coal: 1 }, outputs: { energy: 10 }, count: 0, reqLevel: 2 },
-        { id: 4, name: "전기 철광석 채굴기", cost: { brick: 50, gear: 10 }, inputs: { energy: 2 }, outputs: { ironOre: 1 }, count: 0, reqLevel: 2 },
-        { id: 5, name: "전기 구리 채굴기", cost: { brick: 50, gear: 10 }, inputs: { energy: 2 }, outputs: { copperOre: 1 }, count: 0, reqLevel: 2 },
-        { id: 6, name: "제재소 (판자)", cost: { wood: 100, stone: 50 }, inputs: { wood: 2 }, outputs: { plank: 1 }, count: 0, reqLevel: 0.5 },
-        { id: 7, name: "돌 용광로 (벽돌)", cost: { stone: 100, wood: 50 }, inputs: { stone: 2 }, outputs: { brick: 1 }, count: 0, reqLevel: 0.5 },
-        { id: 8, name: "철 용광로 (철판)", cost: { brick: 100, stone: 100 }, inputs: { ironOre: 2, coal: 0.5 }, outputs: { ironPlate: 1 }, count: 0, reqLevel: 1 },
-        { id: 9, name: "구리 용광로 (구리판)", cost: { brick: 100, stone: 100 }, inputs: { copperOre: 2, coal: 0.5 }, outputs: { copperPlate: 1 }, count: 0, reqLevel: 1 },
-        { id: 10, name: "부품 조립기 (톱니)", cost: { ironPlate: 50, brick: 50 }, inputs: { ironPlate: 2, energy: 1 }, outputs: { gear: 1 }, count: 0, reqLevel: 2 },
-        { id: 11, name: "전자 공장 (회로)", cost: { ironPlate: 100, copperPlate: 100, gear: 20 }, inputs: { ironPlate: 1, copperPlate: 2, energy: 2 }, outputs: { circuit: 1 }, count: 0, reqLevel: 2 }
+        // === TIER 1: 원시 및 기초 (Lv.0 ~ 10) ===
+        { id: 0, name: "수동 벌목 캠프", cost: { wood: 10 }, inputs: null, outputs: { wood: 0.5 }, count: 0, reqLevel: 0 },
+        { id: 1, name: "자동 벌목기", cost: { wood: 50, stone: 10 }, inputs: null, outputs: { wood: 2 }, count: 0, reqLevel: 2 },
+        { id: 2, name: "채석 작업장", cost: { wood: 100, plank: 10 }, inputs: null, outputs: { stone: 1 }, count: 0, reqLevel: 0.5 },
+        { id: 3, name: "석탄 노천 채굴장", cost: { stone: 100, plank: 20 }, inputs: null, outputs: { coal: 1 }, count: 0, reqLevel: 3 },
+        { id: 4, name: "증기압 제재소", cost: { plank: 50, coal: 10 }, inputs: { wood: 3 }, outputs: { plank: 2 }, count: 0, reqLevel: 4 },
+        { id: 5, name: "원시 흙 가마", cost: { stone: 50 }, inputs: { stone: 2, wood: 1 }, outputs: { brick: 1 }, count: 0, reqLevel: 1 },
+        { id: 6, name: "기초 철광소", cost: { brick: 50, stone: 100 }, inputs: { ironOre: 2, coal: 1 }, outputs: { ironPlate: 1 }, count: 0, reqLevel: 5 },
+        { id: 7, name: "기초 구리광소", cost: { brick: 50, stone: 100 }, inputs: { copperOre: 2, coal: 1 }, outputs: { copperPlate: 1 }, count: 0, reqLevel: 5 },
+        { id: 8, name: "풍력 발전기", cost: { plank: 100, ironPlate: 20 }, inputs: null, outputs: { energy: 5 }, count: 0, reqLevel: 8 },
+        { id: 9, name: "기계식 조립대", cost: { ironPlate: 50, gear: 10 }, inputs: { ironPlate: 2 }, outputs: { gear: 1 }, count: 0, reqLevel: 9 },
+
+        // === TIER 2: 산업 혁명 (Lv.10 ~ 25) ===
+        { id: 10, name: "심부 채석 드릴", cost: { ironPlate: 200, gear: 50 }, inputs: { energy: 2 }, outputs: { stone: 5 }, count: 0, reqLevel: 10 },
+        { id: 11, name: "석탄 채굴 터널", cost: { ironPlate: 300, gear: 100 }, inputs: { energy: 3 }, outputs: { coal: 4 }, count: 0, reqLevel: 12 },
+        { id: 12, name: "산업용 용광로", cost: { brick: 500, ironPlate: 200 }, inputs: { ironOre: 5, coal: 2, energy: 5 }, outputs: { ironPlate: 4 }, count: 0, reqLevel: 14 },
+        { id: 13, name: "강철 제련소", cost: { ironPlate: 500, brick: 500 }, inputs: { ironPlate: 4, coal: 5, energy: 10 }, outputs: { steel: 1 }, count: 0, reqLevel: 16 },
+        { id: 14, name: "화력 발전소", cost: { steel: 100, copperPlate: 100 }, inputs: { coal: 3 }, outputs: { energy: 40 }, count: 0, reqLevel: 15 },
+        { id: 15, name: "자동화 회로 공장", cost: { steel: 200, copperPlate: 300 }, inputs: { copperPlate: 3, energy: 8 }, outputs: { circuit: 1 }, count: 0, reqLevel: 18 },
+        { id: 16, name: "콘크리트 믹서", cost: { steel: 300, ironPlate: 500 }, inputs: { stone: 10, energy: 5 }, outputs: { concrete: 2 }, count: 0, reqLevel: 20 },
+        { id: 17, name: "대형 유압 프레스", cost: { steel: 500, gear: 200 }, inputs: { steel: 2, energy: 12 }, outputs: { gear: 5 }, count: 0, reqLevel: 22 },
+        { id: 18, name: "유리 용해로", cost: { brick: 1000, steel: 200 }, inputs: { stone: 5, coal: 2 }, outputs: { glass: 2 }, count: 0, reqLevel: 24 },
+        { id: 19, name: "구리 제련 전해조", cost: { steel: 400, circuit: 50 }, inputs: { copperOre: 5, energy: 15 }, outputs: { copperPlate: 6 }, count: 0, reqLevel: 25 },
+
+        // === TIER 3: 석유 및 고분자 (Lv.25 ~ 35) ===
+        { id: 20, name: "원유 시추 펌프", cost: { steel: 1000, circuit: 100 }, inputs: { energy: 20 }, outputs: { oil: 5 }, count: 0, reqLevel: 26 },
+        { id: 21, name: "석유 정제 시설", cost: { steel: 2000, copperPlate: 1000 }, inputs: { oil: 10, energy: 30 }, outputs: { plastic: 2, sulfur: 1 }, count: 0, reqLevel: 28 },
+        { id: 22, name: "배터리 화학 공장", cost: { plastic: 500, circuit: 200 }, inputs: { lead: 5, sulfur: 2, energy: 25 }, outputs: { battery: 1 }, count: 0, reqLevel: 30 },
+        { id: 23, name: "태양광 패널 농장", cost: { glass: 1000, circuit: 500 }, inputs: null, outputs: { energy: 150 }, count: 0, reqLevel: 32 },
+        { id: 24, name: "고급 조립 라인", cost: { steel: 5000, circuit: 1000 }, inputs: { circuit: 5, plastic: 5, energy: 40 }, outputs: { advCircuit: 1 }, count: 0, reqLevel: 33 },
+        { id: 25, name: "티타늄 채굴 드릴", cost: { steel: 8000, advCircuit: 200 }, inputs: { energy: 60 }, outputs: { titaniumOre: 2 }, count: 0, reqLevel: 34 },
+        { id: 26, name: "티타늄 제련소", cost: { titaniumOre: 500, steel: 5000 }, inputs: { titaniumOre: 3, coal: 10, energy: 80 }, outputs: { titaniumPlate: 1 }, count: 0, reqLevel: 35 },
+        { id: 27, name: "정밀 렌즈 가공기", cost: { glass: 2000, steel: 1000 }, inputs: { glass: 4, energy: 20 }, outputs: { optics: 1 }, count: 0, reqLevel: 31 },
+
+        // === TIER 4: 원자력 및 컴퓨팅 (Lv.35 ~ 45) ===
+        { id: 28, name: "우라늄 채굴기", cost: { titaniumOre: 2000, advCircuit: 500 }, inputs: { energy: 100 }, outputs: { uraniumOre: 1 }, count: 0, reqLevel: 36 },
+        { id: 29, name: "원심 분리기", cost: { steel: 10000, gear: 5000 }, inputs: { uraniumOre: 10, energy: 150 }, outputs: { fuelCell: 1 }, count: 0, reqLevel: 38 },
+        { id: 30, name: "원자력 발전소", cost: { concrete: 5000, titaniumOre: 3000 }, inputs: { fuelCell: 1 }, outputs: { energy: 1500 }, count: 0, reqLevel: 40 },
+        { id: 31, name: "반도체 클린룸", cost: { advCircuit: 2000, optics: 500 }, inputs: { advCircuit: 4, plastic: 10, energy: 200 }, outputs: { processor: 1 }, count: 0, reqLevel: 41 },
+        { id: 32, name: "나노 팩토리", cost: { processor: 100, titaniumOre: 5000 }, inputs: { processor: 2, steel: 10, energy: 300 }, outputs: { nanobots: 1 }, count: 0, reqLevel: 43 },
+        { id: 33, name: "AI 연산 서버", cost: { processor: 500, battery: 2000 }, inputs: { processor: 5, energy: 500 }, outputs: { aiCore: 1 }, count: 0, reqLevel: 44 },
+        { id: 34, name: "고급 합금 용광로", cost: { titaniumOre: 10000, concrete: 10000 }, inputs: { titaniumOre: 10, steel: 20, energy: 400 }, outputs: { advAlloy: 2 }, count: 0, reqLevel: 45 },
+
+        // === TIER 5: 우주 시대 (Lv.45 ~ 50) ===
+        { id: 35, name: "로켓 연료 정제소", cost: { oil: 20000, sulfur: 10000 }, inputs: { oil: 50, sulfur: 20, energy: 800 }, outputs: { rocketFuel: 5 }, count: 0, reqLevel: 46 },
+        { id: 36, name: "퀀텀 컴퓨터 메인프레임", cost: { aiCore: 100, processor: 1000 }, inputs: { aiCore: 1, energy: 2000 }, outputs: { quantumData: 10 }, count: 0, reqLevel: 47 },
+        { id: 37, name: "중력 제어 연구소", cost: { titaniumOre: 50000, nanobots: 1000 }, inputs: { energy: 5000 }, outputs: { gravityModule: 1 }, count: 0, reqLevel: 48 },
+        { id: 38, name: "항성간 추진기 공장", cost: { advAlloy: 5000, aiCore: 500 }, inputs: { advAlloy: 100, rocketFuel: 500, energy: 10000 }, outputs: { warpCore: 1 }, count: 0, reqLevel: 49 },
+        { id: 39, name: "다이슨 스웜 송신기", cost: { quantumData: 5000, advAlloy: 10000 }, inputs: null, outputs: { energy: 50000 }, count: 0, reqLevel: 50 }
     ]
 };
 
-// ⭐ 연구 트리 데이터 (reqResearch: 선행 연구 ID)
-// type: 'manual'(클릭버프) | 'building'(건물버프)
-// target: 건물 ID 배열 (어떤 건물이 빨라지는지)
-// value: 배율 (2는 2배, 1.5는 1.5배)
 export const researchList = [
-    // 1. 수동 채집 강화 (초반)
-    { 
-        id: "stone_tool", name: "돌 곡괭이 연마", desc: "수동 채집량이 +1 증가합니다.", 
-        cost: { wood: 50, stone: 20 }, type: 'manual', value: 1, reqResearch: null 
-    },
-    
-    // 2. 기초 자동화 (벌목기, 채석드릴 속도 2배) - 선행: 돌 곡괭이
-    { 
-        id: "basic_logistics", name: "기초 물류학", desc: "벌목기와 채석 드릴의 속도가 2배 빨라집니다.", 
-        cost: { plank: 100, stone: 100 }, type: 'building', target: [0, 1], value: 2, reqResearch: "stone_tool" 
-    },
+    // === [Tier 1: 생존 및 수동 도구] ===
+    { id: "stone_tool", name: "돌 곡괭이", desc: "수동 채집량 +1", cost: { wood: 30, stone: 10 }, type: 'manual', value: 1, reqResearch: null },
+    { id: "sharp_axe", name: "날카로운 도끼", desc: "수동 나무 채집량 +2", cost: { stone: 50, plank: 20 }, type: 'manual', value: 2, reqResearch: "stone_tool" },
+    { id: "carbon_pick", name: "탄화 곡괭이", desc: "수동 석탄/광석 채집량 +3", cost: { coal: 50, brick: 30 }, type: 'manual', value: 3, reqResearch: "sharp_axe" },
 
-    // 3. 철제 도구 (수동 +2) - 선행: 기초 물류학
-    { 
-        id: "iron_pickaxe", name: "철제 도구 제작", desc: "수동 채집량이 +2 증가합니다.", 
-        cost: { plank: 200, ironPlate: 20 }, type: 'manual', value: 2, reqResearch: "basic_logistics" 
-    },
+    // === [Tier 2: 기초 산업 자동화] ===
+    { id: "basic_logistics", name: "기초 물류학", desc: "자동 벌목기 속도 2배", cost: { plank: 50, stone: 50 }, type: 'building', target: [0], value: 2, reqResearch: "stone_tool" },
+    { id: "quarry_tech", name: "채석 기술", desc: "채석 드릴 속도 2배", cost: { plank: 100, coal: 50 }, type: 'building', target: [1], value: 2, reqResearch: "basic_logistics" },
+    { id: "furnace_bellows", name: "용광로 송풍기", desc: "돌 용광로 속도 2배", cost: { stone: 200, coal: 100 }, type: 'building', target: [7], value: 2, reqResearch: "quarry_tech" },
 
-    // 4. 제련 기술 (용광로 속도 2배) - 선행: 철제 도구
-    { 
-        id: "advanced_smelting", name: "고온 제련법", desc: "모든 용광로의 작업 속도가 2배 빨라집니다.", 
-        cost: { brick: 200, ironPlate: 50 }, type: 'building', target: [7, 8, 9], value: 2, reqResearch: "iron_pickaxe" 
-    },
+    // === [Tier 3: 금속 및 기계 공학] ===
+    { id: "iron_working", name: "철제 도구 제작", desc: "수동 채집량 +5", cost: { ironPlate: 100, gear: 50 }, type: 'manual', value: 5, reqResearch: "furnace_bellows" },
+    { id: "hardened_steel", name: "강철 강화 공정", desc: "철/구리 용광로 속도 2배", cost: { ironPlate: 300, brick: 200 }, type: 'building', target: [8, 9], value: 2, reqResearch: "iron_working" },
+    { id: "gearbox_opt", name: "변속기 최적화", desc: "부품 조립기 속도 2배", cost: { gear: 200, ironPlate: 200 }, type: 'building', target: [10], value: 2, reqResearch: "hardened_steel" },
+    { id: "steam_power", name: "증기압 조절", desc: "석탄 발전소 출력 2배", cost: { ironPlate: 500, copperPlate: 200 }, type: 'building', target: [3], value: 2, reqResearch: "hardened_steel" },
 
-    // 5. 전력 효율 (발전소 효율 2배 = 석탄1개로 전력 2배 생산이 아니라, 속도가 2배라 전력 생산량 2배)
-    // 선행: 고온 제련법
-    {
-        id: "steam_engine_v2", name: "고압 터빈", desc: "석탄 발전소의 출력이 2배 증가합니다.",
-        cost: { ironPlate: 200, gear: 50 }, type: 'building', target: [3], value: 2, reqResearch: "advanced_smelting"
-    },
+    // === [Tier 4: 전기 및 회로 기술] ===
+    { id: "copper_wiring", name: "고효율 구리 배선", desc: "전력 소모 건물 효율 +20% (속도 1.2배)", cost: { copperPlate: 1000, circuit: 100 }, type: 'building', target: [4, 5, 11], value: 1.2, reqResearch: "steam_power" },
+    { id: "integrated_circuit", name: "집적 회로 설계", desc: "회로 공장 속도 2.5배", cost: { circuit: 500, plastic: 200 }, type: 'building', target: [11], value: 2.5, reqResearch: "copper_wiring" },
+    { id: "electric_motor", name: "고속 전기 모터", desc: "모든 채굴기(석탄/철/구리) 속도 2배", cost: { gear: 1000, circuit: 300 }, type: 'building', target: [2, 4, 5], value: 2, reqResearch: "integrated_circuit" },
 
-    // 6. 고급 채광 (전기 채굴기 속도 2배)
-    {
-        id: "electric_mining", name: "고속 모터", desc: "전기 채굴기의 속도가 2배 증가합니다.",
-        cost: { gear: 100, copperPlate: 100 }, type: 'building', target: [4, 5, 2], value: 2, reqResearch: "steam_engine_v2"
-    },
+    // === [Tier 5: 화학 및 정유 공정] ===
+    { id: "oil_refining", name: "원유 분별 증류", desc: "원유 시추기 속도 2배", cost: { steel: 500, circuit: 500 }, type: 'building', target: [13], value: 2, reqResearch: "integrated_circuit" },
+    { id: "polymer_science", name: "고분자 화학", desc: "화학 공장 속도 2배", cost: { oil: 1000, plastic: 500 }, type: 'building', target: [14], value: 2, reqResearch: "oil_refining" },
+    { id: "sulfuric_acid", name: "황산 제련법", desc: "강철 제련소 속도 3배", cost: { sulfur: 500, steel: 1000 }, type: 'building', target: [12], value: 3, reqResearch: "polymer_science" },
 
-    // 7. 자동화 2 (조립기 속도 2배)
-    {
-        id: "mass_production", name: "대량 생산", desc: "제재소와 조립 공장의 속도가 2배 증가합니다.",
-        cost: { circuit: 50, gear: 200 }, type: 'building', target: [6, 10, 11], value: 2, reqResearch: "electric_mining"
-    },
-    
-    // 8. 레이저 채광 (최종 수동 버프)
-    { 
-        id: "laser_mining", name: "레이저 채광 기술", desc: "수동 채집량이 +10 증가합니다.", 
-        cost: { circuit: 200, energy: 0 }, type: 'manual', value: 10, reqResearch: "mass_production" 
-    }
+    // === [Tier 6: 첨단 재료 및 티타늄] ===
+    { id: "titanium_alloy", name: "티타늄 합금", desc: "티타늄 채굴기 속도 2배", cost: { steel: 5000, advCircuit: 200 }, type: 'building', target: [17], value: 2, reqResearch: "sulfuric_acid" },
+    { id: "high_precision", name: "나노미터 정밀도", desc: "고급 조립기 속도 2배", cost: { advCircuit: 1000, gear: 5000 }, type: 'building', target: [16], value: 2, reqResearch: "titanium_alloy" },
+    { id: "supercomputing", name: "슈퍼컴퓨팅", desc: "정밀 로봇 공장 속도 2배", cost: { processor: 100, advCircuit: 2000 }, type: 'building', target: [18], value: 2, reqResearch: "high_precision" },
+
+    // === [Tier 7: 에너지 혁명] ===
+    { id: "solar_efficiency", name: "광전소자 개선", desc: "태양광 발전소 출력 3배", cost: { glass: 2000, circuit: 5000 }, type: 'building', target: [20], value: 3, reqResearch: "supercomputing" },
+    { id: "battery_density", name: "고밀도 배터리", desc: "전력 효율 전체 1.5배 증가", cost: { battery: 500, copperPlate: 10000 }, type: 'building', target: [3, 20], value: 1.5, reqResearch: "solar_efficiency" },
+
+    // === [Tier 8: 우주 항행 및 엔딩 준비] ===
+    { id: "rocket_dynamics", name: "로켓 역학", desc: "연료 정제소 속도 2배", cost: { rocketFuel: 100, processor: 500 }, type: 'building', target: [19], value: 2, reqResearch: "supercomputing" },
+    { id: "cryogenic_fuel", name: "극저온 연료 냉각", desc: "연료 정제소 속도 추가 3배", cost: { rocketFuel: 1000, titaniumOre: 10000 }, type: 'building', target: [19], value: 3, reqResearch: "rocket_dynamics" },
+    { id: "nanotech_click", name: "분자 분해 장치", desc: "수동 채집량 +100", cost: { processor: 2000, titaniumOre: 20000 }, type: 'manual', value: 100, reqResearch: "cryogenic_fuel" },
+    { id: "final_prep", name: "지구 이별 준비", desc: "모든 건물 속도 1.2배", cost: { rocketFuel: 5000, processor: 5000, steel: 50000 }, type: 'building', target: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20], value: 1.2, reqResearch: "nanotech_click" }
 ];
 
 export const houseStages = [
-    { 
-        name: "임시 야영지", 
-        desc: "지구 탈출을 위한 첫 걸음입니다. 나무를 모아 거주지를 확보하세요.", 
-        req: { wood: 20 }, 
-        unlock: "basic" 
-    },
-    { 
-        name: "목재 작업장", 
-        desc: "비와 바람을 피할 지붕을 만들었습니다. 이제 광물을 캘 도구를 만드세요.", 
-        req: { plank: 50, stone: 20 }, 
-        unlock: "coal" 
-    },
-    { 
-        name: "강철 요새", 
-        desc: "집이라기보단 벙커에 가깝습니다. 발전기를 설치하고 공장화를 시작하세요.", 
-        req: { brick: 100, coal: 100 }, 
-        unlock: "power" 
-    },
-    { 
-        name: "발사체 조립동", 
-        desc: "거주 구역을 개조하여 로켓 엔진을 부착할 프레임을 짰습니다.", 
-        req: { ironPlate: 300, copperPlate: 300, energy: 0 }, 
-        unlock: "copper" 
-    },
-    { 
-        name: "우주선 본체 (Starship)", 
-        desc: "이것은 더 이상 집이 아닙니다. 궤도 진입을 위한 정밀 부품을 장착하세요.", 
-        req: { gear: 200, circuit: 100 }, 
-        unlock: "advanced" 
-    },
-    { 
-        name: "지구 탈출 (Launch)", 
-        desc: "모든 준비가 끝났습니다. 카운트다운을 시작합니다.", 
-        req: { circuit: 2000, gear: 5000, ironPlate: 10000 }, 
-        unlock: "end" 
-    }
+    // 0~9: 기초
+    { name: "임시 야영지", desc: "지구 탈출을 위한 아주 긴 여정의 시작입니다.", req: { wood: 10 } },
+    { name: "나뭇잎 텐트", desc: "이제 밤이슬은 피할 수 있습니다.", req: { wood: 50 } },
+    { name: "통나무 오두막", desc: "제법 집 같은 모양새가 되었습니다.", req: { wood: 100, plank: 20 } },
+    { name: "돌 벽 난로", desc: "겨울을 날 준비가 되었습니다.", req: { stone: 100, plank: 50 } },
+    { name: "단단한 석조 주택", desc: "집의 기초를 돌로 튼튼히 다졌습니다.", req: { stone: 300, brick: 50 } },
+    { name: "강철 보강문", desc: "외부의 침입으로부터 안전합니다.", req: { ironPlate: 50, plank: 100 } },
+    { name: "지하 대피소", desc: "지하실을 파서 공간을 확보했습니다.", req: { stone: 500, concrete: 20 } },
+    { name: "산업용 굴뚝", desc: "집에서 매연이 나오기 시작합니다.", req: { brick: 300, ironPlate: 100 } },
+    { name: "구리 배선함", desc: "전기를 들여올 준비를 마쳤습니다.", req: { copperPlate: 100, gear: 50 } },
+    { name: "2층 조립동", desc: "작업 공간을 위로 확장했습니다.", req: { ironPlate: 300, plank: 500 } },
+
+    // 10~19: 산업화
+    { name: "전력 수신탑", desc: "외부로부터 전력을 끌어옵니다.", req: { copperPlate: 500, circuit: 50 } },
+    { name: "강철 프레임", desc: "집의 하중을 철골이 견디게 합니다.", req: { steel: 100, gear: 100 } },
+    { name: "유리 온실", desc: "자체적으로 식량을 조달합니다.", req: { glass: 50, wood: 1000 } },
+    { name: "정밀 공작소", desc: "미세한 기계 장치를 만들 수 있습니다.", req: { gear: 500, steel: 300 } },
+    { name: "화학 실험실", desc: "각종 원소를 정제하기 시작합니다.", req: { plastic: 100, sulfur: 50 } },
+    { name: "공조 시스템", desc: "내부 공기를 정화하고 순환시킵니다.", req: { circuit: 200, copperPlate: 1000 } },
+    { name: "방사능 차폐 외벽", desc: "두꺼운 콘크리트로 외벽을 감쌉니다.", req: { concrete: 500, steel: 500 } },
+    { name: "자동화 창고 관리실", desc: "로봇 팔이 자원을 분류합니다.", req: { advCircuit: 50, gear: 1000 } },
+    { name: "백업 배터리실", desc: "정전에 대비해 에너지를 저장합니다.", req: { battery: 100, copperPlate: 2000 } },
+    { name: "연산 처리 센터", desc: "복잡한 비행 경로를 계산합니다.", req: { processor: 20, circuit: 1000 } },
+
+    // 20~29: 개조
+    { name: "밀폐형 선체 코팅", desc: "진공 상태를 견디도록 집을 코팅합니다.", req: { plastic: 1000, steel: 2000 } },
+    { name: "외부 관측 창", desc: "강화 유리로 밖을 내다봅니다.", req: { glass: 500, titaniumOre: 200 } },
+    { name: "열 차폐 타일", desc: "대기권 진입 시 열을 차단합니다.", req: { brick: 5000, concrete: 2000 } },
+    { name: "데이터 송신 안테나", desc: "지구 밖과 통신을 시도합니다.", req: { advCircuit: 200, copperPlate: 5000 } },
+    { name: "추진체 탱크 기초", desc: "거대한 연료통 자리를 잡습니다.", req: { steel: 5000, concrete: 5000 } },
+    { name: "생명 유지 장치 v2", desc: "수개월의 비행을 견딜 수 있습니다.", req: { processor: 100, battery: 500 } },
+    { name: "보조 스러스터", desc: "집의 방향을 틀 수 있는 소형 엔진입니다.", req: { gear: 5000, rocketFuel: 100 } },
+    { name: "중력 제어 장치", desc: "내부 중력을 일정하게 유지합니다.", req: { circuit: 10000, advCircuit: 500 } },
+    { name: "반물질 보관함", desc: "가장 위험하고 강력한 연료를 담습니다.", req: { titaniumOre: 2000, processor: 200 } },
+    { name: "AI 파일럿 이식", desc: "자율 주행 시스템을 활성화합니다.", req: { processor: 500, advCircuit: 1000 } },
+
+    // 30~39: 하이테크
+    { name: "티타늄 보강 선체", desc: "철보다 가볍고 단단한 티타늄을 입힙니다.", req: { titaniumOre: 5000, steel: 10000 } },
+    { name: "핵융합 가속기", desc: "엄청난 전력을 한꺼번에 뽑아냅니다.", req: { energy: 1000, battery: 2000 } },
+    { name: "퀀텀 레이더", desc: "우주 쓰레기를 피해 비행합니다.", req: { processor: 1000, glass: 2000 } },
+    { name: "재순환 폐수 처리장", desc: "물 한 방울도 낭비하지 않습니다.", req: { sulfur: 1000, plastic: 5000 } },
+    { name: "선실 모듈화 완성", desc: "필요시 특정 구역을 분리할 수 있습니다.", req: { steel: 20000, gear: 20000 } },
+    { name: "고성능 항법 장치", desc: "가장 빠른 경로를 찾아냅니다.", req: { processor: 2000, advCircuit: 5000 } },
+    { name: "동면 캡슐 설치", desc: "장거리 비행을 위해 잠이 듭니다.", req: { plastic: 10000, circuit: 20000 } },
+    { name: "이온 엔진 테스트", desc: "푸른 빛의 엔진을 점화해봅니다.", req: { energy: 3000, battery: 5000 } },
+    { name: "외부 방어막", desc: "미세 소행성으로부터 선체를 보호합니다.", req: { advCircuit: 10000, titaniumOre: 10000 } },
+    { name: "도킹 베이 증설", desc: "다른 우주선과 만날 준비를 합니다.", req: { steel: 50000, concrete: 20000 } },
+
+    // 40~50: 최종 발사 단계
+    { name: "메인 엔진 조립", desc: "거대한 주 엔진을 하단에 고정합니다.", req: { steel: 100000, rocketFuel: 1000 } },
+    { name: "연료 파이프라인 연결", desc: "모든 엔진에 연료를 공급합니다.", req: { copperPlate: 50000, oil: 50000 } },
+    { name: "내부 기압 안정화", desc: "마지막으로 공기 누출을 점검합니다.", req: { plastic: 50000, gear: 100000 } },
+    { name: "에너지 완충 작업", desc: "모든 배터리를 100% 충전합니다.", req: { energy: 5000, battery: 20000 } },
+    { name: "비행 소프트웨어 동기화", desc: "마지막 코드를 업로드합니다.", req: { processor: 10000 } },
+    { name: "발사대 이동", desc: "집(우주선)을 발사 패드로 옮깁니다.", req: { concrete: 100000, gear: 200000 } },
+    { name: "액체 산소 주입", desc: "극저온 연료를 탱크에 채웁니다.", req: { sulfur: 20000, rocketFuel: 5000 } },
+    { name: "선내 시스템 가동", desc: "모든 장치가 '정상' 신호를 보냅니다.", req: { advCircuit: 50000, processor: 20000 } },
+    { name: "카운트다운 준비", desc: "모든 준비가 끝났습니다. 발사 1분 전.", req: { titaniumOre: 50000, steel: 500000 } },
+    { name: "최종 엔진 점화", desc: "5... 4... 3... 2... 1...", req: { rocketFuel: 20000, energy: 10000 } },
+    { name: "지구 탈출 성공", desc: "축하합니다! 당신은 마침내 지구를 떠났습니다.", req: { processor: 50000, titaniumOre: 100000, steel: 1000000 }, unlock: "end" }
 ];
 
 export function setGameData(newData) {
@@ -132,8 +188,9 @@ export function setGameData(newData) {
     gameData.researches = newData.researches || [];
     if (newData.buildings) {
         newData.buildings.forEach((savedB, i) => {
-            if (gameData.buildings[i]) {
-                gameData.buildings[i].count = savedB.count;
+            const currentB = gameData.buildings.find(b => b.id === savedB.id);
+            if (currentB) {
+                currentB.count = savedB.count;
             }
         });
     }

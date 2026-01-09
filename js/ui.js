@@ -28,12 +28,14 @@ const elements = {
 };
 
 const resNames = {
-    wood: "🌲 나무", stone: "🪨 돌", coal: "⚫ 석탄",
-    ironOre: "⚙️ 철광석", copperOre: "🥉 구리광석",
-    plank: "🪵 판자", brick: "🧱 벽돌",
-    ironPlate: "⬜ 철판", copperPlate: "🟧 구리판",
-    gear: "⚙️ 톱니", circuit: "📟 회로",
-    energy: "⚡ 전력"
+    wood: "🌲 나무", stone: "🪨 돌", coal: "⚫ 석탄", ironOre: "⚙️ 철광", copperOre: "🥉 구리광", 
+    oil: "🛢️ 원유", titaniumOre: "💎 티타늄광", uraniumOre: "💚 우라늄광",
+    plank: "🪵 판자", brick: "🧱 벽돌", ironPlate: "⬜ 철판", copperPlate: "🟧 구리판", 
+    glass: "🍷 유리", sulfur: "💛 유황", steel: "🏗️ 강철", plastic: "🧪 플라스틱", 
+    concrete: "🏢 콘크리트", battery: "🔋 배터리", fuelCell: "☢️ 연료봉",
+    gear: "⚙️ 톱니", circuit: "📟 회로", advCircuit: "🔴 고급회로", 
+    processor: "🔵 프로세서", aiCore: "🧠 AI코어", rocketFuel: "🚀 로켓연료", 
+    nanobots: "🤖 나노봇", warpCore: "🌀 워프코어", energy: "⚡ 전력"
 };
 
 function formatNumber(num) {
@@ -146,48 +148,46 @@ function updatePowerUI() {
 
 function renderResearchTab() {
     const container = elements.viewResearch.querySelector('.action-box');
-    container.innerHTML = `<div class="section-title">연구 목록</div>`;
+    container.innerHTML = `<div class="section-title">기술 계통도 (Research Tree)</div>`;
+    
     const listDiv = document.createElement('div');
     listDiv.id = 'research-list-container';
-    listDiv.style.display = 'grid';
-    listDiv.style.gap = '10px';
     
-    // ⭐ [안전장치] 데이터가 없으면 빈 배열로 처리
+    // 안전장치
     if (!gameData.researches) gameData.researches = [];
 
     researchList.forEach(r => {
         const isDone = gameData.researches.includes(r.id);
         
+        // 선행 연구 체크
         let isUnlocked = true;
         if (r.reqResearch && !gameData.researches.includes(r.reqResearch)) {
             isUnlocked = false;
         }
 
+        // 잠겨있고 완료도 안 된 연구는 아예 안 보여줌 (테크트리 발견의 재미)
         if (!isDone && !isUnlocked) return;
 
         const div = document.createElement('div');
-        div.className = `shop-item ${isDone ? 'disabled' : ''}`;
+        // 클래스 부여 (연구 완료 시 .done 추가)
+        div.className = `shop-item ${isDone ? 'done disabled' : ''}`;
         div.id = `research-${r.id}`;
         
-        let costTxt = Object.entries(r.cost).map(([k, v]) => `${formatNumber(v)} ${resNames[k].split(' ')[1]}`).join(', ');
-        if(isDone) costTxt = "연구 완료";
-
+        let costTxt = Object.entries(r.cost).map(([k, v]) => `${formatNumber(v)}${resNames[k].split(' ')[1]}`).join(' ');
+        
         div.innerHTML = `
-            <div style="flex:1;">
-                <div style="font-weight:bold; font-size:1em;">${r.name}</div>
-                <div style="font-size:0.8em; margin-top:3px; color:#aaa;">${r.desc}</div>
-            </div>
-            <div style="text-align:right; font-size:0.9em;">
-                <span class="cost-text" style="${isDone ? 'color:#2ecc71' : ''}">${costTxt}</span>
-            </div>
+            <span class="si-name">${r.name}</span>
+            <span class="si-level">${isDone ? '✓' : ''}</span>
+            <div class="si-desc">${r.desc}</div>
+            <div class="si-cost">${isDone ? '<span class="research-done-tag">연구 완료</span>' : costTxt}</div>
         `;
         
         if (!isDone) {
             div.onclick = () => {
                 if(Logic.tryBuyResearch(r.id)) {
                     log(`🔬 [연구 완료] ${r.name}`, true);
-                    renderResearchTab();
-                    updateScreen(Logic.calculateNetMPS()); 
+                    renderResearchTab(); // 즉시 리스트 갱신
+                    updateScreen(Logic.calculateNetMPS()); // 속도 즉시 반영
                 } else {
                     log("연구 자원이 부족합니다.");
                 }
@@ -195,6 +195,7 @@ function renderResearchTab() {
         }
         listDiv.appendChild(div);
     });
+    
     container.appendChild(listDiv);
     updateResearchButtons();
 }

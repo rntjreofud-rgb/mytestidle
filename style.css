@@ -101,8 +101,32 @@ header h2 { margin: 0; font-size: 1rem; color: #fff; }
 #building-list, 
 #research-list-container {
     display: grid !important;
-    grid-template-columns: repeat(4, 1fr) !important; 
-    gap: 10px !important;
+    /* 4열 배열 유지 */
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 8px !important;
+}
+
+/* 개별 연구 아이템 */
+.research-item {
+    /* 기존 shop-item 스타일 계승 */
+    background-color: #2a2525; /* 상점과 살짝 다른 색상으로 구분 */
+    border: 1px solid #443b3b;
+}
+
+/* 연구 완료 상태 디자인 */
+.research-item.done {
+    background-color: #1a2a1a !important; /* 어두운 녹색 */
+    border-color: #27ae60 !important;
+    cursor: default;
+    opacity: 0.8;
+}
+
+/* 연구 완료 텍스트 */
+.research-done-tag {
+    color: #2ecc71;
+    font-weight: bold;
+    font-size: 0.7rem;
+    text-transform: uppercase;
 }
 
 

@@ -54,87 +54,72 @@ export function calculateNetMPS() {
 }
 
 export function produceResources(deltaTime) {
+    // 1. 전력망 연산 (발전기 우선 순위)
     let totalEnergyProd = 0;
     let totalEnergyReq = 0;
 
-    // 1. 전력 생산
     gameData.buildings.forEach(b => {
         if (b.count > 0 && b.outputs && b.outputs.energy) {
             let speedMult = getBuildingMultiplier(b.id);
-            let fuelEfficiency = 1.0;
-
+            let inputEfficiency = 1.0;
+            
             if(b.inputs) {
                 for(let res in b.inputs) {
                     let needed = b.inputs[res] * b.count * speedMult * deltaTime;
                     if((gameData.resources[res] || 0) < needed) {
-                        fuelEfficiency = (gameData.resources[res] || 0) / needed;
+                        inputEfficiency = Math.min(inputEfficiency, (gameData.resources[res] || 0) / needed);
                     }
                 }
-                if(fuelEfficiency > 0) {
-                    for(let res in b.inputs) {
-                        gameData.resources[res] -= (b.inputs[res] * b.count * speedMult * deltaTime) * fuelEfficiency;
-                    }
+                // 자원 소모
+                for(let res in b.inputs) {
+                    gameData.resources[res] = Math.max(0, gameData.resources[res] - (b.inputs[res] * b.count * speedMult * deltaTime * inputEfficiency));
                 }
             }
-            totalEnergyProd += (b.outputs.energy * b.count * speedMult) * fuelEfficiency;
+            totalEnergyProd += (b.outputs.energy * b.count * speedMult) * inputEfficiency;
         }
     });
 
-    // 2. 전력 소모 집계
+    // 2. 부하 계산
     gameData.buildings.forEach(b => {
         if (b.count > 0 && b.inputs && b.inputs.energy) {
-            let speedMult = getBuildingMultiplier(b.id);
-            totalEnergyReq += b.inputs.energy * b.count * speedMult;
+            totalEnergyReq += b.inputs.energy * b.count * getBuildingMultiplier(b.id);
         }
     });
 
     gameData.resources.energy = totalEnergyProd;
     gameData.resources.energyMax = totalEnergyReq;
+    let powerFactor = totalEnergyReq > 0 ? Math.min(1.0, totalEnergyProd / totalEnergyReq) : 1.0;
 
-    let powerFactor = 1.0;
-    if (totalEnergyReq > 0) {
-        powerFactor = totalEnergyProd / totalEnergyReq;
-        if (powerFactor > 1) powerFactor = 1.0;
-    }
-
-    // 3. 일반 생산
+    // 3. 일반 생산 시설 가동
     gameData.buildings.forEach(b => {
-        if (b.count === 0) return;
-        if (b.outputs && b.outputs.energy) return;
+        if (b.count === 0 || (b.outputs && b.outputs.energy)) return;
 
         let speedMult = getBuildingMultiplier(b.id);
-        let efficiency = 1.0 * speedMult;
-        
-        if (b.inputs && b.inputs.energy) {
-            efficiency *= powerFactor;
-        }
+        let efficiency = speedMult * (b.inputs && b.inputs.energy ? powerFactor : 1.0);
 
         if (b.inputs) {
-            let maxPotential = 1.0; 
+            let inputEfficiency = 1.0;
             for (let res in b.inputs) {
                 if (res === 'energy') continue;
-                let required = b.inputs[res] * b.count * deltaTime * efficiency;
-                
-                if(required > 0) {
-                    if ((gameData.resources[res] || 0) < required) {
-                        let ratio = (gameData.resources[res] || 0) / required; 
-                        if (ratio < maxPotential) maxPotential = ratio;
-                    }
+                let needed = b.inputs[res] * b.count * deltaTime * efficiency;
+                if(needed > 0 && (gameData.resources[res] || 0) < needed) {
+                    inputEfficiency = Math.min(inputEfficiency, (gameData.resources[res] || 0) / needed);
                 }
             }
-            efficiency *= maxPotential;
+            efficiency *= inputEfficiency;
 
-            if (efficiency > 0) {
-                for (let res in b.inputs) {
-                    if (res === 'energy') continue;
-                    gameData.resources[res] -= (b.inputs[res] * b.count * deltaTime) * efficiency;
-                }
+            // 자원 실제 소모
+            for (let res in b.inputs) {
+                if (res === 'energy') continue;
+                gameData.resources[res] = Math.max(0, gameData.resources[res] - (b.inputs[res] * b.count * deltaTime * efficiency));
             }
         }
 
+        // 자원 실제 생산
         if (efficiency > 0 && b.outputs) {
             for (let res in b.outputs) {
-                gameData.resources[res] += (b.outputs[res] * b.count * deltaTime) * efficiency;
+                if (res === 'energy') continue;
+                gameData.resources[res] += (b.outputs[res] * b.count * deltaTime * efficiency);
             }
         }
     });
