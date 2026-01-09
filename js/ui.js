@@ -288,17 +288,13 @@ function checkUnlocks() {
 }
 
 export function renderShop(onBuyCallback, getCostFunc) {
-    if (onBuyCallback) cachedBuyCallback = onBuyCallback; // 탭 전환 대비 콜백 저장
+    if(onBuyCallback) cachedBuyCallback = onBuyCallback; // ⭐ 콜백 함수 기억
     
-    if (!elements.buildingList) return;
     elements.buildingList.innerHTML = "";
-
     const wood = gameData.resources.wood || 0;
-    // 석재가 해금되었는지 판단 (나무 10개 이상 혹은 집 1레벨 이상 등)
     const isStoneUnlocked = (gameData.houseLevel >= 1 || wood >= 10 || (gameData.buildings[0] && gameData.buildings[0].count > 0));
 
     gameData.buildings.forEach((b, index) => {
-        // 해금 레벨(reqLevel) 체크
         const req = b.reqLevel || 0;
         if (req === 0.5 && !isStoneUnlocked) return;
         if (req >= 1 && gameData.houseLevel < req) return;
@@ -306,66 +302,24 @@ export function renderShop(onBuyCallback, getCostFunc) {
         const div = document.createElement('div');
         div.className = `shop-item`;
         div.id = `build-${index}`;
-
-        // 1. 현재 레벨의 구매 비용 계산
         const cost = getCostFunc(b);
-        let costTxt = Object.entries(cost)
-            .map(([k, v]) => `${formatNumber(v)}${getResNameOnly(k)}`)
-            .join(' ');
+        let costTxt = Object.entries(cost).map(([k, v]) => `${formatNumber(v)}${resNames[k].split(' ')[1]}`).join(' ');
 
-        // 2. 연구 배수 가져오기
-        let speedMult = Logic.getBuildingMultiplier(b.id);             // 생산 속도 배수 (연구)
-        let consMult = Logic.getBuildingConsumptionMultiplier(b.id);   // 재료 소모 감소 배수 (연구)
+        let speedMult = Logic.getBuildingMultiplier(b.id);
+        let inArr = b.inputs ? Object.entries(b.inputs).map(([k,v]) => `${formatNumber(v * speedMult)}${k === 'energy' ? '⚡' : resNames[k].split(' ')[1]}`) : [];
+        let outArr = b.outputs ? Object.entries(b.outputs).map(([k,v]) => `${formatNumber(v * speedMult)}${k === 'energy' ? '⚡' : resNames[k].split(' ')[1]}`) : [];
         
-        // 3. 소모 자원(Inputs) 텍스트 생성
-        let inArr = [];
-        if (b.inputs) {
-            inArr = Object.entries(b.inputs).map(([k, v]) => {
-                // 최종 소모량 = 기본값 * 속도배수 * 소모감소배수
-                let finalCons = v * speedMult * consMult;
-                let icon = (k === 'energy') ? '⚡' : getResNameOnly(k);
-                return `${formatNumber(finalCons)}${icon}`;
-            });
-        }
-
-        // 4. 생산 자원(Outputs) 텍스트 생성
-        let outArr = [];
-        if (b.outputs) {
-            outArr = Object.entries(b.outputs).map(([k, v]) => {
-                // 최종 생산량 = 기본값 * 속도배수
-                let finalProd = v * speedMult;
-                let icon = (k === 'energy') ? '⚡' : getResNameOnly(k);
-                return `${formatNumber(finalProd)}${icon}`;
-            });
-        }
-        
-        // 5. 설명 문구(프로세스) 조립
         let processTxt = "";
-        if (inArr.length > 0) {
-            processTxt += `<span style="color:#e74c3c">-${inArr.join(',')}</span> `;
-        }
-        if (outArr.length > 0) {
-            processTxt += `➡ <span style="color:#2ecc71">+${outArr.join(',')}</span>/s`;
-        }
+        if (inArr.length > 0) processTxt += `<span style="color:#e74c3c">-${inArr.join(',')}</span> `;
+        if (outArr.length > 0) processTxt += `➡<span style="color:#2ecc71">+${outArr.join(',')}</span>/s`;
 
-        // 6. HTML 구조 생성
-        div.innerHTML = `
-            <span class="si-name">${b.name}</span>
-            <span class="si-level">Lv.${b.count}</span>
-            <div class="si-desc">${processTxt}</div>
-            <div class="si-cost">${costTxt}</div>
-        `;
+        div.innerHTML = `<span class="si-name">${b.name}</span><span class="si-level">Lv.${b.count}</span><div class="si-desc">${processTxt}</div><div class="si-cost">${costTxt}</div>`;
         
-        // 클릭 이벤트 연결
-        div.onclick = (e) => {
-            e.stopPropagation();
-            if (cachedBuyCallback) cachedBuyCallback(index);
+        div.onclick = () => {
+            if(cachedBuyCallback) cachedBuyCallback(index);
         };
-
         elements.buildingList.appendChild(div);
     });
-
-    // 버튼 활성/비활성 상태 즉시 업데이트
     updateShopButtons(getCostFunc);
 }
 
