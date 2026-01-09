@@ -9,12 +9,11 @@ function init() {
     Storage.loadGame();
     setupEvents();
     
-    // 초기 상점 렌더링
+    // UI 초기화 (handleBuyBuilding 함수 참조를 UI 모듈에 넘겨줍니다)
     UI.renderShop(handleBuyBuilding, Logic.getBuildingCost);
     UI.updateHouseUI(handleHouseUpgrade);
     
     UI.log("시스템 로드 완료. Escape Earth 가동 시작.");
-
     requestAnimationFrame(gameLoop);
     setInterval(() => Storage.saveGame(), 10000);
 }
