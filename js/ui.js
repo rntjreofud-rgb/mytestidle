@@ -113,6 +113,7 @@ function checkResourceDiscovery() {
     }
 }
 
+
 export function updateScreen(stats) {
     checkResourceDiscovery();
     for (let key in gameData.resources) {
