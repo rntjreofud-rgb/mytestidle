@@ -227,13 +227,22 @@ export function tryBuyResearch(id) {
 export function tryBuyBuilding(index) {
     const b = gameData.buildings[index];
     const cost = getBuildingCost(b);
+    
+    // 자원 체크
     for (let r in cost) {
         if ((gameData.resources[r] || 0) < cost[r]) return false;
     }
+    // 자원 소모
     for (let r in cost) {
         gameData.resources[r] -= cost[r];
     }
+    
     b.count++;
+    
+    // ⭐ [추가] 건물을 지으면 무조건 전원을 켭니다.
+    if (b.on === undefined) b.on = true;
+    b.on = true;
+
     return true;
 }
 

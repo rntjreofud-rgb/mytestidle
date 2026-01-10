@@ -332,7 +332,13 @@ export function setGameData(newData) {
 
     // 4. 안전장치: 혹시라도 on 속성이 누락된 건물이 있다면 강제로 켬
     gameData.buildings.forEach(b => {
-        if (b.on === undefined) b.on = true;
+        if (b.on === false) {
+            // 명시적으로 꺼진 건 유지
+            b.on = false;
+        } else {
+            // undefined거나 null이면 켜짐으로 설정
+            b.on = true;
+        }
     });
 
     console.log("세이브 데이터 호환성 패치 완료.");
