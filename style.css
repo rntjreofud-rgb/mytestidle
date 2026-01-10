@@ -176,6 +176,17 @@ header h2 { margin: 0; font-size: 1rem; color: #fff; }
     grid-template-columns: repeat(4, 1fr) !important;
     gap: 8px !important;
 }
+.build-category-title {
+    width: 100%;
+    font-size: 0.9rem;
+    color: var(--accent-green); /* 자원창고와 다른 색상으로 구분 */
+    margin: 20px 0 10px 0;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #2a4038;
+    font-weight: bold;
+    grid-column: 1 / -1; /* 그리드 전체 너비 사용 */
+}
+
 /* 연구 탭 전용 섹션 제목 */
 .research-section-title {
     width: 100%;
@@ -187,7 +198,13 @@ header h2 { margin: 0; font-size: 1rem; color: #fff; }
     font-size: 0.95rem;
     grid-column: 1 / -1; /* 그리드 전체 너비 차지 */
 }
-
+.sub-build-grid {
+    display: grid;
+    /* PC 기준 3~4열 배치 */
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 10px;
+    margin-bottom: 15px;
+}
 
 /* 개별 연구 아이템 */
 .research-item {

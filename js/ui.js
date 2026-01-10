@@ -64,6 +64,25 @@ const resourceGroups = {
     }
 };
 
+const buildingGroups = {
+    extraction: {
+        title: "🚜 채집 및 채굴 (Extraction)",
+        ids: [0, 1, 2, 3, 40, 41, 42, 43, 44, 45, 49, 51, 53, 54]
+    },
+    refining: {
+        title: "🔥 기초 공정 및 제련 (Refining)",
+        ids: [4, 5, 6, 7, 13, 16, 18, 20, 21, 26, 34, 48, 50, 52]
+    },
+    production: {
+        title: "🔬 첨단 제조 및 부품 (Manufacturing)",
+        ids: [9, 15, 22, 24, 27, 31, 32, 33, 35, 36, 37, 38, 47]
+    },
+    power: {
+        title: "⚡ 에너지 발전 (Power Generation)",
+        ids: [8, 14, 23, 30, 39, 46]
+    }
+};
+
 let isGridInitialized = false;
 function initResourceGrid() {
     if (isGridInitialized) return;
@@ -521,48 +540,79 @@ function checkUnlocks() {
 }
 
 export function renderShop(onBuyCallback, getCostFunc) {
-    if(onBuyCallback) cachedBuyCallback = onBuyCallback; // ⭐ 콜백 함수 기억
+    if(onBuyCallback) cachedBuyCallback = onBuyCallback;
     
+    if (!elements.buildingList) return;
     elements.buildingList.innerHTML = "";
+    elements.buildingList.style.display = "block"; // 전체 그리드 대신 블록으로 사용
+
     const wood = gameData.resources.wood || 0;
     const isStoneUnlocked = (gameData.houseLevel >= 1 || wood >= 10 || (gameData.buildings[0] && gameData.buildings[0].count > 0));
 
-    gameData.buildings.forEach((b, index) => {
-        const req = b.reqLevel || 0;
-        if (req === 0.5 && !isStoneUnlocked) return;
-        if (req >= 1 && gameData.houseLevel < req) return;
-        
-        const div = document.createElement('div');
-        div.className = `shop-item`;
-        div.id = `build-${index}`;
-        const cost = getCostFunc(b);
-        let costTxt = Object.entries(cost).map(([k, v]) => `${formatNumber(v)}${resNames[k].split(' ')[1]}`).join(' ');
+    // 그룹별로 순회하며 렌더링
+    for (const [groupKey, group] of Object.entries(buildingGroups)) {
+        // 이 그룹에 속한 건물 중 현재 해금된(보이는) 건물이 있는지 확인
+        const visibleBuildings = gameData.buildings.filter(b => {
+            if (!group.ids.includes(b.id)) return false;
+            const req = b.reqLevel || 0;
+            if (req === 0.5) return isStoneUnlocked;
+            return gameData.houseLevel >= req;
+        });
 
-        let speedMult = Logic.getBuildingMultiplier(b.id);
-        // ⭐ [추가] 소모량 감소 연구 배수 가져오기
-        let consMult = Logic.getBuildingConsumptionMultiplier(b.id);
-        let energyEff = Logic.getEnergyEfficiencyMultiplier(b.id); // ⭐ 추가
+        // 해금된 건물이 하나도 없는 그룹은 제목조차 보여주지 않음 (UI 깔끔)
+        if (visibleBuildings.length === 0) continue;
 
-        // ⭐ [수정] 소모량(inArr) 계산식 뒤에 * consMult 를 추가함
-        let inArr = b.inputs ? Object.entries(b.inputs).map(([k,v]) => {
-        let finalVal = v * speedMult * consMult;
-         if (k === 'energy') finalVal *= energyEff; // ⭐ 전력일 때만 전기효율 배수 추가 적용
-        return `${formatNumber(finalVal)}${k === 'energy' ? '⚡' : resNames[k].split(' ')[1]}`;
-        }) : [];
-        let outArr = b.outputs ? Object.entries(b.outputs).map(([k,v]) => `${formatNumber(v * speedMult)}${k === 'energy' ? '⚡' : resNames[k].split(' ')[1]}`) : [];
-        
-        let processTxt = "";
-        if (inArr.length > 0) processTxt += `<span style="color:#e74c3c">-${inArr.join(',')}</span> `;
-        if (outArr.length > 0) processTxt += `➡<span style="color:#2ecc71">+${outArr.join(',')}</span>/s`;
+        // 그룹 제목 생성
+        const title = document.createElement('div');
+        title.className = 'build-category-title';
+        title.innerText = group.title;
+        elements.buildingList.appendChild(title);
 
-        div.innerHTML = `<span class="si-name">${b.name}</span><span class="si-level">Lv.${b.count}</span><div class="si-desc">${processTxt}</div><div class="si-cost">${costTxt}</div>`;
-        
-        div.onclick = () => {
-            if(cachedBuyCallback) cachedBuyCallback(index);
-        };
-        elements.buildingList.appendChild(div);
-    });
+        // 그룹 컨테이너(서브 그리드) 생성
+        const subGrid = document.createElement('div');
+        subGrid.className = 'sub-build-grid';
+        elements.buildingList.appendChild(subGrid);
+
+        // 해당 그룹의 건물들 배치
+        visibleBuildings.forEach(b => {
+            const index = gameData.buildings.findIndex(build => build.id === b.id);
+            const div = createBuildingElement(b, index, getCostFunc);
+            subGrid.appendChild(div);
+        });
+    }
+    
     updateShopButtons(getCostFunc);
+}
+
+// 개별 건물 엘리먼트 생성 보조 함수 (기존 renderShop 내부 로직 분리)
+function createBuildingElement(b, index, getCostFunc) {
+    const div = document.createElement('div');
+    div.className = `shop-item`;
+    div.id = `build-${index}`;
+    
+    const cost = getCostFunc(b);
+    let costTxt = Object.entries(cost).map(([k, v]) => `${formatNumber(v)}${getResNameOnly(k)}`).join(' ');
+
+    let speedMult = Logic.getBuildingMultiplier(b.id);
+    let consMult = Logic.getBuildingConsumptionMultiplier(b.id);
+    let energyEff = Logic.getEnergyEfficiencyMultiplier(b.id);
+
+    let inArr = b.inputs ? Object.entries(b.inputs).map(([k,v]) => {
+        let finalVal = v * speedMult * consMult;
+        if (k === 'energy') finalVal *= energyEff;
+        return `${formatNumber(finalVal)}${k === 'energy' ? '⚡' : getResNameOnly(k)}`;
+    }) : [];
+    
+    let outArr = b.outputs ? Object.entries(b.outputs).map(([k,v]) => `${formatNumber(v * speedMult)}${k === 'energy' ? '⚡' : getResNameOnly(k)}`) : [];
+    
+    let processTxt = "";
+    if (inArr.length > 0) processTxt += `<span style="color:#e74c3c">-${inArr.join(',')}</span> `;
+    if (outArr.length > 0) processTxt += `➡<span style="color:#2ecc71">+${outArr.join(',')}</span>/s`;
+
+    div.innerHTML = `<span class="si-name">${b.name}</span><span class="si-level">Lv.${b.count}</span><div class="si-desc">${processTxt}</div><div class="si-cost">${costTxt}</div>`;
+    
+    div.onclick = () => { if(cachedBuyCallback) cachedBuyCallback(index); };
+    return div;
 }
 
 export function updateShopButtons(getCostFunc) {
