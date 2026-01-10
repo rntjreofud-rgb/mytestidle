@@ -82,6 +82,8 @@ export const researchList = [
     { id: "quarry_tech", name: "벌목 기술", desc: "자동 벌목기의 나무 생산 속도 2배", cost: { plank: 100, coal: 50 }, type: 'building', target: [1], value: 2, reqResearch: "basic_logistics" },
     { id: "furnace_bellows", name: "용광로 송풍기", desc: "기초 철/구리 용광로의 생산 및 재료 소모 속도 2배", cost: { stone: 200, coal: 100 }, type: 'building', target: [6, 7], value: 2, reqResearch: "quarry_tech" },
     { id: "stone_excavation", name: "채석 공법 개선", desc: "채석 작업장의 돌 생산 속도 3배 증가", cost: { plank: 50, ironPlate: 200 }, type: 'building', target: [2], value: 3, reqResearch: "quarry_tech" },
+    { id: "basic_forestry", name: "기초 임업 관리", desc: "수동 벌목 캠프 및 자동 벌목기의 나무 생산량 2배 증가", cost: { wood: 200, stone: 50 }, type: 'building', target: [0, 1], value: 2, reqResearch: "basic_logistics" },
+    { id: "kiln_insulation", name: "가마 단열 강화", desc: "목탄 제조 가마의 나무 소모량 40% 감소 (생산량 유지)", cost: { plank: 300, coal: 100 }, type: 'consumption', target: [48], value: 0.6, reqResearch: "charcoal_efficiency" },
     { id: "charcoal_efficiency", name: "고급 탄화 공법", desc: "목탄 제조 가마의 석탄 생산 및 나무 소모 속도 3배 증가", cost: { plank: 500, coal: 200 }, type: 'building', target: [48], value: 3, reqResearch: "furnace_bellows" },
     { id: "coal_liquefaction", name: "석탄 액화 기술", desc: "석탄 광산 가동 중 원유 부산물 추가 획득", cost: { steel: 10000, plastic: 5000, processor: 500 }, type: 'building', target: [3], value: 1, reqResearch: "oil_recovery" },
     { id: "iron_working", name: "철제 도구 제작", desc: "수동 채집량 +5", cost: { ironPlate: 100, gear: 50 }, type: 'manual', value: 5, reqResearch: "furnace_bellows" },
