@@ -30,7 +30,15 @@ export let gameData = {
     { id: 3, name: "석탄 노천 채굴장", cost: { stone: 200, plank: 50 }, inputs: null, outputs: { coal: 1 }, count: 0, reqLevel: 1 },
     { id: 4, name: "증기압 제재소", cost: { plank: 50, coal: 10 }, inputs: { wood: 3 }, outputs: { plank: 2 }, count: 0, reqLevel: 1 },
     { id: 5, name: "원시 흙 가마", cost: { stone: 50 }, inputs: { stone: 2, wood: 1 }, outputs: { brick: 1 }, count: 0, reqLevel: 0.5 },
-    
+    { 
+    id: 48, 
+    name: "목탄 제조 가마", 
+    cost: { stone: 150, plank: 30 }, 
+    inputs: { wood: 10 },           // 나무 10개 소모
+    outputs: { coal: 2.0 },         // 석탄 2개 생산
+    count: 0, 
+    reqLevel: 3                    // 석탄이 많이 필요해지는 시점(Lv.3)에 해금
+},
     // === TIER 2: 산업 기초 및 전력 (Lv.5 ~ 10) ===
     { id: 16, name: "콘크리트 믹서", cost: { ironPlate: 200, brick: 100 }, inputs: { stone: 10, energy: 5 }, outputs: { concrete: 2 }, count: 0, reqLevel: 5 }, // 집 Lv.6 대비
     { id: 6, name: "기초 철 용광로", cost: { brick: 50, stone: 100 }, inputs: { ironOre: 2, coal: 1 }, outputs: { ironPlate: 1 }, count: 0, reqLevel: 4 },
@@ -41,6 +49,15 @@ export let gameData = {
     { id: 43, name: "전기 구리 채굴기", cost: { ironPlate: 200, gear: 50 }, inputs: { energy: 15 }, outputs: { copperOre: 2 }, count: 0, reqLevel: 7},
     { id: 44, name: "전기 석탄 채굴기", cost: { copperPlate: 200, gear: 50 }, inputs: { energy: 20 }, outputs: { coal: 5 }, count: 0, reqLevel: 8},
     { id: 45, name: "전기 석재 채굴기", cost: { copperPlate: 200, gear: 50 }, inputs: { energy: 20 }, outputs: { stone: 2 }, count: 0, reqLevel: 9},
+    { 
+    id: 47, 
+    name: "바이오 수목 배양소", 
+    cost: { steel: 2000, glass: 1000, circuit: 500 }, 
+    inputs: { energy: 40 },       // 전력 소모
+    outputs: { wood: 50.0 },      // 초당 나무 50개 생산 (자동 벌목기의 25배)
+    count: 0, 
+    reqLevel: 14                  // 유리 온실(Lv.13) 이후 바로 해금
+},
     // === TIER 3: 금속 공학 (Lv.10 ~ 20) ===
     { id: 13, name: "강철 제련소", cost: { ironPlate: 300, brick: 300 }, inputs: { ironPlate: 4, coal: 5, energy: 10 }, outputs: { steel: 2 }, count: 0, reqLevel: 8 }, // 집 Lv.11 대비
     { id: 18, name: "유리 용해로", cost: { brick: 500, stone: 500 }, inputs: { stone: 5, coal: 2 }, outputs: { glass: 2 }, count: 0, reqLevel: 10 }, // 집 Lv.12 대비
@@ -63,10 +80,28 @@ export let gameData = {
     id: 36, 
     name: "퀀텀 컴퓨터 메인프레임", 
     cost: { processor: 1000, advCircuit: 2000, titaniumPlate: 5000 }, 
-    inputs: { energy: 1000 }, 
+    inputs: { energy: 500 }, 
     outputs: { quantumData: 10 }, 
     count: 0, 
     reqLevel: 35 
+},
+{ 
+    id: 49, 
+    name: "지각 심부 드릴", 
+    cost: { steel: 5000, titaniumPlate: 2000, gear: 1000 }, 
+    inputs: { energy: 150 }, 
+    outputs: { stone: 50.0 },     // 초당 돌 100개 (전기 채굴기의 20배)
+    count: 0, 
+    reqLevel: 20 
+},
+{ 
+    id: 50, 
+    name: "대형 아크 용광로", 
+    cost: { titaniumPlate: 5000, advCircuit: 1000, concrete: 5000 }, 
+    inputs: { ironOre: 20, copperOre: 20, coal: 10, energy: 300 }, 
+    outputs: { ironPlate: 20, copperPlate: 20, steel: 10 }, // 철판 20개 구리판 20개 강철 10개를 동시에 생산
+    count: 0, 
+    reqLevel: 30 
 },
 { 
     id: 37, 
@@ -77,6 +112,10 @@ export let gameData = {
     count: 0, 
     reqLevel: 37 
 },
+{ id: 52, name: "대기 유황 포집기", cost: { titaniumPlate: 5000, optics: 1000, plastic: 10000 }, inputs: { energy: 200 }, outputs: { sulfur: 30.0 }, count: 0, reqLevel: 28 },
+{ id: 51, name: "초전도 자기력 채굴기", cost: { steel: 10000, advCircuit: 2000, concrete: 5000 }, inputs: { energy: 250 }, outputs: { copperOre: 50.0 }, count: 0, reqLevel: 25 },
+{ id: 53, name: "심부 우라늄 파쇄기", cost: { advAlloy: 5000, aiCore: 200, concrete: 20000 }, inputs: { energy: 500 }, outputs: { uraniumOre: 10.0 }, count: 0, reqLevel: 40 },
+{ id: 54, name: "심해 해상 시추 플랫폼", cost: { steel: 50000, concrete: 30000, advCircuit: 5000 }, inputs: { energy: 400 }, outputs: { oil: 100.0 }, count: 0, reqLevel: 30 },
     // === TIER 5: 원자력 및 우주 기술 (Lv.30 ~ 50) ===
     { id: 28, name: "우라늄 채굴기", cost: { titaniumPlate: 2000, advCircuit: 500 }, inputs: { energy: 150 }, outputs: { uraniumOre: 1 }, count: 0, reqLevel: 32 },
     { id: 29, name: "원심 분리기", cost: { steel: 10000, gear: 5000 }, inputs: { uraniumOre: 10, energy: 200 }, outputs: { fuelCell: 1 }, count: 0, reqLevel: 35 },
@@ -112,6 +151,26 @@ export const researchList = [
     value: 3, 
     reqResearch: "quarry_tech" 
     },
+    { 
+    id: "charcoal_efficiency", 
+    name: "고급 탄화 공법", 
+    desc: "목탄 제조 가마의 석탄 생산량 3배 증가", 
+    cost: { plank: 500, coal: 200 }, 
+    type: 'building', 
+    target: [48], 
+    value: 3, 
+    reqResearch: "furnace_bellows" 
+},
+{ 
+    id: "coal_liquefaction", 
+    name: "석탄 액화 기술", 
+    desc: "석탄 노천 채굴장(ID 3)에서 부가적으로 원유를 획득 (원유 +1.0/s 추가)", 
+    cost: { steel: 10000, plastic: 5000, processor: 500 }, 
+    type: 'building', 
+    target: [3], 
+    value: 1, // 로직상 value는 배수지만, 이 연구는 특수하게 원유 출력을 '잠금해제'하는 용도로 설명
+    reqResearch: "oil_recovery" 
+},
     { id: "iron_working", name: "철제 도구 제작", desc: "수동 채집량 +5", cost: { ironPlate: 100, gear: 50 }, type: 'manual', value: 5, reqResearch: "furnace_bellows" },
     { id: "hardened_steel", name: "강철 강화 공정", desc: "풍력 발전기 및 조립대 효율 2배", cost: { ironPlate: 300, brick: 200 }, type: 'building', target: [8, 9], value: 2, reqResearch: "iron_working" },
     { id: "gearbox_opt", name: "변속기 최적화", desc: "기계식 조립대 속도 2배", cost: { gear: 200, ironPlate: 200 }, type: 'building', target: [9], value: 2, reqResearch: "hardened_steel" },
@@ -146,6 +205,7 @@ export const researchList = [
     value: 3, 
     reqResearch: "electric_motor" 
     },
+    
     { id: "copper_wiring", name: "고효율 구리 배선", desc: "회로 공장 속도 1.5배", cost: { copperPlate: 1000, circuit: 100 }, type: 'building', target: [15], value: 1.5, reqResearch: "steam_power" },
     { id: "integrated_circuit", name: "집적 회로 설계", desc: "회로 공장 속도 추가 2.5배", cost: { circuit: 500, plastic: 200 }, type: 'building', target: [15], value: 2.5, reqResearch: "copper_wiring" },
     { id: "electric_motor", name: "고속 전기 모터", desc: "채석/제재소/가마 속도 2배", cost: { gear: 1000, circuit: 300 }, type: 'building', target: [2, 4, 5], value: 2, reqResearch: "integrated_circuit" },
@@ -171,6 +231,69 @@ export const researchList = [
     target: [46], 
     value: 2, 
     reqResearch: "oil_refining" 
+},
+{ 
+    id: "coal_purification", 
+    name: "석탄 정제 공정", 
+    desc: "제련 시설(강철/티타늄/용광로)의 석탄 소모량 50% 감소", 
+    cost: { steel: 1000, circuit: 500 }, 
+    type: 'consumption', 
+    target: [6, 7, 13, 26], 
+    value: 0.5, 
+    reqResearch: "steel_refinement" 
+},
+{ 
+    id: "bio_acceleration", 
+    name: "성장 촉진 호르몬", 
+    desc: "바이오 수목 배양소의 나무 생산량 3배 증가", 
+    cost: { plastic: 5000, processor: 200 }, 
+    type: 'building', 
+    target: [47], 
+    value: 3, 
+    reqResearch: "polymer_science" 
+},
+{ 
+    id: "efficient_burner", 
+    name: "고효율 연소실", 
+    desc: "석탄 발전소(ID 14)의 석탄 소모량 50% 감소", 
+    cost: { steel: 500, circuit: 200 }, 
+    type: 'consumption', 
+    target: [14], 
+    value: 0.5, 
+    reqResearch: "coal_efficiency" 
+},
+{ 
+    id: "coal_gasification", 
+    name: "석탄 가스화 공정", 
+    desc: "석탄 발전소의 전력 생산량 2배 증가 및 소모량 추가 30% 감소", 
+    cost: { steel: 2000, advCircuit: 500 }, 
+    type: 'building', // 생산량(energy) 증가용
+    target: [14], 
+    value: 2, 
+    reqResearch: "efficient_burner" 
+},
+// (위 연구와 세트로 소모량도 동시에 줄여줍니다)
+{ 
+    id: "coal_gasification_cons", 
+    name: "가스화 소모 절감", 
+    desc: "가스화 공정 적용으로 석탄 소모 30% 감소", 
+    cost: { steel: 1, circuit: 1 }, // 실제론 위 연구와 함께 완료되게 하거나 자동화
+    type: 'consumption', 
+    target: [14], 
+    value: 0.7, 
+    reqResearch: "efficient_burner" 
+},
+
+// 3. 나노 촉매 연소 (최종 단계)
+{ 
+    id: "nano_catalyst", 
+    name: "나노 촉매 연소", 
+    desc: "모든 석탄 사용 시설의 석탄 소모량 60% 감소", 
+    cost: { nanobots: 200, titaniumPlate: 1000 }, 
+    type: 'consumption', 
+    target: [14, 13, 26, 6, 7], // 발전소, 강철, 티타늄, 용광로 모두 포함
+    value: 0.4, 
+    reqResearch: "coal_purification" 
 },
 { 
     id: "blasting_tech", 
