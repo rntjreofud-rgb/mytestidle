@@ -159,7 +159,13 @@ header h2 { margin: 0; font-size: 1rem; color: #fff; }
     width: 100%;
     margin-bottom: 20px;
 }
-
+.sub-build-grid {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important; /* 공간을 정확히 4등분 */
+    gap: 12px !important;
+    width: 100% !important; /* 부모 너비의 100% 사용 */
+    margin-bottom: 30px !important;
+}
 /* 1. 왼쪽: 수동 작업 (2열 배치) */
 #manual-btn-list {
     display: grid !important;
@@ -198,25 +204,11 @@ header h2 { margin: 0; font-size: 1rem; color: #fff; }
     font-size: 0.95rem;
     grid-column: 1 / -1; /* 그리드 전체 너비 차지 */
 }
-.auto-area {
-    width: 100% !important;
-}
+
 
 /* --- 2. 건물 카테고리 내부 그리드 (PC 4열 고정) --- */
-.sub-build-grid {
-    display: grid !important;
-    grid-template-columns: repeat(4, 1fr) !important; /* 무조건 4등분 */
-    gap: 12px !important;
-    width: 100% !important; /* 부모 너비 꽉 채우기 */
-    margin-bottom: 30px;
-}
 
-/* --- 3. 개별 버튼 (shop-item) 너비 강제 확장 --- */
-.shop-item {
-    width: 100% !important; /* 1fr 너비를 꽉 채움 */
-    max-width: none !important; /* 너비 제한 해제 */
-    box-sizing: border-box;
-}
+
 
 /* 개별 연구 아이템 */
 .research-item {
