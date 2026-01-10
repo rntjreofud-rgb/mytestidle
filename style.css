@@ -1,121 +1,93 @@
+/* =================================================================
+   1. 기본 설정 및 변수 (Root & Reset)
+   ================================================================= */
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Consolas&display=swap');
 
 :root {
-    --bg-main: #1a1a2e;       
-    --bg-sidebar: #11111f;    
-    --bg-panel: #16213e;      
-    --bg-button: #0f3460;     
-    --bg-button-hover: #1f4287; 
-    --bg-button-disabled: #0a1120;
-    --border-color: #2a2a40;
-    --primary-orange: #e94560; 
-    --accent-green: #4ecca3;
-    --accent-blue: #4db5ff;
-    --text-main: #e0e0e0;
-    --text-muted: #8892b0;
+    --bg-main: #1a1a2e;       --bg-sidebar: #11111f;    --bg-panel: #16213e;      
+    --bg-button: #0f3460;     --bg-button-hover: #1f4287; --bg-button-disabled: #0a1120;
+    --border-color: #2a2a40;  --primary-orange: #e94560; --accent-green: #4ecca3;
+    --accent-blue: #4db5ff;   --text-main: #e0e0e0;     --text-muted: #8892b0;
 }
 
 * { box-sizing: border-box; }
-
 body {
     font-family: 'Noto Sans KR', sans-serif;
-    background-color: var(--bg-main);
-    color: var(--text-main);
-    margin: 0; padding: 0;
-    width: 100vw; height: 100vh;
-    display: flex; overflow: hidden;
-    font-size: 13px;
-}
-/* === 토글 스위치 === */
-.switch {
-  position: relative;
-  display: inline-block;
-  width: 40px;
-  height: 20px;
-  vertical-align: middle;
+    background-color: var(--bg-main); color: var(--text-main);
+    margin: 0; padding: 0; width: 100vw; height: 100vh;
+    display: flex; overflow: hidden; font-size: 13px;
 }
 
-.switch input { 
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
-.slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background-color: #95a5a6; /* 꺼졌을 때 회색 */
-  transition: .4s;
-  border-radius: 20px;
-}
-
-.slider:before {
-  position: absolute;
-  content: "";
-  height: 16px;
-  width: 16px;
-  left: 2px;
-  bottom: 2px;
-  background-color: white;
-  transition: .4s;
-  border-radius: 50%;
-}
-
-/* 켜졌을 때 (초록색) */
-input:checked + .slider {
-  background-color: #2ecc71;
-}
-
-/* 켜졌을 때 동그라미 이동 */
-input:checked + .slider:before {
-  transform: translateX(20px);
-}
-/* === 사이드바 === */
+/* =================================================================
+   2. 사이드바 및 네비게이션 (Sidebar)
+   ================================================================= */
 .sidebar {
-    width: 200px;
-    height: 100%;
-    background-color: var(--bg-sidebar);
-    border-right: 1px solid #000;
-    display: flex; flex-direction: column; flex-shrink: 0;
+    width: 200px; height: 100%; background-color: var(--bg-sidebar);
+    border-right: 1px solid #000; display: flex; flex-direction: column; flex-shrink: 0;
 }
 .logo-area { padding: 20px 10px; background-color: #0b0b14; text-align: center; }
 .logo-area h1 { margin: 0; font-size: 1.1rem; color: var(--accent-green); letter-spacing: 1px; }
 .nav-menu { flex: 1; overflow-y: auto; padding: 10px 0; }
 .nav-category { font-size: 0.75rem; color: #556; margin: 15px 0 5px 15px; font-weight: bold; }
-.nav-item { display: flex; align-items: center; padding: 10px 15px; cursor: pointer; color: var(--text-muted); font-size: 0.9rem; transition: 0.2s; }
-.nav-item:hover, .nav-item.active { background-color: var(--bg-panel); color: #fff; border-left: 3px solid var(--primary-orange); }
+.nav-item { 
+    display: flex; align-items: center; padding: 10px 15px; cursor: pointer; 
+    color: var(--text-muted); font-size: 0.9rem; transition: 0.2s; 
+}
+.nav-item:hover, .nav-item.active { 
+    background-color: var(--bg-panel); color: #fff; border-left: 3px solid var(--primary-orange); 
+}
 .nav-item i { margin-right: 10px; width: 16px; text-align: center; }
 
-/* === 메인 레이아웃 === */
+/* =================================================================
+   3. 메인 레이아웃 (Main Content)
+   ================================================================= */
 .main-wrapper { flex: 1; display: flex; flex-direction: column; height: 100%; overflow: hidden; }
-header { background-color: var(--bg-panel); border-bottom: 1px solid var(--border-color); padding: 0 20px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; height: 50px; }
-header h2 { margin: 0; font-size: 1rem; color: #fff; }
+header { 
+    background-color: var(--bg-panel); border-bottom: 1px solid var(--border-color); 
+    padding: 0 20px; display: flex; justify-content: space-between; align-items: center; 
+    flex-shrink: 0; height: 50px; 
+}
 .content-area { flex: 1; overflow-y: auto; padding: 20px; background-color: var(--bg-main); }
 
-/* === 패널 === */
-.info-panel { background-color: var(--bg-panel); border-left: 4px solid var(--accent-blue); padding: 15px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; border-radius: 8px; }
-.info-text h3 { margin: 0 0 5px 0; font-size: 1.1rem; color: #fff; }
-.action-box { margin: 0; /* 마진 제거 (그리드 갭 사용) */ }
-.section-title { font-size: 0.9rem; color: #8892b0; margin-bottom: 10px; padding-bottom: 5px; border-bottom: 2px solid var(--bg-panel); font-weight: bold; }
+/* 상단 정보 패널 */
+.info-panel { 
+    background-color: var(--bg-panel); border-left: 4px solid var(--accent-blue); 
+    padding: 15px; margin-bottom: 20px; display: flex; align-items: center; 
+    justify-content: space-between; border-radius: 8px; 
+}
+.section-title { font-size: 0.9rem; color: #8892b0; margin-bottom: 10px; font-weight: bold; }
 
-/* === 자원 카드 === */
-.resource-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; margin-bottom: 20px; }
-.res-card { background-color: var(--bg-panel); border: none; padding: 10px 15px; border-radius: 8px; min-height: 70px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
-.res-header { display: flex; justify-content: space-between; margin-bottom: 5px; }
-.res-name { font-size: 0.85rem; color: #aaa; font-weight: bold; }
+/* 액션 그리드 (수동 25% : 자동 75%) */
+.action-grid {
+    display: grid; grid-template-columns: 280px 1fr; gap: 20px; width: 100%; margin-bottom: 20px;
+}
+
+/* =================================================================
+   4. 자원 카드 및 창고 (Resource Cards)
+   ================================================================= */
+.sub-res-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); 
+    gap: 10px; margin-bottom: 20px; width: 100%;
+}
+.res-card {
+    background-color: var(--bg-panel); padding: 10px 15px; border-radius: 8px;
+    min-height: 80px; display: flex; flex-direction: column; justify-content: space-between;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2); position: relative;
+}
+.res-card::after { 
+    content: ''; display: block; height: 3px; width: 100%; margin-top: 8px; 
+    border-radius: 2px; flex-shrink: 0; 
+}
 .res-amount { font-size: 1.3rem; font-weight: 700; color: #fff; margin: 0; }
-.res-mps { font-size: 0.8rem; color: #8892b0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.res-card::after { content: ''; display: block; height: 3px; width: 100%; margin-top: 8px; border-radius: 2px; }
-/* --- 기존 자원 --- */
+.res-mps { font-size: 0.8rem; color: var(--text-muted); }
+
+/* 자원별 색상 바 */
 .res-card.wood::after { background-color: #27ae60; }
 .res-card.stone::after { background-color: #7f8c8d; }
 .res-card.coal::after { background-color: #2c3e50; }
 .res-card.ironOre::after { background-color: #bdc3c7; }
 .res-card.copperOre::after { background-color: #d35400; }
-
-/* --- 1차/2차 가공품 --- */
 .res-card.plank::after { background-color: #e67e22; }
 .res-card.brick::after { background-color: #c0392b; }
 .res-card.ironPlate::after { background-color: #ecf0f1; }
@@ -124,490 +96,121 @@ header h2 { margin: 0; font-size: 1rem; color: #fff; }
 .res-card.sulfur::after { background-color: #f1c40f; }
 .res-card.steel::after { background-color: #4b6584; }
 .res-card.concrete::after { background-color: #95a5a6; }
-
-/* --- 산업/전기 부품 --- */
 .res-card.gear::after { background-color: #636e72; }
 .res-card.circuit::after { background-color: #26de81; }
 .res-card.advCircuit::after { background-color: #eb4d4b; }
 .res-card.processor::after { background-color: #0984e3; }
 .res-card.battery::after { background-color: #fed330; }
-
-/* --- 고급 소재 및 연료 --- */
-.res-card.oil::after { background-color: #2d3436; } /* 검은색 원유 */
+.res-card.oil::after { background-color: #2d3436; }
 .res-card.titaniumOre::after { background-color: #00cec9; }
 .res-card.titaniumPlate::after { background-color: #81ecec; }
-.res-card.uraniumOre::after { background-color: #badc58; } /* 방사능 연두색 */
+.res-card.uraniumOre::after { background-color: #badc58; }
 .res-card.fuelCell::after { background-color: #6ab04c; }
 .res-card.optics::after { background-color: #7ed6df; }
-
-/* --- 엔드게임 자원 --- */
 .res-card.nanobots::after { background-color: #686de0; }
 .res-card.aiCore::after { background-color: #a29bfe; }
 .res-card.rocketFuel::after { background-color: #ff793f; }
 .res-card.advAlloy::after { background-color: #485460; }
-.res-card.warpCore::after { background-color: #be2edd; } /* 보라색 우주 에너지 */
+.res-card.warpCore::after { background-color: #be2edd; }
 
 /* =================================================================
-   ⭐ [핵심 수정] 레이아웃 비율 재조정 (남는 공간 활용)
+   5. 건물 및 연구소 그리드 (Building & Research)
    ================================================================= */
+#building-list, #research-list-container { width: 100%; display: block; }
 
-/* 전체 그리드: 왼쪽은 280px 고정, 오른쪽은 나머지 전부(1fr) */
-.action-grid {
-    display: grid !important;
-    grid-template-columns: 280px 1fr !important;
-    gap: 20px !important;
-    width: 100%;
-    margin-bottom: 20px;
-}
-
-/* 1. 왼쪽: 수동 작업 (2열 배치) */
-#manual-btn-list {
-    display: grid !important;
-    grid-template-columns: repeat(2, 1fr) !important; 
-    gap: 8px !important;
-}
-
-/* 2. 오른쪽: 공장 건설 & 연구 목록 (4열 배치) 
-   -> 오른쪽 공간이 넓어졌으므로 4열이어도 버튼이 찌그러지지 않음 */
-#building-list, 
-#research-list-container {
-    display: grid !important;
-    /* 4열 배열 유지 */
-    grid-template-columns: repeat(4, 1fr) !important;
-    gap: 8px !important;
-}
-
-#research-list-container {
-    display: block !important; /* 그리드 해제 (제목이 한 줄을 다 쓰게 함) */
-    width: 100% !important;
-}
-
-
-.auto-area, #building-list {
-    width: 100% !important;
-    display: block !important;
-}
-
-/* 2. 건물 카테고리 제목 (줄바꿈 강제 및 너비 확장) */
-.build-category-title {
-    width: 100% !important;
-    display: block !important;
-    font-size: 0.95rem;
-    color: var(--accent-green);
-    margin: 25px 0 12px 0 !important;
-    padding-bottom: 8px;
-    border-bottom: 1px solid #2a4038;
-    font-weight: bold;
-}
-
-/* 3. ⭐ 건물 그리드 (PC: 무조건 4열 꽉 채우기) */
 .sub-build-grid {
     display: grid !important;
-    /* 1fr을 4번 반복하여 공간을 정확히 25%씩 4등분 */
-    grid-template-columns: repeat(4, 1fr) !important; 
-    gap: 12px !important;
-    width: 100% !important; 
-    margin-bottom: 30px !important;
-}
-
-/* 4. 개별 건물 버튼 (4등분된 칸을 꽉 채우도록 강제) */
-.shop-item {
-    width: 100% !important;  /* 칸 전체 너비 사용 */
-    height: 95px !important; /* 높이 고정 */
-    min-width: 0 !important; /* 찌그러짐 방지 */
-    margin: 0 !important;
-    box-sizing: border-box !important;
-}
-
-/* 연구 탭 전용 섹션 제목 */
-.research-section-title {
-    width: 100% !important;
-    display: flex !important;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 0.95rem;
-    color: var(--accent-blue);
-    margin: 25px 0 12px 0 !important;
-    padding: 8px 10px !important;
-    border-bottom: 2px solid var(--bg-panel);
-    font-weight: bold;
-    cursor: pointer;
-}
-
-#research-list-container .sub-build-grid {
-    display: grid !important;
     grid-template-columns: repeat(4, 1fr) !important; /* PC 4열 고정 */
-    gap: 12px !important;
-    width: 100% !important;
-    margin-bottom: 30px !important;
-}
-/* --- 2. 건물 카테고리 내부 그리드 (PC 4열 고정) --- */
-
-
-
-/* 개별 연구 아이템 */
-.research-item {
-    /* 기존 shop-item 스타일 계승 */
-    background-color: #2a2525; /* 상점과 살짝 다른 색상으로 구분 */
-    border: 1px solid #443b3b;
+    gap: 12px; width: 100%; margin-bottom: 30px;
 }
 
-/* 연구 완료 상태 디자인 */
-.research-item.done {
-    background-color: #1a2a1a !important; /* 어두운 녹색 */
-    border-color: #27ae60 !important;
-    cursor: default;
-    opacity: 0.8;
-}
-
-/* 연구 완료 텍스트 */
-.research-done-tag {
-    color: #2ecc71;
-    font-weight: bold;
-    font-size: 0.7rem;
-    text-transform: uppercase;
-}
-
-@keyframes blink-red {
-    0% { opacity: 1; }
-    50% { opacity: 0.5; }
-    100% { opacity: 1; }
-}
-
-.power-low {
-    animation: blink-red 0.8s infinite;
-    box-shadow: 0 0 10px #e74c3c;
-}
-
-/* =================================================================
-   버튼 디자인 (글자 잘림/겹침 방지 강화)
-   ================================================================= */
-
-/* 공통 박스 스타일 */
+/* 개별 버튼 스타일 (shop-item) */
 .shop-item, .btn-large {
-    position: relative !important;
-    width: 100%;
-    height: 90px !important; /* 높이 넉넉하게 */
-    
-    background-color: var(--bg-button);
-    border: 1px solid #444;
-    border-radius: 6px;
-    padding: 0 !important;
-    margin: 0;
-    
-    cursor: pointer;
-    box-shadow: 0 4px 0 rgba(0,0,0,0.2);
-    display: block !important;
-    transition: transform 0.1s;
-    overflow: hidden; /* 박스 밖으로 튀어나가는 것 방지 */
+    position: relative; width: 100%; height: 90px;
+    background-color: var(--bg-button); border: 1px solid #444;
+    border-radius: 6px; cursor: pointer; transition: 0.1s; overflow: hidden;
 }
+.shop-item:hover, .btn-large:hover { background-color: var(--bg-button-hover); transform: translateY(-2px); }
+.shop-item.disabled, .btn-large.disabled { opacity: 0.5; background-color: var(--bg-button-disabled); cursor: not-allowed; }
 
-.shop-item:hover, .btn-large:hover { background-color: var(--bg-button-hover); transform: translateY(-2px); z-index: 10; }
-.shop-item:active, .btn-large:active { transform: translateY(2px); box-shadow: none; }
-.shop-item.disabled, .btn-large.disabled { opacity: 0.5; background-color: var(--bg-button-disabled); cursor: not-allowed; box-shadow: none; }
+/* 버튼 내부 텍스트 배치 */
+.si-name { position: absolute; top: 12px; left: 14px; right: 70px; font-weight: bold; color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.si-level { position: absolute; top: 12px; right: 14px; color: #ffd700; }
+.si-desc { position: absolute; bottom: 12px; left: 14px; right: 12px; font-size: 0.75rem; color: #aeb6ce; }
+.si-cost { position: absolute; top: 32px; right: 14px; font-size: 0.8rem; color: var(--primary-orange); font-weight: bold; }
 
-/* =========================================
-   3. 텍스트 위치 고정 (4모서리 배치)
-   ========================================= */
+/* 수동 작업 버튼 전용 (2열) */
+#manual-btn-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
 
-/* [좌측 상단] 이름 */
-.si-name {
-    position: absolute !important;
-    top: 12px;
-    left: 14px;
-    
-    /* 레벨 텍스트(우측)와 겹치지 않게 공간 제한 */
-    right: 70px; 
-    
-    font-size: 0.95rem;
-    font-weight: bold;
-    color: #fff;
-    text-align: left;
-    
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+/* 연구소 완료 아이템 */
+.research-item.done { background-color: #1a2a1a !important; border-color: #27ae60 !important; cursor: default; opacity: 0.8; }
+
+/* =================================================================
+   6. 접기/펴기 기능 (Collapsible)
+   ================================================================= */
+.res-category-title, .build-category-title, .research-section-title {
+    cursor: pointer; display: flex !important; justify-content: space-between; align-items: center;
+    padding: 8px 10px; border-radius: 4px; user-select: none; margin-bottom: 5px;
 }
+.res-category-title:hover, .build-category-title:hover, .research-section-title:hover { background: rgba(255, 255, 255, 0.05); }
 
-/* [우측 상단] 레벨 */
-.si-level {
-    position: absolute !important;
-    top: 12px;
-    right: 14px;
-    
-    font-size: 0.8rem;
-    color: #ffd700; /* 노란색 */
-    font-weight: normal;
-    text-align: right;
-    
-    /* 이름과 분리되어 우측 끝에 고정 */
-    z-index: 5;
-}
+/* 화살표 회전 */
+.toggle-arrow { display: inline-block; transition: transform 0.3s; font-size: 0.7rem; color: #556; }
+.collapsed .toggle-arrow { transform: rotate(-90deg); }
 
-/* [좌측 하단] 설명 (생산량) */
-.si-desc {
-    position: absolute !important;
-    bottom: 12px;
-    left: 14px;
-    
-    /* 가격 텍스트(우측)와 겹치지 않게 공간 제한 */
-    right: 80px;
-    
-    font-size: 0.75rem;
-    color: #aeb6ce;
-    line-height: 1;
-    text-align: left;
-    
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
+/* 접혔을 때 숨김 (최우선순위) */
+.collapsed-content { display: none !important; }
 
-/* [우측 하단] 비용 (가격) */
-.si-cost {
-    position: absolute !important;
-    bottom: 12px;
-    right: 14px;
-    
-    text-align: right;
-    font-size: 0.85rem;
-    color: var(--primary-orange);
-    font-weight: bold;
-}
+/* =================================================================
+   7. 전력망 및 시스템 로그 (Systems)
+   ================================================================= */
+/* 전력 바 애니메이션 */
+@keyframes blink-red { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+.power-low { animation: blink-red 0.8s infinite; box-shadow: 0 0 10px #e74c3c; }
 
-/* 수동 버튼 */
-.btn-large {
-    display: flex !important;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    color: #e0e0e0; font-weight: bold;
-}
-.btn-large strong { position: static !important; font-size: 0.95rem; }
+/* 토글 스위치 디자인 */
+.switch { position: relative; display: inline-block; width: 40px; height: 20px; vertical-align: middle; }
+.switch input { opacity: 0; width: 0; height: 0; }
+.slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #95a5a6; transition: .4s; border-radius: 20px; }
+.slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 2px; bottom: 2px; background-color: white; transition: .4s; border-radius: 50%; }
+input:checked + .slider { background-color: #2ecc71; }
+input:checked + .slider:before { transform: translateX(20px); }
 
-/* 업그레이드 버튼 */
-#upgrade-btn {
-    width: 100%; height: 50px;
-    background-color: var(--accent-green);
-    color: #fff; border: none; border-radius: 6px;
-    font-weight: bold; cursor: pointer;
-    box-shadow: 0 4px 0 rgba(0,0,0,0.2);
-    margin-bottom: 10px;
-}
-#upgrade-btn:disabled { background-color: #333; color: #555; cursor: not-allowed; box-shadow: none; }
+/* 전력 테이블 스크롤 */
+#power-breakdown-container { max-height: 400px; overflow-y: auto; border: 1px solid var(--border-color); }
 
-/* 하단 로그 */
-.system-log-area { height: 150px; background-color: #0b0b10; border-top: 2px solid #000; display: flex; flex-direction: column; flex-shrink: 0; }
-.log-header { background-color: #161620; padding: 5px 15px; font-size: 0.8rem; color: #8892b0; font-weight: bold; border-bottom: 1px solid #222; }
-.log-content { flex: 1; overflow-y: auto; padding: 10px; font-family: 'Consolas', monospace; }
-#game-log-list { list-style: none; padding: 0; margin: 0; }
-.log-entry { padding: 3px 0; font-size: 0.85rem; color: #bbb; display: flex; gap: 10px; }
-.log-time { color: #556; min-width: 60px; font-size: 0.75rem; }
+/* 하단 시스템 로그 */
+.system-log-area { height: 150px; background-color: #0b0b10; border-top: 2px solid #000; display: flex; flex-direction: column; }
+.log-content { flex: 1; overflow-y: auto; padding: 10px; font-family: 'Consolas', monospace; font-size: 0.85rem; }
+.log-entry { display: flex; gap: 10px; margin-bottom: 3px; }
+.log-time { color: #556; min-width: 65px; }
 .log-highlight { color: var(--accent-green); }
-::-webkit-scrollbar { width: 8px; height: 8px; }
-::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
-::-webkit-scrollbar-track { background: #0b0b10; }
-
 
 /* =================================================================
-   ⭐ [핵심 수정] 자원 및 건물 카테고리 접기/펼치기 기능
+   8. 반응형 레이아웃 (Media Queries)
    ================================================================= */
-.res-category-title, 
-.build-category-title, 
-.research-section-title {
-    cursor: pointer;
-    display: flex !important;
-    justify-content: space-between;
-    align-items: center;
-    transition: background 0.2s;
-    padding: 8px 10px !important;
-    border-radius: 4px;
-    user-select: none; /* 텍스트 선택 방지 */
-}
-
-/* Hover 효과도 쉼표로 구분 */
-.res-category-title:hover, 
-.build-category-title:hover, 
-.research-section-title:hover {
-    background: rgba(255, 255, 255, 0.05);
-}
-
-.sub-res-grid.collapsed-content, 
-.sub-build-grid.collapsed-content {
-    display: none !important;
-}
-
-/* 화살표 회전 애니메이션 고정 */
-.toggle-arrow {
-    display: inline-block !important;
-    transition: transform 0.3s ease !important;
-}
-
-.collapsed .toggle-arrow {
-    transform: rotate(-90deg) !important;
-}
-
-
-
-
-/* 모바일 대응 (화면 좁을 때) */
+/* 노트북/작은 모니터 */
 @media (max-width: 1200px) {
-    /* 화면이 좁아지면 구획을 1열로 세움 */
-    .action-grid { grid-template-columns: 1fr !important; }
-    /* 수동 버튼은 3열 */
-    #manual-btn-list { grid-template-columns: repeat(3, 1fr) !important; }
-    /* 공장 버튼은 2열 */
-    #building-list, #research-list-container { grid-template-columns: repeat(2, 1fr) !important; }
-}
-/* =================================================================
-   ⭐ [핵심 수정] 전력 상세 내역 스크롤 가능 영역
-   ================================================================= */
-#power-breakdown-container {
-    max-height: 300px; /* 원하는 높이로 조절 */
-    overflow-y: auto;
-    border: 1px solid var(--border-color);
+    .action-grid { grid-template-columns: 1fr; }
+    .sub-build-grid { grid-template-columns: repeat(2, 1fr) !important; }
 }
 
-#power-breakdown-container td {
-    border-bottom: 1px solid rgba(255,255,255,0.05);
+/* 휴대폰/태블릿 */
+@media (max-width: 768px) {
+    body { flex-direction: column; overflow-y: auto; }
+    .sidebar { width: 100%; height: auto; position: sticky; top: 0; z-index: 1000; border-right: none; border-bottom: 1px solid #000; }
+    .logo-area { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 10px; }
+    .logo-area small, .nav-category { display: none; }
+    .nav-menu { display: flex; overflow-x: auto; white-space: nowrap; }
+    .nav-item { flex: 1; justify-content: center; border-left: none; border-bottom: 3px solid transparent; }
+    .nav-item.active { border-left: none; border-bottom: 3px solid var(--primary-orange); }
+
+    .sub-res-grid { grid-template-columns: repeat(2, 1fr); }
+    .sub-build-grid { grid-template-columns: 1fr !important; }
+    #manual-btn-list { grid-template-columns: 1fr; }
+    
+    header { height: auto; flex-direction: column; padding: 10px; }
+    .info-panel { flex-direction: column; text-align: center; gap: 10px; }
 }
-
-.sub-res-grid {
-    display: grid;
-    /* 최소 너비 140px로 설정하여 PC에선 가로로, 모바일에선 2열로 자동 조정 */
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); 
-    gap: 10px;
-    margin-bottom: 20px;
-    width: 100%;
-}
-
-
-/* 4. 내부 텍스트 간격 조정 */
-.res-header { margin-bottom: 0; }
-.res-body { flex: 1; display: flex; flex-direction: column; justify-content: center; }
-.res-amount { font-size: 1.3rem; font-weight: 700; margin: 2px 0; }
 
 .hidden { display: none !important; }
-
-/* 휴대폰/태블릿 대응 (화면 너비 768px 이하) */
-@media (max-width: 768px) {
-    body {
-        flex-direction: column; /* 사이드바와 메인을 세로로 배치 */
-        overflow-y: auto;      /* 전체 페이지 스크롤 허용 */
-    }
-
-    /* 1. 사이드바를 상단 바 형태로 변경 */
-    .sidebar {
-        width: 100%;
-        height: auto;
-        border-right: none;
-        border-bottom: 1px solid #000;
-        position: sticky; /* 상단에 고정 */
-        top: 0;
-        z-index: 1000;
-    }
-
-    .logo-area {
-        padding: 10px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-    }
-
-    .logo-area div { font-size: 1.5rem !important; } /* 로고 이모지 크기 축소 */
-    .logo-area h1 { font-size: 0.9rem; }
-    .logo-area small { display: none; } /* IDLE GAME 텍스트 숨김 */
-
-    /* 2. 메뉴 아이템을 가로로 배치 */
-    .nav-menu {
-        display: flex;
-        overflow-x: auto; /* 가로 스크롤 허용 */
-        padding: 0;
-        white-space: nowrap;
-        background-color: var(--bg-sidebar);
-    }
-
-    .nav-category { display: none; } /* 'Control Center', 'Systems' 분류 텍스트 숨김 */
-
-    .nav-item {
-        flex: 1;
-        justify-content: center;
-        padding: 12px 15px;
-        border-left: none;
-        border-bottom: 3px solid transparent;
-        font-size: 0.8rem;
-    }
-
-    .nav-item.active {
-        border-left: none;
-        border-bottom: 3px solid var(--primary-orange);
-    }
-
-    /* 3. 메인 콘텐츠 영역 조정 */
-    .main-wrapper {
-        height: auto;
-        overflow: visible;
-    }
-
-    .content-area {
-        padding: 10px;
-        overflow: visible;
-    }
-
-    header {
-        height: auto;
-        padding: 10px;
-        flex-direction: column;
-        gap: 10px;
-        text-align: center;
-    }
-
-    /* 4. 그리드 시스템 1열로 강제 전환 */
-    .resource-grid {
-        grid-template-columns: repeat(2, 1fr); /* 자원 카드는 2열로 */
-    }
-
-    .action-grid {
-        grid-template-columns: 1fr !important; /* 수동/자동 영역 세로 배치 */
-    }
-
-    #manual-btn-list {
-        grid-template-columns: repeat(2, 1fr) !important;
-    }
-
-    #building-list, #research-list-container {
-        grid-template-columns: 1fr !important; /* 건물/연구는 보기 편하게 1열로 */
-    }
-
-    /* 5. 하단 로그 영역 */
-    .system-log-area {
-        height: 120px;
-        position: relative;
-    }
-
-    .sub-build-grid {
-        /* 모바일: 무조건 1열로 세우기 */
-        grid-template-columns: 1fr !important; 
-        gap: 8px;
-    }
-    #research-list-container .sub-build-grid {
-        grid-template-columns: 1fr !important; /* 모바일 1열 */
-    }
-
-    /* 자원 카테고리 제목 */
-.res-category-title {
-    width: 100%;
-    font-size: 0.85rem;
-    color: #8892b0;
-    margin: 15px 0 5px 0;
-    padding-bottom: 5px;
-    border-bottom: 1px solid #333;
-    font-weight: bold;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-}
-
-
-}
