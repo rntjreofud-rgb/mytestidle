@@ -1,28 +1,29 @@
 // js/ui.js 전체 교체
 
 import { gameData, houseStages, researchList } from './data.js';
-import * as Logic from './logic.js';
-import * as UI from './ui.js';
+import * as Logic from './logic.js'; // ⭐ Logic이 반드시 있어야 계산을 다시 합니다.
 
 // 내부에서 구매 콜백 함수를 기억하기 위한 변수
 let cachedBuyCallback = null;
 
+// ⭐ [핵심] window 객체에 함수를 강제로 등록해야 HTML의 onclick이 인식합니다.
 window.toggleBuildingPower = function(id) {
-    // 1. 해당 건물 찾기
+    // 1. 데이터에서 해당 건물 찾기
     const building = gameData.buildings.find(b => b.id === id);
     
     if (building) {
-        // 2. 상태 토글 (켜져있으면 끄고, 꺼져있으면 켬)
-        // (undefined일 경우를 대비해 확실하게 true/false 처리)
-        building.on = (building.on === undefined) ? false : !building.on;
+        // 2. 상태 뒤집기 (undefined일 경우 false로 초기화 후 뒤집기)
+        if (building.on === undefined) building.on = true;
+        building.on = !building.on;
         
-        // 3. 화면 갱신 (중요: UI.updateScreen이 아니라 그냥 updateScreen 호출)
+        // 3. 화면 즉시 갱신
+        // (주의: UI.updateScreen이 아니라, 이 파일 내부의 updateScreen을 직접 호출)
         const netMPS = Logic.calculateNetMPS();
         updateScreen(netMPS); 
         
-        console.log(`건물 ID ${id} 전원 상태 변경: ${building.on ? 'ON' : 'OFF'}`);
+        console.log(`건물 ${building.name} 전원: ${building.on ? 'ON' : 'OFF'}`);
     } else {
-        console.error("건물을 찾을 수 없습니다. ID:", id);
+        console.error(`ID ${id} 건물을 찾을 수 없습니다.`);
     }
 };
 
