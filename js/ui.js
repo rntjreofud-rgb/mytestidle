@@ -137,11 +137,10 @@ function initResourceGrid() {
     }
     isGridInitialized = true;
 }
-function getResNameOnly(key) {
+export function getResNameOnly(key) { 
     const full = resNames[key];
-    if (!full) return key; // 이름이 없으면 키값 그대로 반환
+    if (!full) return key; 
     const parts = full.split(' ');
-    // "🌲 나무" 형태라면 "나무"를 반환, 공백이 없다면 전체 반환
     return parts.length > 1 ? parts[1] : parts[0];
 }
 
