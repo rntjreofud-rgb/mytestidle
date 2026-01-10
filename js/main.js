@@ -160,7 +160,8 @@ function handleBuyBuilding(index) {
         UI.log(`[건설] ${gameData.buildings[index].name} 건설 완료.`);
         UI.renderShop(handleBuyBuilding, Logic.getBuildingCost); 
     } else {
-        UI.log("자원이 부족합니다.");
+        const missingNames = result.missing.map(key => UI.getResNameOnly(key)).join(', ');
+        UI.log(`🏗️ 건설 불가 (부족: ${missingNames})`, false);
     }
 }
 
@@ -178,7 +179,8 @@ function handleHouseUpgrade(nextStage) {
             Storage.resetGame();
         }
     } else {
-        UI.log("업그레이드 자원이 부족합니다.");
+        const missingNames = result.missing.map(key => UI.getResNameOnly(key)).join(', ');
+        UI.log(`⬆️ 업그레이드 불가 (부족: ${missingNames})`, false);
     }
 }
 

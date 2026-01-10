@@ -293,120 +293,101 @@ function updatePowerUI() {
     const percent = req > 0 ? (prod / req) * 100 : 100;
     const powerColor = (prod >= req) ? '#2ecc71' : '#e74c3c';
 
-    // 1. [전력 관리 탭] 상단 요약 업데이트
-    if(elements.powerDisplay) {
-        elements.powerDisplay.innerHTML = `<span style="color:#2ecc71">${formatNumber(prod)} MW</span> 생산 / <span style="color:#e74c3c">${formatNumber(req)} MW</span> 소비`;
-    }
+    // 1. 상단 요약 바 업데이트
+    if(elements.powerDisplay) elements.powerDisplay.innerHTML = `<span style="color:#2ecc71">${formatNumber(prod)} MW</span> 생산 / <span style="color:#e74c3c">${formatNumber(req)} MW</span> 소비`;
     if(elements.powerBar) {
         elements.powerBar.style.width = `${Math.min(100, percent)}%`;
         elements.powerBar.style.backgroundColor = powerColor;
         if (prod < req) elements.powerBar.classList.add('power-low');
         else elements.powerBar.classList.remove('power-low');
     }
-
-    // 2. [메인 대시보드] 전력바 실시간 업데이트
-    if (elements.dashPowerPanel) {
-        if (gameData.houseLevel >= 5) {
-            elements.dashPowerPanel.classList.remove('hidden');
-            if (elements.dashPowerText) elements.dashPowerText.innerHTML = `<span style="color:#2ecc71">${formatNumber(prod)}</span> / <span style="color:#e74c3c">${formatNumber(req)} MW</span>`;
-            if (elements.dashPowerFill) {
-                elements.dashPowerFill.style.width = `${Math.min(100, percent)}%`;
-                elements.dashPowerFill.style.backgroundColor = powerColor;
-            }
-        } else {
-            elements.dashPowerPanel.classList.add('hidden');
-        }
+    // 대시보드 연동
+    if (elements.dashPowerPanel && gameData.houseLevel >= 5) {
+        elements.dashPowerPanel.classList.remove('hidden');
+        elements.dashPowerText.innerHTML = `<span style="color:#2ecc71">${formatNumber(prod)}</span> / <span style="color:#e74c3c">${formatNumber(req)} MW</span>`;
+        elements.dashPowerFill.style.width = `${Math.min(100, percent)}%`;
+        elements.dashPowerFill.style.backgroundColor = powerColor;
     }
 
-    // 3. [생산 및 전력 제어 내역] 테이블 렌더링 (가동 레벨 조절 버전)
+    // 2. 생산 제어 센터 컨테이너 정리
     const container = document.getElementById('power-breakdown-container');
     if (!container) return;
-
-    let table = container.querySelector('table');
-    if (!table) {
-        container.innerHTML = `
-            <table style="width:100%; border-collapse: collapse; font-size: 0.85rem; table-layout: fixed;">
-                <thead>
-                    <tr style="border-bottom: 1px solid #444; color: #8892b0;">
-                        <th style="text-align:left; padding: 8px; width: 40%;">건물 (가동/보유)</th>
-                        <th style="text-align:center; padding: 8px; width: 35%;">가동 레벨 조절</th>
-                        <th style="text-align:right; padding: 8px; width: 25%;">에너지 (MW)</th>
-                    </tr>
-                </thead>
-                <tbody id="power-list-body"></tbody>
-            </table>`;
-        table = container.querySelector('table');
+    
+    // 처음 1회 실행 시 제목만 남기고 초기화
+    if (!container.dataset.initialized) {
+        container.innerHTML = ""; 
+        container.dataset.initialized = "true";
     }
 
-    const tbody = container.querySelector('#power-list-body');
-    const currentBuildingIds = new Set();
+    // 3. 카테고리별로 모든 건물 렌더링
+    for (const [groupKey, group] of Object.entries(buildingGroups)) {
+        // 해당 그룹에서 1개 이상 보유한 건물만 필터링
+        const ownedBuildings = gameData.buildings.filter(b => group.ids.includes(b.id) && b.count > 0);
+        if (ownedBuildings.length === 0) continue;
 
-    gameData.buildings.forEach(b => {
-        if (b.count > 0) {
-            const isProducer = b.outputs && b.outputs.energy;
-            const isConsumer = b.inputs && b.inputs.energy;
-            if (!isProducer && !isConsumer) return;
+        // 섹션 제목 및 그리드 생성 (없으면 생성)
+        let sectionTitle = document.getElementById(`ctrl-title-${groupKey}`);
+        let sectionGrid = document.getElementById(`ctrl-grid-${groupKey}`);
 
-            currentBuildingIds.add(b.id);
-
-            const speedMult = Logic.getBuildingMultiplier(b.id);
-            const consMult = Logic.getBuildingConsumptionMultiplier(b.id);
-            const energyEff = Logic.getEnergyEfficiencyMultiplier(b.id);
-
-            // 가동 중인 개수(activeCount) 기준으로 전력량 계산
-            let energyVal = isProducer 
-                ? (b.outputs.energy * b.activeCount * speedMult)
-                : (b.inputs.energy * b.activeCount * speedMult * consMult * energyEff);
-
-            let row = document.getElementById(`pwr-row-${b.id}`);
-            if (!row) {
-                row = document.createElement('tr');
-                row.id = `pwr-row-${b.id}`;
-                row.style.borderBottom = "1px solid rgba(255,255,255,0.05)";
-                row.innerHTML = `
-                    <td class="p-name" style="padding: 8px; vertical-align: middle; line-height: 1.2;"></td>
-                    <td class="p-ctrl" style="text-align:center; padding: 8px; vertical-align: middle;">
-                        <div style="display:inline-flex; gap:3px;">
-                            <button class="btn-step" data-step="-10" style="padding:3px 6px; background:#444; color:#fff; border:none; border-radius:3px; cursor:pointer; font-size:0.7rem;">--</button>
-                            <button class="btn-step" data-step="-1" style="padding:3px 8px; background:#e74c3c; color:#fff; border:none; border-radius:3px; cursor:pointer; font-weight:bold;">-</button>
-                            <button class="btn-step" data-step="1" style="padding:3px 8px; background:#2ecc71; color:#fff; border:none; border-radius:3px; cursor:pointer; font-weight:bold;">+</button>
-                            <button class="btn-step" data-step="10" style="padding:3px 6px; background:#444; color:#fff; border:none; border-radius:3px; cursor:pointer; font-size:0.7rem;">++</button>
-                        </div>
-                    </td>
-                    <td class="p-energy" style="text-align:right; padding: 8px; vertical-align: middle; font-weight:bold;"></td>
-                `;
-
-                // 조절 버튼 이벤트 리스너 연결
-                row.querySelectorAll('.btn-step').forEach(btn => {
-                    btn.onclick = function() {
-                        const step = parseInt(this.dataset.step);
-                        // window.adjustActiveCount를 호출하거나 직접 로직 수행
-                        b.activeCount = Math.max(0, Math.min(b.count, (b.activeCount || 0) + step));
-                        updateScreen(Logic.calculateNetMPS());
-                    };
-                });
-
-                tbody.appendChild(row);
-            }
-
-            // 내용 실시간 업데이트
-            row.style.opacity = b.activeCount === 0 ? "0.4" : "1";
-            row.querySelector('.p-name').innerHTML = `${b.name}<br><small style="color:#8892b0;">${b.activeCount} / ${b.count} 가동</small>`;
+        if (!sectionTitle) {
+            sectionTitle = document.createElement('div');
+            sectionTitle.id = `ctrl-title-${groupKey}`;
+            sectionTitle.className = 'build-category-title';
+            sectionTitle.style.marginTop = "20px";
+            sectionTitle.innerHTML = `${group.title} <span class="toggle-arrow">▼</span>`;
             
-            const energyCell = row.querySelector('.p-energy');
-            if (isProducer) {
-                energyCell.innerHTML = `<span style="color:#2ecc71">+${formatNumber(energyVal)}</span>`;
-            } else {
-                energyCell.innerHTML = `<span style="color:#e74c3c">-${formatNumber(energyVal)}</span>`;
-            }
-        }
-    });
+            sectionGrid = document.createElement('div');
+            sectionGrid.id = `ctrl-grid-${groupKey}`;
+            sectionGrid.className = 'sub-build-grid'; // 기존 4열 그리드 스타일 재활용
 
-    // 제거된 건물의 행 삭제
-    Array.from(tbody.children).forEach(row => {
-        const id = parseInt(row.id.replace('pwr-row-', ''));
-        if (!currentBuildingIds.has(id)) row.remove();
-    });
+            sectionTitle.onclick = () => {
+                sectionTitle.classList.toggle('collapsed');
+                sectionGrid.classList.toggle('collapsed-content');
+            };
+
+            container.appendChild(sectionTitle);
+            container.appendChild(sectionGrid);
+        }
+
+        // 4. 섹션 내부 건물 조절 카드 생성
+        ownedBuildings.forEach(b => {
+            let ctrlCard = document.getElementById(`ctrl-card-${b.id}`);
+            if (!ctrlCard) {
+                ctrlCard = document.createElement('div');
+                ctrlCard.id = `ctrl-card-${b.id}`;
+                ctrlCard.className = 'shop-item'; // 기존 버튼 스타일 재활용
+                ctrlCard.style.cursor = "default"; // 클릭해서 사는게 아니므로
+                sectionGrid.appendChild(ctrlCard);
+            }
+
+            // 실시간 가동 효율 계산
+            const speedMult = Logic.getBuildingMultiplier(b.id);
+            const isOn = b.activeCount > 0;
+            
+            // 건물 정보 요약 (생산품 표시)
+            const mainOutput = b.outputs ? Object.keys(b.outputs)[0] : "작업";
+            const outputVal = b.outputs ? b.outputs[mainOutput] * b.activeCount * speedMult : 0;
+            const energyInfo = b.inputs?.energy 
+                ? `<span style="color:#e74c3c">-${formatNumber(b.inputs.energy * b.activeCount * speedMult)}MW</span>` 
+                : (b.outputs?.energy ? `<span style="color:#2ecc71">+${formatNumber(energyVal)}MW</span>` : "");
+
+            ctrlCard.style.opacity = isOn ? "1" : "0.5";
+            ctrlCard.innerHTML = `
+                <span class="si-name" style="font-size:0.8rem;">${b.name}</span>
+                <span class="si-level" style="font-size:0.7rem; color:#8892b0;">${b.activeCount}/${b.count} 가동</span>
+                <div class="si-desc" style="bottom:35px;">
+                    ${isOn ? `<span style="color:#2ecc71">▲ ${formatNumber(outputVal)}${getResNameOnly(mainOutput)}</span>` : "가동 중지"}
+                    ${energyInfo}
+                </div>
+                <div class="si-cost" style="bottom:8px; left:12px; right:12px; display:flex; gap:3px;">
+                    <button onclick="adjustActiveCount(${b.id}, -10)" style="flex:1; background:#444; color:#fff; border:none; border-radius:3px; cursor:pointer; padding:3px 0;">--</button>
+                    <button onclick="adjustActiveCount(${b.id}, -1)" style="flex:1; background:#e74c3c; color:#fff; border:none; border-radius:3px; cursor:pointer; font-weight:bold;">-</button>
+                    <button onclick="adjustActiveCount(${b.id}, 1)" style="flex:1; background:#2ecc71; color:#fff; border:none; border-radius:3px; cursor:pointer; font-weight:bold;">+</button>
+                    <button onclick="adjustActiveCount(${b.id}, 10)" style="flex:1; background:#444; color:#fff; border:none; border-radius:3px; cursor:pointer; padding:3px 0;">++</button>
+                </div>
+            `;
+        });
+    }
 }
 
 export function renderResearchTab() {
@@ -479,7 +460,8 @@ function createResearchElement(r, isDone) {
                 renderResearchTab(); // 다시 그려서 완료 목록으로 이동
                 renderShop(cachedBuyCallback, Logic.getBuildingCost);
             } else {
-                log("연구 자원이 부족합니다.");
+                const missingNames = result.missing.map(key => getResNameOnly(key)).join(', ');
+                log(`❌ 연구 불가 (부족: ${missingNames})`);
             }
         };
     }

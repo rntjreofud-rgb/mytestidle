@@ -200,68 +200,89 @@ export function manualGather(type) {
 
 export function tryBuyResearch(id) {
     if (!gameData.researches) gameData.researches = [];
-    if (gameData.researches.includes(id)) return false;
+    if (gameData.researches.includes(id)) return { success: false, missing: [] };
     
     const research = researchList.find(r => r.id === id);
-    if (!research) return false;
+    if (!research) return { success: false, missing: [] };
     
-    // 선행 연구 체크 (안전장치)
+    // 선행 연구 체크
     if (research.reqResearch && !gameData.researches.includes(research.reqResearch)) {
-        return false;
+        return { success: false, missing: ["선행 연구"] }; // 특수 케이스 처리
     }
 
+    // 부족한 자원 체크
+    let missing = [];
     const cost = research.cost;
     for (let r in cost) {
-        if ((gameData.resources[r] || 0) < cost[r]) return false;
+        if ((gameData.resources[r] || 0) < cost[r]) {
+            missing.push(r);
+        }
     }
+
+    if (missing.length > 0) return { success: false, missing: missing };
     
-    // 소모
+    // 소모 및 저장
     for (let r in cost) {
         gameData.resources[r] -= cost[r];
     }
-    
     gameData.researches.push(id);
-    return true;
+    return { success: true };
 }
 
+// 2. 건물 구매 로직 수정
 export function tryBuyBuilding(index) {
     const b = gameData.buildings[index];
     const cost = getBuildingCost(b);
     
-    // 자원 체크
+    // 부족한 자원 체크
+    let missing = [];
     for (let r in cost) {
-        if ((gameData.resources[r] || 0) < cost[r]) return false;
+        if ((gameData.resources[r] || 0) < cost[r]) {
+            missing.push(r);
+        }
     }
+
+    if (missing.length > 0) return { success: false, missing: missing };
+
     // 자원 소모
     for (let r in cost) {
         gameData.resources[r] -= cost[r];
     }
     
     b.count++;
-    // ⭐ [수정] 건물을 사면 즉시 가동 개수도 1 늘어납니다.
     b.activeCount = (b.activeCount || 0) + 1;
-    
-    // 하위 호환성 유지
     b.on = true;
 
-    return true;
+    return { success: true };
 }
 
+// 3. 집 업그레이드 로직 수정
 export function tryUpgradeHouse(nextStage) {
     const req = nextStage.req;
+    let missing = [];
+
+    // 부족한 자원 및 전력 체크
     for (let r in req) {
         if (r === 'energy') { 
-            if(gameData.resources.energy < req[r]) return false;
+            if (gameData.resources.energy < req[r]) {
+                missing.push('energy');
+            }
             continue; 
         }
-        if ((gameData.resources[r] || 0) < req[r]) return false;
+        if ((gameData.resources[r] || 0) < req[r]) {
+            missing.push(r);
+        }
     }
+
+    if (missing.length > 0) return { success: false, missing: missing };
+
+    // 실제 소모 (전력 제외)
     for (let r in req) {
         if (r === 'energy') continue;
         gameData.resources[r] -= req[r];
     }
     gameData.houseLevel++;
-    return true;
+    return { success: true };
 }
 
 export function getBuildingConsumptionMultiplier(buildingId) {
