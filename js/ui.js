@@ -253,13 +253,12 @@ function updatePowerUI() {
     const prod = gameData.resources.energy || 0;
     const req = gameData.resources.energyMax || 0;
     
-    // 1. 상단 요약 텍스트 및 바 업데이트 (기존 유지)
+    // 1. 상단 바 업데이트
     if(elements.powerDisplay) elements.powerDisplay.innerHTML = `<span style="color:#2ecc71">${formatNumber(prod)} MW</span> 생산 / <span style="color:#e74c3c">${formatNumber(req)} MW</span> 소비`;
     
     if(elements.powerBar) {
         let percent = req > 0 ? (prod / req) * 100 : 100;
         elements.powerBar.style.width = `${Math.min(100, percent)}%`;
-        
         if (prod < req) {
             elements.powerBar.classList.add('power-low');
             elements.powerBar.style.backgroundColor = '#e74c3c';
@@ -269,17 +268,16 @@ function updatePowerUI() {
         }
     }
 
-    // 2. 상세 내역 렌더링 (4열로 확장)
+    // 2. 상세 내역 렌더링 (토글 스위치 적용)
     const container = document.getElementById('power-breakdown-container');
     if (!container) return;
 
-    // ⭐ [수정] 헤더에 '개수' 컬럼 부활
     let html = `<table style="width:100%; border-collapse: collapse; font-size: 0.85rem;">
                 <tr style="border-bottom: 1px solid #444; color: #8892b0;">
                     <th style="text-align:left; padding: 5px;">건물명</th>
                     <th style="text-align:right; padding: 5px;">개수</th>
-                    <th style="text-align:center; padding: 5px;">상태</th>
-                    <th style="text-align:right; padding: 5px;">에너지 (MW)</th>
+                    <th style="text-align:center; padding: 5px;">전원</th> <!-- 제목 변경 -->
+                    <th style="text-align:right; padding: 5px;">에너지</th>
                 </tr>`;
 
     gameData.buildings.forEach(b => {
@@ -296,32 +294,34 @@ function updatePowerUI() {
             let energyTxt = "";
             let rowStyle = "";
             
+            // 전원이 꺼져있으면 텍스트 흐리게
             if (!b.on) {
-                energyTxt = `<span style="color:#7f8c8d;">OFF</span>`;
-                rowStyle = "opacity: 0.5;";
+                energyTxt = `<span style="color:#7f8c8d;">0 MW</span>`;
+                rowStyle = "opacity: 0.5; filter: grayscale(1);"; 
             } else {
                 if (isProducer) {
                     const totalProd = b.outputs.energy * b.count * speedMult;
-                    energyTxt = `<span style="color:#2ecc71">+${formatNumber(totalProd)}</span>`;
+                    energyTxt = `<span style="color:#2ecc71">+${formatNumber(totalProd)} MW</span>`;
                 } else {
                     const totalCons = b.inputs.energy * consMult * energyEff * b.count * speedMult;
-                    energyTxt = `<span style="color:#e74c3c">-${formatNumber(totalCons)}</span>`;
+                    energyTxt = `<span style="color:#e74c3c">-${formatNumber(totalCons)} MW</span>`;
                 }
             }
 
-            const btnColor = b.on ? "#2ecc71" : "#95a5a6";
-            const btnText = b.on ? "ON" : "OFF";
-            
-            // ⭐ [수정] 4개의 td로 데이터 분리 (건물명 | 개수 | 버튼 | 에너지)
-            html += `<tr style="${rowStyle} border-bottom: 1px solid rgba(255,255,255,0.05);">
+            // ⭐ [핵심] 토글 스위치 HTML 생성
+            // onchange 이벤트로 window.toggleBuildingPower 호출
+            const checked = b.on ? 'checked' : '';
+            const toggleHtml = `
+                <label class="switch">
+                    <input type="checkbox" ${checked} onchange="window.toggleBuildingPower(${b.id})">
+                    <span class="slider"></span>
+                </label>
+            `;
+
+            html += `<tr style="${rowStyle} border-bottom: 1px solid rgba(255,255,255,0.05); transition: opacity 0.3s;">
                 <td style="padding: 5px;">${b.name}</td>
                 <td style="text-align:right; padding: 5px; font-weight:bold;">${formatNumber(b.count)}</td>
-                <td style="text-align:center; padding: 5px;">
-                    <button onclick="window.toggleBuildingPower(${b.id})" 
-                            style="background:${btnColor}; color:#fff; border:none; border-radius:3px; cursor:pointer; font-size:0.7rem; padding:2px 6px;">
-                        ${btnText}
-                    </button>
-                </td>
+                <td style="text-align:center; padding: 5px;">${toggleHtml}</td>
                 <td style="text-align:right; padding: 5px;">${energyTxt}</td>
             </tr>`;
         }
@@ -329,6 +329,7 @@ function updatePowerUI() {
 
     html += `</table>`;
     
+    // 테이블 갱신 (토글 작동 시 깜빡임 방지를 위해 내용이 다를 때만 갱신)
     if (container.innerHTML !== html) {
         container.innerHTML = html;
     }

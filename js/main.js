@@ -8,32 +8,28 @@ import * as Storage from './save.js';
 window.gameData = gameData;
 
 function init() {
+    // ⭐ [핵심 수정] HTML의 토글 스위치가 이 함수를 찾을 수 있게 강제로 등록
     window.toggleBuildingPower = function(id) {
         const building = gameData.buildings.find(b => b.id === id);
         if (building) {
-            // 1. 상태 변경
+            // 상태 반전
             building.on = !building.on;
             
-            // 2. 화면 및 로직 즉시 갱신
+            // 화면 갱신 & 로직 재계산
             UI.updateScreen(Logic.calculateNetMPS());
             
-            // 3. 로그 출력 (이제 F12 콘솔에 보일 겁니다)
-            console.log(`[시스템] ${building.name} 전원 ${building.on ? '켜짐(ON)' : '꺼짐(OFF)'}`);
-        } else {
-            console.error(`ID ${id}번 건물을 찾을 수 없습니다.`);
+            console.log(`[스위치 조작] ${building.name}: ${building.on ? 'ON' : 'OFF'}`);
         }
     };
 
-
+    // 기존 초기화 로직들
     Storage.loadGame();
-    //window.UI = UI; 
     setupEvents();
-    
-    // UI 초기화 (handleBuyBuilding 함수 참조를 UI 모듈에 넘겨줍니다)
     UI.renderShop(handleBuyBuilding, Logic.getBuildingCost);
     UI.updateHouseUI(handleHouseUpgrade);
-    
     UI.log("시스템 로드 완료. Escape Earth 가동 시작.");
+    
+    // 게임 루프 시작
     requestAnimationFrame(gameLoop);
     setInterval(() => Storage.saveGame(), 10000);
 }

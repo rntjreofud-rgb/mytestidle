@@ -27,8 +27,51 @@ body {
     display: flex; overflow: hidden;
     font-size: 13px;
 }
+/* === 토글 스위치 === */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 20px;
+  vertical-align: middle;
+}
 
+.switch input { 
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
 
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: #95a5a6; /* 꺼졌을 때 회색 */
+  transition: .4s;
+  border-radius: 20px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 2px;
+  bottom: 2px;
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
+}
+
+/* 켜졌을 때 (초록색) */
+input:checked + .slider {
+  background-color: #2ecc71;
+}
+
+/* 켜졌을 때 동그라미 이동 */
+input:checked + .slider:before {
+  transform: translateX(20px);
+}
 /* === 사이드바 === */
 .sidebar {
     width: 200px;
