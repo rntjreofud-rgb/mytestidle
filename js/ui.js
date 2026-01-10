@@ -3,18 +3,28 @@
 import { gameData, houseStages, researchList } from './data.js';
 import * as Logic from './logic.js';
 
+// 내부에서 구매 콜백 함수를 기억하기 위한 변수
+let cachedBuyCallback = null;
+
 window.toggleBuildingPower = function(id) {
+    // 1. 해당 건물 찾기
     const building = gameData.buildings.find(b => b.id === id);
+    
     if (building) {
-        building.on = !building.on; // 상태 반전 (true <-> false)
-        // 화면 갱신 (로직 재계산 포함)
-        UI.updateScreen(Logic.calculateNetMPS()); 
+        // 2. 상태 토글 (켜져있으면 끄고, 꺼져있으면 켬)
+        // (undefined일 경우를 대비해 확실하게 true/false 처리)
+        building.on = (building.on === undefined) ? false : !building.on;
+        
+        // 3. 화면 갱신 (중요: UI.updateScreen이 아니라 그냥 updateScreen 호출)
+        const netMPS = Logic.calculateNetMPS();
+        updateScreen(netMPS); 
+        
+        console.log(`건물 ID ${id} 전원 상태 변경: ${building.on ? 'ON' : 'OFF'}`);
+    } else {
+        console.error("건물을 찾을 수 없습니다. ID:", id);
     }
 };
 
-
-// 내부에서 구매 콜백 함수를 기억하기 위한 변수
-let cachedBuyCallback = null;
 
 const elements = {
     viewDashboard: document.getElementById('view-dashboard'),
