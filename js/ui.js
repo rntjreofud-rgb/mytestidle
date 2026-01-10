@@ -232,7 +232,7 @@ function updatePowerUI() {
     const prod = gameData.resources.energy || 0;
     const req = gameData.resources.energyMax || 0;
     
-    // 1. 상단 바 업데이트
+    // 1. 상단 바 업데이트 (기존 로직)
     if(elements.powerDisplay) elements.powerDisplay.innerHTML = `<span style="color:#2ecc71">${formatNumber(prod)} MW</span> 생산 / <span style="color:#e74c3c">${formatNumber(req)} MW</span> 소비`;
     
     if(elements.powerBar) {
@@ -273,11 +273,11 @@ function updatePowerUI() {
             let energyTxt = "";
             let rowStyle = "";
             
+            // 전원이 꺼져있으면(false) 흐리게 표시
             if (b.on === false) {
-            energyTxt = `<span style="color:#7f8c8d;">0 MW</span>`;
-            rowStyle = "opacity: 0.5; filter: grayscale(1);"; 
+                energyTxt = `<span style="color:#7f8c8d;">0 MW</span>`;
+                rowStyle = "opacity: 0.5; filter: grayscale(1);"; 
             } else {
-            // 켜져 있는 경우 (true 또는 undefined)
                 if (isProducer) {
                     const totalProd = b.outputs.energy * b.count * speedMult;
                     energyTxt = `<span style="color:#2ecc71">+${formatNumber(totalProd)} MW</span>`;
@@ -287,20 +287,18 @@ function updatePowerUI() {
                 }
             }
 
-            // ⭐ [핵심 수정] 
-            // 1. input의 이벤트를 없애고 pointer-events: none 처리
-            // 2. 감싸고 있는 label(또는 div)에 onclick 이벤트를 부여
-            // 3. event.preventDefault()로 브라우저의 기본 동작(체크박스 자동 변경)을 막고 데이터만 변경
-            const checked = (b.on !== false) ? 'checked' : '';
-        
+            // ⭐ [핵심 1] HTML에는 onclick을 아예 뺍니다. data-id만 남깁니다.
+            // b.on이 false가 아니면(undefined 포함) 체크된 상태로 렌더링
+            const isChecked = (b.on !== false) ? 'checked' : '';
+            
             const toggleHtml = `
                 <label class="switch">
-                    <input type="checkbox" ${checked} class="power-toggle-input" data-id="${b.id}">
+                    <input type="checkbox" class="real-power-toggle" data-id="${b.id}" ${isChecked}>
                     <span class="slider"></span>
                 </label>
             `;
 
-            html += `<tr style="${rowStyle} border-bottom: 1px solid rgba(255,255,255,0.05); transition: opacity 0.3s;">
+            html += `<tr style="${rowStyle} border-bottom: 1px solid rgba(255,255,255,0.05);">
                 <td style="padding: 5px;">${b.name}</td>
                 <td style="text-align:right; padding: 5px; font-weight:bold;">${formatNumber(b.count)}</td>
                 <td style="text-align:center; padding: 5px;">${toggleHtml}</td>
@@ -311,9 +309,29 @@ function updatePowerUI() {
 
     html += `</table>`;
     
-    if (container.innerHTML !== html) {
-        container.innerHTML = html;
-    }
+    // HTML을 먼저 집어넣습니다.
+    container.innerHTML = html;
+
+    // ⭐ [핵심 2] HTML이 그려진 직후에, 자바스크립트로 직접 이벤트를 붙입니다.
+    // 이러면 연결이 끊길 일이 절대 없습니다.
+    const toggles = container.querySelectorAll('.real-power-toggle');
+    toggles.forEach(toggle => {
+        toggle.addEventListener('change', (e) => {
+            const id = parseInt(e.target.dataset.id);
+            const building = gameData.buildings.find(b => b.id === id);
+            
+            if (building) {
+                // 상태 변경 (체크되면 켜짐, 해제되면 꺼짐)
+                building.on = e.target.checked;
+                
+                console.log(`스위치 변경: ${building.name} -> ${building.on}`);
+                
+                // 로직 재계산 및 화면 갱신 (자기 자신 재호출)
+                const netMPS = Logic.calculateNetMPS();
+                updateScreen(netMPS);
+            }
+        });
+    });
 }
 
 export function renderResearchTab() {
