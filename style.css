@@ -200,10 +200,11 @@ header h2 { margin: 0; font-size: 1rem; color: #fff; }
 }
 .sub-build-grid {
     display: grid;
-    /* PC 기준 3~4열 배치 */
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    /* PC: 무조건 4열로 나누기 */
+    grid-template-columns: repeat(4, 1fr); 
     gap: 10px;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
+    width: 100%;
 }
 
 /* 개별 연구 아이템 */
@@ -399,7 +400,9 @@ header h2 { margin: 0; font-size: 1rem; color: #fff; }
     margin-bottom: 20px;
     width: 100%;
 }
-
+.sub-build-grid {
+        grid-template-columns: repeat(2, 1fr); /* 2열로 조정해서 가독성 유지 */
+    }
 
 /* 4. 내부 텍스트 간격 조정 */
 .res-header { margin-bottom: 0; }
@@ -505,7 +508,11 @@ header h2 { margin: 0; font-size: 1rem; color: #fff; }
         position: relative;
     }
 
-
+    .sub-build-grid {
+        /* 모바일: 무조건 1열로 세우기 */
+        grid-template-columns: 1fr !important; 
+        gap: 8px;
+    }
 
 
     /* 자원 카테고리 제목 */
