@@ -273,10 +273,11 @@ function updatePowerUI() {
             let energyTxt = "";
             let rowStyle = "";
             
-            if (!b.on) {
-                energyTxt = `<span style="color:#7f8c8d;">0 MW</span>`;
-                rowStyle = "opacity: 0.5; filter: grayscale(1);"; 
+            if (b.on === false) {
+            energyTxt = `<span style="color:#7f8c8d;">0 MW</span>`;
+            rowStyle = "opacity: 0.5; filter: grayscale(1);"; 
             } else {
+            // 켜져 있는 경우 (true 또는 undefined)
                 if (isProducer) {
                     const totalProd = b.outputs.energy * b.count * speedMult;
                     energyTxt = `<span style="color:#2ecc71">+${formatNumber(totalProd)} MW</span>`;
@@ -290,12 +291,13 @@ function updatePowerUI() {
             // 1. input의 이벤트를 없애고 pointer-events: none 처리
             // 2. 감싸고 있는 label(또는 div)에 onclick 이벤트를 부여
             // 3. event.preventDefault()로 브라우저의 기본 동작(체크박스 자동 변경)을 막고 데이터만 변경
-            const checked = b.on ? 'checked' : '';
+            const checked = (b.on !== false) ? 'checked' : '';
+        
             const toggleHtml = `
-            <label class="switch">
-                <input type="checkbox" ${checked} class="power-toggle-input" data-id="${b.id}">
-                <span class="slider"></span>
-            </label>
+                <label class="switch">
+                    <input type="checkbox" ${checked} class="power-toggle-input" data-id="${b.id}">
+                    <span class="slider"></span>
+                </label>
             `;
 
             html += `<tr style="${rowStyle} border-bottom: 1px solid rgba(255,255,255,0.05); transition: opacity 0.3s;">
