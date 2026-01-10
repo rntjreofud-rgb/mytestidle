@@ -73,8 +73,11 @@ header { background-color: var(--bg-panel); border-bottom: 1px solid var(--borde
 
 /* 업그레이드 버튼 */
 #upgrade-btn { width: 100%; height: 95px !important; background-color: var(--accent-green) !important; color: #fff; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 0 rgba(0,0,0,0.2); transition: 0.1s; display: flex; align-items: center; justify-content: center; text-align: center; word-break: keep-all; } 
-#upgrade-btn:hover { filter: brightness(1.1); transform: translateY(-2px); } #upgrade-btn:active { transform: translateY(2px); box-shadow: none; } 
+#upgrade-btn:hover { filter: brightness(1.1); transform: translateY(-2px); } 
+#upgrade-btn:active { transform: translateY(2px); box-shadow: none; } 
 #upgrade-btn:disabled { background-color: #333 !important; color: #555 !important; cursor: not-allowed; box-shadow: none; transform: none; }
+
+
 
 
 /* =================================================================
@@ -102,6 +105,22 @@ header { background-color: var(--bg-panel); border-bottom: 1px solid var(--borde
 .res-card.nanobots::after { background-color: #686de0; } .res-card.aiCore::after { background-color: #a29bfe; }
 .res-card.rocketFuel::after { background-color: #ff793f; } .res-card.advAlloy::after { background-color: #485460; }
 .res-card.warpCore::after { background-color: #be2edd; }
+
+/* 슬림 모드 전환 버튼 */
+.btn-size-toggle { font-size: 0.7rem; color: #556; cursor: pointer; margin-right: 10px; padding: 2px 5px; border: 1px solid #333; border-radius: 3px; }
+.btn-size-toggle:hover { color: var(--accent-blue); border-color: var(--accent-blue); }
+
+/* ⭐ 슬림 모드 카드 레이아웃 */
+.sub-res-grid.slim-mode { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)) !important; gap: 5px !important; }
+.sub-res-grid.slim-mode .res-card { min-height: 35px !important; height: 35px !important; padding: 0 10px !important; flex-direction: row !important; align-items: center !important; justify-content: space-between !important; }
+.sub-res-grid.slim-mode .res-card::after { position: absolute; left: 0; top: 0; width: 3px !important; height: 100% !important; margin: 0 !important; border-radius: 0; }
+.sub-res-grid.slim-mode .res-header { margin: 0 !important; }
+.sub-res-grid.slim-mode .res-body { flex-direction: row !important; align-items: center; gap: 8px; }
+.sub-res-grid.slim-mode .res-body span { display: none; } /* '보유' 글자 숨김 */
+.sub-res-grid.slim-mode .res-amount { font-size: 0.95rem !important; margin: 0 !important; }
+.sub-res-grid.slim-mode .res-footer { margin: 0 !important; }
+.sub-res-grid.slim-mode .res-mps { font-size: 0.7rem !important; }
+
 
 /* =================================================================
    6. 카테고리 접기 & 연구소 & 시스템 (Collapsible & Others)

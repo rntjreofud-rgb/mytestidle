@@ -92,20 +92,35 @@ function initResourceGrid() {
     elements.resGrid.style.display = "block";
 
     for (const [key, group] of Object.entries(resourceGroups)) {
-        const title = document.createElement('div');
-        title.className = 'res-category-title';
-        title.innerHTML = `${group.title} <span class="toggle-arrow">▼</span>`;
+        const titleContainer = document.createElement('div');
+        titleContainer.className = 'res-category-title';
+        
+        // 제목 텍스트와 버튼 영역 분리
+        titleContainer.innerHTML = `
+            <span>${group.title} <span class="toggle-arrow">▼</span></span>
+            <div class="title-ctrls">
+                <span class="btn-size-toggle" data-key="${key}">슬림</span>
+            </div>
+        `;
         
         const container = document.createElement('div');
-        container.className = 'sub-res-grid'; // CSS와 이름 일치 확인
+        container.className = 'sub-res-grid';
         container.id = `grid-group-${key}`;
 
-        title.onclick = () => {
-            title.classList.toggle('collapsed');
+        // 1. 접기/펴기 (텍스트 클릭 시)
+        titleContainer.querySelector('span').onclick = (e) => {
+            titleContainer.classList.toggle('collapsed');
             container.classList.toggle('collapsed-content');
         };
 
-        elements.resGrid.appendChild(title);
+        // 2. 슬림 모드 토글 (버튼 클릭 시)
+        titleContainer.querySelector('.btn-size-toggle').onclick = (e) => {
+            e.stopPropagation(); // 접기 이벤트 방지
+            container.classList.toggle('slim-mode');
+            e.target.innerText = container.classList.contains('slim-mode') ? "기본" : "슬림";
+        };
+
+        elements.resGrid.appendChild(titleContainer);
         elements.resGrid.appendChild(container);
     }
     isGridInitialized = true;
