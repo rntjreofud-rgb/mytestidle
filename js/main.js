@@ -5,6 +5,8 @@ import * as UI from './ui.js';
 import * as Logic from './logic.js';
 import * as Storage from './save.js';
 
+window.gameData = gameData;
+
 function init() {
     Storage.loadGame();
     window.UI = UI; 

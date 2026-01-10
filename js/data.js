@@ -287,6 +287,7 @@ export const houseStages = [
 ];
 
 export function setGameData(newData) {
+    // 1. 자원 데이터 동기화 (세이브에 없는 신규 자원은 0으로 초기화하여 에러 방지)
     for (let key in gameData.resources) {
         if (newData.resources && newData.resources[key] !== undefined) {
             gameData.resources[key] = newData.resources[key];
@@ -294,23 +295,29 @@ export function setGameData(newData) {
             gameData.resources[key] = 0;
         }
     }
+
+    // 2. 기본 게임 상태 로드
     gameData.houseLevel = newData.houseLevel || 0;
     gameData.researches = newData.researches || [];
-    // ⭐ 세이브 파일에서 해금 목록 불러오기 (없으면 기본값)
     gameData.unlockedResources = newData.unlockedResources || ['wood', 'stone', 'plank'];
 
+    // 3. 건물 데이터 동기화
     if (newData.buildings) {
         newData.buildings.forEach((savedB) => {
+            // ID를 기준으로 현재 데이터와 세이브 데이터를 매칭
             const currentB = gameData.buildings.find(b => b.id === savedB.id);
             if (currentB) {
                 currentB.count = savedB.count;
-                // ⭐ 추가: 저장된 전원 상태가 있으면 가져오고, 없으면 true(켜짐)
+                
+                // ⭐ 저장된 전원 상태(on)가 있으면 불러오고, 없으면 true(켜짐)로 설정
                 currentB.on = (savedB.on !== undefined) ? savedB.on : true;
             }
         });
     }
+
+    // 4. 안전장치: 모든 건물을 순회하며 on 속성이 없으면 강제로 켜짐 처리
+    // (신규 추가된 건물이나 구버전 세이브 호환용)
     gameData.buildings.forEach(b => {
         if (b.on === undefined) b.on = true;
     });
-    
 }
