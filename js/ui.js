@@ -293,7 +293,7 @@ function updatePowerUI() {
     const percent = req > 0 ? (prod / req) * 100 : 100;
     const powerColor = (prod >= req) ? '#2ecc71' : '#e74c3c';
 
-    // 1. 상단 전력 요약 바 업데이트
+    // 1. 상단 바 업데이트 (기존 유지)
     if(elements.powerDisplay) elements.powerDisplay.innerHTML = `<span style="color:#2ecc71">${formatNumber(prod)} MW</span> 생산 / <span style="color:#e74c3c">${formatNumber(req)} MW</span> 소비`;
     if(elements.powerBar) {
         elements.powerBar.style.width = `${Math.min(100, percent)}%`;
@@ -301,8 +301,7 @@ function updatePowerUI() {
         if (prod < req) elements.powerBar.classList.add('power-low');
         else elements.powerBar.classList.remove('power-low');
     }
-
-    // 대시보드 전력바 연동
+    // 대시보드 연동
     if (elements.dashPowerPanel && gameData.houseLevel >= 5) {
         elements.dashPowerPanel.classList.remove('hidden');
         elements.dashPowerText.innerHTML = `<span style="color:#2ecc71">${formatNumber(prod)}</span> / <span style="color:#e74c3c">${formatNumber(req)} MW</span>`;
@@ -310,19 +309,21 @@ function updatePowerUI() {
         elements.dashPowerFill.style.backgroundColor = powerColor;
     }
 
-    // 2. 생산 제어 센터 컨테이너 정리
     const container = document.getElementById('power-breakdown-container');
     if (!container) return;
-    
-    if (!container.dataset.initialized) {
-        container.innerHTML = ""; 
-        container.dataset.initialized = "true";
-    }
+    if (!container.dataset.initialized) { container.innerHTML = ""; container.dataset.initialized = "true"; }
 
-    // 3. 모든 카테고리를 순회하며 보유한 건물을 조절 카드로 생성
+    // 2. 카테고리별 루프
     for (const [groupKey, group] of Object.entries(buildingGroups)) {
         const ownedBuildings = gameData.buildings.filter(b => group.ids.includes(b.id) && b.count > 0);
-        if (ownedBuildings.length === 0) continue;
+        if (ownedBuildings.length === 0) {
+            // 건물이 하나도 없으면 섹션 숨기기
+            const oldTitle = document.getElementById(`ctrl-title-${groupKey}`);
+            const oldGrid = document.getElementById(`ctrl-grid-${groupKey}`);
+            if(oldTitle) oldTitle.style.display = "none";
+            if(oldGrid) oldGrid.style.display = "none";
+            continue;
+        }
 
         let sectionTitle = document.getElementById(`ctrl-title-${groupKey}`);
         let sectionGrid = document.getElementById(`ctrl-grid-${groupKey}`);
@@ -332,79 +333,70 @@ function updatePowerUI() {
             sectionTitle.id = `ctrl-title-${groupKey}`;
             sectionTitle.className = 'build-category-title';
             sectionTitle.innerHTML = `${group.title} <span class="toggle-arrow">▼</span>`;
-            
             sectionGrid = document.createElement('div');
             sectionGrid.id = `ctrl-grid-${groupKey}`;
             sectionGrid.className = 'sub-build-grid';
-
-            sectionTitle.onclick = () => {
-                sectionTitle.classList.toggle('collapsed');
-                sectionGrid.classList.toggle('collapsed-content');
-            };
-
+            sectionTitle.onclick = () => { sectionTitle.classList.toggle('collapsed'); sectionGrid.classList.toggle('collapsed-content'); };
             container.appendChild(sectionTitle);
             container.appendChild(sectionGrid);
         }
+        sectionTitle.style.display = "flex";
+        sectionGrid.style.display = "grid";
 
+        // 3. 개별 건물 카드 루프
         ownedBuildings.forEach(b => {
             let ctrlCard = document.getElementById(`ctrl-card-${b.id}`);
             if (!ctrlCard) {
+                // ⭐ [핵심] 카드를 처음 만들 때만 버튼과 기본 구조를 생성
                 ctrlCard = document.createElement('div');
                 ctrlCard.id = `ctrl-card-${b.id}`;
                 ctrlCard.className = 'shop-item';
                 ctrlCard.style.cursor = "default";
+                ctrlCard.innerHTML = `
+                    <span class="si-name" style="font-size:0.8rem;"></span>
+                    <span class="si-level" style="font-size:0.7rem; color:#ffd700;"></span>
+                    <div class="si-desc" style="bottom:38px;"></div>
+                    <div class="si-cost" style="bottom:8px; left:12px; right:12px; display:flex; gap:3px;">
+                        <button class="b-adj" data-v="-10" style="flex:1; background:#444; color:#fff; border:none; border-radius:3px; cursor:pointer; padding:3px 0;">--</button>
+                        <button class="b-adj" data-v="-1" style="flex:1; background:#e74c3c; color:#fff; border:none; border-radius:3px; cursor:pointer; font-weight:bold;">-</button>
+                        <button class="b-adj" data-v="1" style="flex:1; background:#2ecc71; color:#fff; border:none; border-radius:3px; cursor:pointer; font-weight:bold;">+</button>
+                        <button class="b-adj" data-v="10" style="flex:1; background:#444; color:#fff; border:none; border-radius:3px; cursor:pointer; padding:3px 0;">++</button>
+                    </div>
+                `;
+                // 버튼에 이벤트 직접 연결 (innerHTML 덮어쓰기 방지)
+                ctrlCard.querySelectorAll('.b-adj').forEach(btn => {
+                    btn.onclick = (e) => {
+                        e.stopPropagation();
+                        window.adjustActiveCount(b.id, parseInt(btn.dataset.v));
+                    };
+                });
                 sectionGrid.appendChild(ctrlCard);
             }
 
-            // 실시간 배수 계산
+            // 4. ⭐ [핵심] 변하는 값(텍스트)만 업데이트 (버튼은 건드리지 않음)
             const speedMult = Logic.getBuildingMultiplier(b.id);
             const consMult = Logic.getBuildingConsumptionMultiplier(b.id);
             const energyEff = Logic.getEnergyEfficiencyMultiplier(b.id);
-            
-            const isProducer = b.outputs && b.outputs.energy;
-            const isConsumer = b.inputs && b.inputs.energy;
             const isOn = b.activeCount > 0;
 
-            // 에너지 값 계산 (에러 방지를 위해 변수 선언 확실히 함)
-            let currentEnergyImpact = 0;
-            if (isProducer) {
-                currentEnergyImpact = b.outputs.energy * b.activeCount * speedMult;
-            } else if (isConsumer) {
-                currentEnergyImpact = b.inputs.energy * b.activeCount * speedMult * consMult * energyEff;
-            }
+            let energyImpact = 0;
+            if (b.outputs && b.outputs.energy) energyImpact = b.outputs.energy * b.activeCount * speedMult;
+            else if (b.inputs && b.inputs.energy) energyImpact = b.inputs.energy * b.activeCount * speedMult * consMult * energyEff;
 
-            // 생산 자원 정보 표시 (첫 번째 생산물 기준)
-            let prodInfo = "가동 중지";
+            let prodText = "가동 중지";
             if (isOn && b.outputs) {
-                const firstRes = Object.keys(b.outputs).find(k => k !== 'energy');
-                if (firstRes) {
-                    const amount = b.outputs[firstRes] * b.activeCount * speedMult;
-                    prodInfo = `<span style="color:#2ecc71">▲ ${formatNumber(amount)}${getResNameOnly(firstRes)}/s</span>`;
-                }
+                const resKey = Object.keys(b.outputs).find(k => k !== 'energy');
+                if (resKey) prodText = `<span style="color:#2ecc71">▲ ${formatNumber(b.outputs[resKey] * b.activeCount * speedMult)}${getResNameOnly(resKey)}/s</span>`;
             }
 
-            // 에너지 정보 텍스트 생성
-            let energyInfoText = "";
-            if (isProducer) {
-                energyInfoText = `<span style="color:#2ecc71">+${formatNumber(currentEnergyImpact)}MW</span>`;
-            } else if (isConsumer) {
-                energyInfoText = `<span style="color:#e74c3c">-${formatNumber(currentEnergyImpact)}MW</span>`;
-            }
+            let energyText = "";
+            if (b.outputs && b.outputs.energy) energyText = `<span style="color:#2ecc71">+${formatNumber(energyImpact)}MW</span>`;
+            else if (b.inputs && b.inputs.energy) energyText = `<span style="color:#e74c3c">-${formatNumber(energyImpact)}MW</span>`;
 
             ctrlCard.style.opacity = isOn ? "1" : "0.5";
-            ctrlCard.innerHTML = `
-                <span class="si-name" style="font-size:0.8rem;">${b.name}</span>
-                <span class="si-level" style="font-size:0.7rem; color:#ffd700;">${b.activeCount}/${b.count} 가동</span>
-                <div class="si-desc" style="bottom:38px;">
-                    ${prodInfo}<br>${energyInfoText}
-                </div>
-                <div class="si-cost" style="bottom:8px; left:12px; right:12px; display:flex; gap:3px;">
-                    <button onclick="adjustActiveCount(${b.id}, -10)" style="flex:1; background:#444; color:#fff; border:none; border-radius:3px; cursor:pointer; padding:3px 0;">--</button>
-                    <button onclick="adjustActiveCount(${b.id}, -1)" style="flex:1; background:#e74c3c; color:#fff; border:none; border-radius:3px; cursor:pointer; font-weight:bold;">-</button>
-                    <button onclick="adjustActiveCount(${b.id}, 1)" style="flex:1; background:#2ecc71; color:#fff; border:none; border-radius:3px; cursor:pointer; font-weight:bold;">+</button>
-                    <button onclick="adjustActiveCount(${b.id}, 10)" style="flex:1; background:#444; color:#fff; border:none; border-radius:3px; cursor:pointer; padding:3px 0;">++</button>
-                </div>
-            `;
+            ctrlCard.querySelector('.si-name').innerText = b.name;
+            ctrlCard.querySelector('.si-level').innerText = `${b.activeCount}/${b.count} 가동`;
+            ctrlCard.querySelector('.si-desc').innerHTML = `${prodText}<br>${energyText}`;
         });
     }
 }
