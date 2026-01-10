@@ -232,7 +232,7 @@ function updatePowerUI() {
     const prod = gameData.resources.energy || 0;
     const req = gameData.resources.energyMax || 0;
     
-    // 1. 상단 바 업데이트 (기존 유지)
+    // 1. 상단 바 업데이트
     if(elements.powerDisplay) elements.powerDisplay.innerHTML = `<span style="color:#2ecc71">${formatNumber(prod)} MW</span> 생산 / <span style="color:#e74c3c">${formatNumber(req)} MW</span> 소비`;
     
     if(elements.powerBar) {
@@ -251,17 +251,17 @@ function updatePowerUI() {
     const container = document.getElementById('power-breakdown-container');
     if (!container) return;
 
-    // 테이블이 없으면 기본 뼈대 생성 (최초 1회만 실행됨)
+    // 테이블 틀 생성 (최초 1회)
     let table = container.querySelector('table');
     if (!table) {
         container.innerHTML = `
-            <table style="width:100%; border-collapse: collapse; font-size: 0.85rem;">
+            <table style="width:100%; border-collapse: collapse; font-size: 0.85rem; table-layout: fixed;">
                 <thead>
                     <tr style="border-bottom: 1px solid #444; color: #8892b0;">
-                        <th style="text-align:left; padding: 5px;">건물명</th>
-                        <th style="text-align:right; padding: 5px;">개수</th>
-                        <th style="text-align:center; padding: 5px;">전원 제어</th>
-                        <th style="text-align:right; padding: 5px;">에너지</th>
+                        <th style="text-align:left; padding: 8px; width: 40%;">건물명</th>
+                        <th style="text-align:center; padding: 8px; width: 15%;">개수</th>
+                        <th style="text-align:center; padding: 8px; width: 25%;">전원 제어</th>
+                        <th style="text-align:right; padding: 8px; width: 20%;">에너지</th>
                     </tr>
                 </thead>
                 <tbody id="power-list-body"></tbody>
@@ -270,6 +270,9 @@ function updatePowerUI() {
     }
 
     const tbody = container.querySelector('#power-list-body');
+
+    // 현재 존재하는 건물 ID 목록 (청소용)
+    const currentBuildingIds = new Set();
 
     gameData.buildings.forEach(b => {
         if (b.count > 0) {
@@ -282,7 +285,9 @@ function updatePowerUI() {
 
             if (!isProducer && !isConsumer) return;
 
-            // 에너지 텍스트 계산
+            currentBuildingIds.add(b.id);
+
+            // 에너지 값 계산
             let energyVal = 0;
             let isPlus = false;
             
@@ -296,81 +301,95 @@ function updatePowerUI() {
                 }
             }
 
-            // --- 여기서부터가 핵심: 이미 있는 줄인지 확인 ---
+            // --- DOM 요소 찾기 또는 생성 ---
             let row = document.getElementById(`pwr-row-${b.id}`);
             
-            // 없으면 새로 만듦 (딱 한 번만 실행됨)
             if (!row) {
                 row = document.createElement('tr');
                 row.id = `pwr-row-${b.id}`;
                 row.style.borderBottom = "1px solid rgba(255,255,255,0.05)";
+                row.style.transition = "opacity 0.2s"; // 깜빡임 부드럽게
                 
-                // 셀 생성
+                // 셀 구조 생성
                 row.innerHTML = `
-                    <td class="p-name" style="padding: 5px;"></td>
-                    <td class="p-count" style="text-align:right; padding: 5px; font-weight:bold;"></td>
-                    <td class="p-ctrl" style="text-align:center; padding: 5px; display:flex; justify-content:center; gap:5px;"></td>
-                    <td class="p-energy" style="text-align:right; padding: 5px;"></td>
+                    <td class="p-name" style="padding: 8px; vertical-align: middle;"></td>
+                    <td class="p-count" style="text-align:center; padding: 8px; vertical-align: middle; font-weight:bold;"></td>
+                    <td class="p-ctrl" style="text-align:center; padding: 8px; vertical-align: middle;">
+                        <div style="display:inline-flex; gap:4px;"></div>
+                    </td>
+                    <td class="p-energy" style="text-align:right; padding: 8px; vertical-align: middle;"></td>
                 `;
 
-                // ⭐ 버튼 직접 생성 및 이벤트 연결 (HTML 문자열 아님!)
+                // 버튼 생성 (HTML 문자열 아님, 객체 직접 생성)
                 const btnOn = document.createElement('button');
                 btnOn.innerText = "ON";
-                btnOn.style.cssText = "padding:4px 8px; border-radius:4px; cursor:pointer; border:1px solid #555;";
-                // ⭐ 여기서 직접 함수를 연결하므로 무조건 작동함
+                btnOn.style.cssText = "padding: 4px 8px; border-radius: 4px 0 0 4px; cursor: pointer; border: 1px solid #555; font-size: 0.75rem;";
+                
+                // ⭐ [수정] UI.updateScreen -> updateScreen 으로 변경 (에러 해결)
                 btnOn.onclick = function() { 
                     b.on = true; 
-                    // 즉시 갱신하지 않아도 다음 프레임에 반영되지만, 반응성을 위해 호출
-                    UI.updateScreen(Logic.calculateNetMPS()); 
+                    updateScreen(Logic.calculateNetMPS()); 
                 };
 
                 const btnOff = document.createElement('button');
                 btnOff.innerText = "OFF";
-                btnOff.style.cssText = "padding:4px 8px; border-radius:4px; cursor:pointer; border:1px solid #555;";
+                btnOff.style.cssText = "padding: 4px 8px; border-radius: 0 4px 4px 0; cursor: pointer; border: 1px solid #555; font-size: 0.75rem; border-left: none;";
+                
+                // ⭐ [수정] UI.updateScreen -> updateScreen 으로 변경
                 btnOff.onclick = function() { 
                     b.on = false; 
-                    UI.updateScreen(Logic.calculateNetMPS()); 
+                    updateScreen(Logic.calculateNetMPS()); 
                 };
 
-                // 버튼을 셀에 넣음
-                const ctrlCell = row.querySelector('.p-ctrl');
-                ctrlCell.appendChild(btnOn);
-                ctrlCell.appendChild(btnOff);
+                // 버튼 삽입
+                const btnContainer = row.querySelector('.p-ctrl div');
+                btnContainer.appendChild(btnOn);
+                btnContainer.appendChild(btnOff);
 
-                // 버튼 참조를 row에 저장해둠 (나중에 스타일 바꾸려고)
+                // 참조 저장
                 row.btnOn = btnOn;
                 row.btnOff = btnOff;
 
                 tbody.appendChild(row);
             }
 
-            // --- 매 프레임마다 내용(텍스트, 색상)만 업데이트 ---
+            // --- 내용 업데이트 (매 프레임) ---
             
-            // 1. 이름 및 개수
-            row.querySelector('.p-name').innerHTML = `${b.name}`;
+            // 1. 텍스트
+            row.querySelector('.p-name').innerText = b.name;
             row.querySelector('.p-count').innerText = formatNumber(b.count);
 
-            // 2. 에너지 텍스트 및 투명도 처리
+            // 2. 에너지 및 투명도
             const energyCell = row.querySelector('.p-energy');
             if (b.on === false) {
                 energyCell.innerHTML = `<span style="color:#7f8c8d;">0 MW</span>`;
                 row.style.opacity = "0.5";
             } else {
                 row.style.opacity = "1";
-                if (isPlus) energyCell.innerHTML = `<span style="color:#2ecc71">+${formatNumber(energyVal)} MW</span>`;
-                else energyCell.innerHTML = `<span style="color:#e74c3c">-${formatNumber(energyVal)} MW</span>`;
+                if (isPlus) energyCell.innerHTML = `<span style="color:#2ecc71">+${formatNumber(energyVal)}</span>`;
+                else energyCell.innerHTML = `<span style="color:#e74c3c">-${formatNumber(energyVal)}</span>`;
             }
 
-            // 3. 버튼 스타일 실시간 변경
+            // 3. 버튼 스타일 (활성 상태 강조)
             const isOn = (b.on !== false);
             
-            row.btnOn.style.background = isOn ? "#2ecc71" : "#333";
-            row.btnOn.style.color = isOn ? "#fff" : "#777";
-            row.btnOn.style.borderColor = isOn ? "#27ae60" : "#555";
+            // 켜짐 버튼 스타일
+            row.btnOn.style.background = isOn ? "#2ecc71" : "#222";
+            row.btnOn.style.color = isOn ? "#fff" : "#666";
+            row.btnOn.style.fontWeight = isOn ? "bold" : "normal";
 
-            row.btnOff.style.background = !isOn ? "#e74c3c" : "#333";
-            row.btnOff.style.color = !isOn ? "#fff" : "#777";
-            row.btnOff.style.borderColor = !isOn ? "#c0392b" : "#555";
+            // 꺼짐 버튼 스타일
+            row.btnOff.style.background = !isOn ? "#e74c3c" : "#222";
+            row.btnOff.style.color = !isOn ? "#fff" : "#666";
+            row.btnOff.style.fontWeight = !isOn ? "bold" : "normal";
+        }
+    });
+
+    // 사라진 건물 행 제거 (청소)
+    Array.from(tbody.children).forEach(row => {
+        const id = parseInt(row.id.replace('pwr-row-', ''));
+        if (!currentBuildingIds.has(id)) {
+            row.remove();
         }
     });
 }
