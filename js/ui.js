@@ -442,22 +442,29 @@ export function renderResearchTab() {
         else if (isPrereqDone && isTargetVisible) availableRes.push(r);
     });
 
-    if (availableRes.length > 0) renderResearchSection("🔬 진행 가능한 연구", availableRes, false, container);
-    if (completedRes.length > 0) renderResearchSection("✅ 완료된 기술", completedRes, true, container);
+    // 섹션 생성 시 클릭 이벤트가 확실히 먹히도록 renderResearchSection 호출
+    if (availableRes.length > 0) {
+        renderResearchSection("🔬 진행 가능한 연구", availableRes, false, container);
+    }
+    if (completedRes.length > 0) {
+        renderResearchSection("✅ 완료된 기술", completedRes, true, container);
+    }
     
     updateResearchButtons();
 }
 
+// 연구 섹션(제목 + 그리드) 생성 함수
 function renderResearchSection(titleText, list, isDone, parentContainer) {
     const title = document.createElement('div');
-    title.className = 'research-section-title';
-    title.style.cursor = "pointer";
-    title.style.userSelect = "none";
+    // CSS에서 .research-section-title 에 대한 스타일이 있어야 합니다.
+    title.className = 'research-section-title'; 
     title.innerHTML = `${titleText} (${list.length}) <span class="toggle-arrow">▼</span>`;
 
     const subGrid = document.createElement('div');
+    // 이전에 해결한 4열 그리드 클래스를 사용합니다.
     subGrid.className = 'sub-build-grid'; 
 
+    // ⭐ [핵심] 클릭 이벤트 리스너 등록
     title.onclick = () => {
         title.classList.toggle('collapsed');
         subGrid.classList.toggle('collapsed-content');
@@ -465,27 +472,38 @@ function renderResearchSection(titleText, list, isDone, parentContainer) {
 
     parentContainer.appendChild(title);
     parentContainer.appendChild(subGrid);
-    list.forEach(r => subGrid.appendChild(createResearchElement(r, isDone)));
+
+    list.forEach(r => {
+        subGrid.appendChild(createResearchElement(r, isDone));
+    });
 }
 
+// 개별 연구 버튼 생성 함수
 function createResearchElement(r, isDone) {
     const div = document.createElement('div');
     div.className = `shop-item research-item ${isDone ? 'done disabled' : ''}`;
     div.id = `research-${r.id}`;
-    let costTxt = Object.entries(r.cost).map(([k, v]) => `${formatNumber(v)}${getResNameOnly(k)}`).join(' ');
     
-    // 속도 증가 경고 문구 추가
+    let costTxt = Object.entries(r.cost).map(([k, v]) => `${formatNumber(v)}${getResNameOnly(k)}`).join(' ');
     let warning = (r.type === 'building' && r.value > 1) ? `<br><span style="color:#ff7675; font-size:0.7rem;">⚠️ 속도 증가 시 재료 소모량 비례 증가</span>` : "";
 
-    div.innerHTML = `<span class="si-name">${r.name}</span><span class="si-level">${isDone ? '✓' : ''}</span><div class="si-desc">${r.desc}${warning}</div><div class="si-cost">${isDone ? '연구 완료' : costTxt}</div>`;
+    div.innerHTML = `
+        <span class="si-name">${r.name}</span>
+        <span class="si-level">${isDone ? '✓' : ''}</span>
+        <div class="si-desc">${r.desc}${warning}</div>
+        <div class="si-cost">${isDone ? '연구 완료' : costTxt}</div>
+    `;
+
     if (!isDone) {
         div.onclick = (e) => {
             e.stopPropagation();
             if (Logic.tryBuyResearch(r.id)) {
                 log(`🔬 [연구 완료] ${r.name}`, true);
-                renderResearchTab();
+                renderResearchTab(); // 다시 그려서 완료 목록으로 이동
                 renderShop(cachedBuyCallback, Logic.getBuildingCost);
-            } else log("연구 자원이 부족합니다.");
+            } else {
+                log("연구 자원이 부족합니다.");
+            }
         };
     }
     return div;
