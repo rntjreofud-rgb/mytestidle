@@ -88,6 +88,28 @@ function setupEvents() {
         }
     });
 
+    // ⭐ 전력 토글 스위치 전용 감시자 (이벤트 위임)
+    document.body.addEventListener('change', (e) => {
+        // 변경된 요소가 'power-toggle-input' 클래스를 가지고 있는지 확인
+        if (e.target && e.target.classList.contains('power-toggle-input')) {
+            
+            // 1. 건물의 ID를 가져옴 (문자열이므로 숫자로 변환)
+            const id = parseInt(e.target.dataset.id);
+            console.log(`[스위치 감지] 건물 ID: ${id}`);
+
+            // 2. 데이터 찾기
+            const building = gameData.buildings.find(b => b.id === id);
+            if (building) {
+                // 3. 상태 변경 (체크 여부에 따라 true/false 설정)
+                building.on = e.target.checked;
+                
+                // 4. 화면 및 로직 갱신
+                UI.updateScreen(Logic.calculateNetMPS());
+                
+                console.log(`[상태 변경 완료] ${building.name}: ${building.on ? 'ON' : 'OFF'}`);
+            }
+        }
+    });
 
 }
 

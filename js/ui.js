@@ -292,10 +292,10 @@ function updatePowerUI() {
             // 3. event.preventDefault()로 브라우저의 기본 동작(체크박스 자동 변경)을 막고 데이터만 변경
             const checked = b.on ? 'checked' : '';
             const toggleHtml = `
-                <div class="switch" onclick="event.preventDefault(); window.toggleBuildingPower(${b.id});" style="cursor: pointer;">
-                    <input type="checkbox" ${checked} style="pointer-events: none;">
-                    <span class="slider"></span>
-                </div>
+            <label class="switch">
+                <input type="checkbox" ${checked} class="power-toggle-input" data-id="${b.id}">
+                <span class="slider"></span>
+            </label>
             `;
 
             html += `<tr style="${rowStyle} border-bottom: 1px solid rgba(255,255,255,0.05); transition: opacity 0.3s;">
