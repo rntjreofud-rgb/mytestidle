@@ -31,6 +31,33 @@ body {
 .nav-item:hover, .nav-item.active { background-color: var(--bg-panel); color: #fff; border-left: 3px solid var(--primary-orange); }
 .nav-item i { margin-right: 10px; width: 16px; text-align: center; }
 
+/* --- 사이드바 하단 데이터 버튼 스타일 --- */
+.sidebar-data-btns {
+    padding: 10px 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.side-btn {
+    width: 100%;
+    border: none;
+    border-radius: 4px;
+    padding: 8px;
+    color: white;
+    font-size: 0.8rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+    opacity: 0.8;
+}
+
+.side-btn:hover { opacity: 1; transform: translateY(-1px); }
+.side-btn.export { background-color: #3498db; }
+.side-btn.import { background-color: #9b59b6; }
+.side-btn.reset { background-color: #e74c3c; }
+
+
 /* =================================================================
    3. 메인 레이아웃 및 패널 (Layout & Panels)
    ================================================================= */
@@ -163,19 +190,22 @@ input:checked + .slider:before { transform: translateX(20px); }
 @media (max-width: 768px) {
     body { flex-direction: column; overflow-y: auto; }
     .sidebar { width: 100%; height: auto; position: sticky; top: 0; z-index: 1000; border-right: none; border-bottom: 1px solid #000; }
-    .logo-area { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 10px; }
+    .logo-area { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 8px; } .logo-area div { font-size: 1.5rem !important; } 
     .logo-area small, .nav-category { display: none; }
-    .nav-menu { display: flex; overflow-x: auto; white-space: nowrap; }
-    .nav-item { flex: 1; justify-content: center; border-left: none; border-bottom: 3px solid transparent; }
-    .nav-item.active { border-left: none; border-bottom: 3px solid var(--primary-orange); }
-
-    /* 모바일 수동 작업 2열 유지 */
-    #manual-btn-list { grid-template-columns: repeat(2, 1fr) !important; }
-    .sub-res-grid { grid-template-columns: repeat(2, 1fr); }
+    .nav-menu { display: flex; flex-direction: row !important; overflow-x: auto; white-space: nowrap; background: var(--bg-sidebar); align-items: center; }
+    .nav-item { flex: 0 0 auto; justify-content: center; padding: 10px 15px; border-left: none; border-bottom: 3px solid transparent; } 
+    .nav-item.active { border-bottom: 3px solid var(--primary-orange); }
+    .sidebar-data-btns { display: flex !important; flex-direction: row !important; gap: 5px; padding: 0 10px; margin-left: auto; }
+    .side-btn { width: auto !important; min-width: 60px; padding: 5px 8px !important; font-size: 0.7rem !important; white-space: nowrap; }
+    #manual-btn-list { grid-template-columns: repeat(2, 1fr) !important; } 
+    .sub-res-grid { grid-template-columns: repeat(2, 1fr); } 
     .sub-build-grid { grid-template-columns: 1fr !important; }
-
-    header { height: auto; flex-direction: column; padding: 10px; }
-    .info-panel { flex-direction: column; text-align: center; gap: 10px; }
+    header { height: auto; flex-direction: row !important; justify-content: space-between; padding: 8px 15px !important; } 
+    header h2 { font-size: 0.9rem; } 
+    .header-status { font-size: 0.75rem; max-width: 60%; text-align: right; }
+    .info-panel { flex-direction: column; text-align: center; gap: 10px; padding: 12px; } 
+    #upgrade-btn { height: 70px !important; font-size: 0.9rem; } 
+    .sub-res-grid.slim-mode { grid-template-columns: 1fr !important; }
 }
 
 .hidden { display: none !important; }
