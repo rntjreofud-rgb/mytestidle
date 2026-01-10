@@ -129,222 +129,64 @@ export let gameData = {
 };
 
 export const researchList = [
-    // === [Tier 1: 생존 및 수동 도구] ===
     { id: "stone_tool", name: "돌 곡괭이", desc: "수동 채집량 +1", cost: { wood: 30, stone: 10 }, type: 'manual', value: 1, reqResearch: null },
     { id: "sharp_axe", name: "날카로운 도끼", desc: "수동 나무 채집량 +2", cost: { stone: 50, plank: 20 }, type: 'manual', value: 2, reqResearch: "stone_tool" },
     { id: "carbon_pick", name: "탄화 곡괭이", desc: "수동 석탄/광석 채집량 +3", cost: { coal: 50, brick: 30 }, type: 'manual', value: 3, reqResearch: "sharp_axe" },
-
-
-
-    // === [Tier 2: 기초 산업 자동화] ===
     { id: "basic_logistics", name: "기초 물류학", desc: "수동 벌목 캠프 속도 2배", cost: { plank: 50, stone: 50 }, type: 'building', target: [0], value: 2, reqResearch: "stone_tool" },
     { id: "quarry_tech", name: "벌목 기술", desc: "자동 벌목기 속도 2배", cost: { plank: 100, coal: 50 }, type: 'building', target: [1], value: 2, reqResearch: "basic_logistics" },
     { id: "furnace_bellows", name: "용광로 송풍기", desc: "기초 철/구리 용광로 속도 2배", cost: { stone: 200, coal: 100 }, type: 'building', target: [6, 7], value: 2, reqResearch: "quarry_tech" },
-    // === [Tier 3: 금속 및 기계 공학] ===
-     { 
-    id: "stone_excavation", 
-    name: "채석 공법 개선", 
-    desc: "채석 작업장의 돌 생산량 3배 증가", 
-    cost: { plank: 500, ironPlate: 200 }, 
-    type: 'building', 
-    target: [2], 
-    value: 3, 
-    reqResearch: "quarry_tech" 
-    },
-    { 
-    id: "charcoal_efficiency", 
-    name: "고급 탄화 공법", 
-    desc: "목탄 제조 가마의 석탄 생산량 3배 증가", 
-    cost: { plank: 500, coal: 200 }, 
-    type: 'building', 
-    target: [48], 
-    value: 3, 
-    reqResearch: "furnace_bellows" 
-},
-{ 
-    id: "coal_liquefaction", 
-    name: "석탄 액화 기술", 
-    desc: "석탄 노천 채굴장(ID 3)에서 부가적으로 원유를 획득 (원유 +1.0/s 추가)", 
-    cost: { steel: 10000, plastic: 5000, processor: 500 }, 
-    type: 'building', 
-    target: [3], 
-    value: 1, // 로직상 value는 배수지만, 이 연구는 특수하게 원유 출력을 '잠금해제'하는 용도로 설명
-    reqResearch: "oil_recovery" 
-},
+    { id: "stone_excavation", name: "채석 공법 개선", desc: "채석 작업장의 돌 생산량 3배 증가", cost: { plank: 500, ironPlate: 200 }, type: 'building', target: [2], value: 3, reqResearch: "quarry_tech" },
+    { id: "charcoal_efficiency", name: "고급 탄화 공법", desc: "목탄 제조 가마의 석탄 생산량 3배 증가", cost: { plank: 500, coal: 200 }, type: 'building', target: [48], value: 3, reqResearch: "furnace_bellows" },
+    { id: "coal_liquefaction", name: "석탄 액화 기술", desc: "석탄 광산에서 원유 추가 획득", cost: { steel: 10000, plastic: 5000, processor: 500 }, type: 'building', target: [3], value: 1, reqResearch: "oil_recovery" },
     { id: "iron_working", name: "철제 도구 제작", desc: "수동 채집량 +5", cost: { ironPlate: 100, gear: 50 }, type: 'manual', value: 5, reqResearch: "furnace_bellows" },
     { id: "hardened_steel", name: "강철 강화 공정", desc: "풍력 발전기 및 조립대 효율 2배", cost: { ironPlate: 300, brick: 200 }, type: 'building', target: [8, 9], value: 2, reqResearch: "iron_working" },
     { id: "gearbox_opt", name: "변속기 최적화", desc: "기계식 조립대 속도 2배", cost: { gear: 200, ironPlate: 200 }, type: 'building', target: [9], value: 2, reqResearch: "hardened_steel" },
     { id: "steam_power", name: "증기압 조절", desc: "석탄 발전소 출력 2배", cost: { ironPlate: 500, copperPlate: 200 }, type: 'building', target: [14], value: 2, reqResearch: "hardened_steel" },
     { id: "coal_efficiency", name: "고품위 석탄 가공", desc: "석탄 발전소 전력 생산량 3배 증가", cost: { steel: 500, circuit: 200 }, type: 'building', target: [14], value: 3, reqResearch: "steam_power" },
-    // 채굴 특화 연구
-    { id: "mining_drill_bit", name: "강화 드릴 비트", desc: "모든 채굴기(노천/전기) 속도 2배", cost: { ironPlate: 500, gear: 200 }, type: 'building', target: [40, 41, 42, 43, 44, 45, 3, 25, 28], value: 2, reqResearch: "basic_logistics" },
-    { id: "mineral_scanner", name: "지질 스캐너", desc: "기초 광산(철/구리) 채굴 속도 2배", cost: { copperPlate: 1000, circuit: 200 }, type: 'building', target: [40, 41], value: 2, reqResearch: "mining_drill_bit" },
-    { id: "crushing_tech", name: "광석 분쇄 기술", desc: "전기 채굴기(철/구리) 출력 2.5배", cost: { steel: 500, gear: 1000 }, type: 'building', target: [42, 43], value: 2.5, reqResearch: "mineral_scanner" },
-    { id: "smelting_upgrade", name: "고성능 용광로 개조", desc: "기초 철/구리 용광로의 생산 속도 3.5배 증가", cost: { steel: 1500, circuit: 500 }, type: 'building', target: [6, 7], value: 3.5, reqResearch: "furnace_bellows" },
-    //효율성 연구라인
-    // 1. 용광로 재료 절감 (철광석/구리광석 50% 절약)
-    { id: "lean_smelting", name: "린 제련 공정", desc: "철/구리 용광로의 재료 소모량 50% 감소", cost: { ironPlate: 2000, gear: 1000 }, type: 'consumption', target: [6, 7], value: 0.5, reqResearch: "smelting_upgrade" },
-    // 2. 강철 재료 절감 (철판/석탄 30% 절약)
-    { id: "steel_optimization", name: "강철 배합 최적화", desc: "강철 제련소의 재료 소모량 30% 감소", cost: { steel: 5000, circuit: 1000 }, type: 'consumption', target: [13], value: 0.7, reqResearch: "steel_refinement" },
-
-    // 3. 원유 정제 효율화 (원유 소모량 40% 절약)
-    { id: "oil_recovery", name: "원유 회수 시스템", desc: "석유 정제 및 원유 발전소 소모량 40% 감소", cost: { plastic: 5000, advCircuit: 1000 }, type: 'consumption', target: [21, 46], value: 0.6, reqResearch: "oil_combustion" },
-
-    // 4. 전자 부품 미세화 (구리판/플라스틱 절약)
-    { id: "component_mini", name: "부품 미세화 기술", desc: "회로 및 프로세서 공장 재료 소모 25% 감소", cost: { processor: 1000, optics: 1000 }, type: 'consumption', target: [15, 31, 24], value: 0.75, reqResearch: "integrated_circuit" },
-
-    { id: "coal_mining_tech", name: "탄층 탐사 최적화", desc: "모든 석탄 채굴기 속도 2.5배 증가", cost: { gear: 1000, ironPlate: 2000 }, type: 'building', target: [3, 44], value: 2.5, reqResearch: "mining_drill_bit" },
-    // === [Tier 4: 전기 및 회로 기술] ===
-    { 
-    id: "high_torque_drill", 
-    name: "고토크 회전 드릴", 
-    desc: "전기 석재 채굴기(ID 45)의 생산 속도 3배 증가", 
-    cost: { steel: 1000, gear: 500 }, 
-    type: 'building', 
-    target: [45], 
-    value: 3, 
-    reqResearch: "electric_motor" 
-    },
-    
+    { id: "mining_drill_bit", name: "강화 드릴 비트", desc: "모든 채굴기 속도 2배", cost: { ironPlate: 500, gear: 200 }, type: 'building', target: [40, 41, 42, 43, 44, 45, 3, 25, 28], value: 2, reqResearch: "basic_logistics" },
+    { id: "mineral_scanner", name: "지질 스캐너", desc: "기초 광산 채굴 속도 2배", cost: { copperPlate: 1000, circuit: 200 }, type: 'building', target: [40, 41], value: 2, reqResearch: "mining_drill_bit" },
+    { id: "crushing_tech", name: "광석 분쇄 기술", desc: "전기 채굴기 출력 2.5배", cost: { steel: 500, gear: 1000 }, type: 'building', target: [42, 43], value: 2.5, reqResearch: "mineral_scanner" },
+    { id: "smelting_upgrade", name: "고성능 용광로 개조", desc: "기초 용광로 생산 속도 3.5배 증가", cost: { steel: 1500, circuit: 500 }, type: 'building', target: [6, 7], value: 3.5, reqResearch: "furnace_bellows" },
+    { id: "lean_smelting", name: "린 제련 공정", desc: "용광로 재료 소모량 50% 감소", cost: { ironPlate: 2000, gear: 1000 }, type: 'consumption', target: [6, 7], value: 0.5, reqResearch: "smelting_upgrade" },
+    { id: "steel_optimization", name: "강철 배합 최적화", desc: "강철 제련소 재료 소모 30% 감소", cost: { steel: 5000, circuit: 1000 }, type: 'consumption', target: [13], value: 0.7, reqResearch: "steel_refinement" },
+    { id: "oil_recovery", name: "원유 회수 시스템", desc: "석유 시설 소모량 40% 감소", cost: { plastic: 5000, advCircuit: 1000 }, type: 'consumption', target: [21, 46], value: 0.6, reqResearch: "oil_combustion" },
+    { id: "component_mini", name: "부품 미세화 기술", desc: "회로/프로세서 재료 소모 25% 감소", cost: { processor: 1000, optics: 1000 }, type: 'consumption', target: [15, 31, 24], value: 0.75, reqResearch: "integrated_circuit" },
+    { id: "coal_mining_tech", name: "탄층 탐사 최적화", desc: "석탄 채굴 속도 2.5배 증가", cost: { gear: 1000, ironPlate: 2000 }, type: 'building', target: [3, 44], value: 2.5, reqResearch: "mining_drill_bit" },
+    { id: "high_torque_drill", name: "고토크 회전 드릴", desc: "전기 석재 채굴기 속도 3배 증가", cost: { steel: 1000, gear: 500 }, type: 'building', target: [45], value: 3, reqResearch: "electric_motor" },
     { id: "copper_wiring", name: "고효율 구리 배선", desc: "회로 공장 속도 1.5배", cost: { copperPlate: 1000, circuit: 100 }, type: 'building', target: [15], value: 1.5, reqResearch: "steam_power" },
     { id: "integrated_circuit", name: "집적 회로 설계", desc: "회로 공장 속도 추가 2.5배", cost: { circuit: 500, plastic: 200 }, type: 'building', target: [15], value: 2.5, reqResearch: "copper_wiring" },
-    { id: "electric_motor", name: "고속 전기 모터", desc: "채석/제재소/가마 속도 2배", cost: { gear: 1000, circuit: 300 }, type: 'building', target: [2, 4, 5], value: 2, reqResearch: "integrated_circuit" },
-    { id: "steel_refinement", name: "고급 강철 제련법", desc: "강철 제련소의 생산 효율 3배 증가", cost: { steel: 2000, advCircuit: 500 }, type: 'building', target: [13], value: 3, reqResearch: "sulfuric_acid" },
-    //전력 효율화 연구라인
-    { id: "low_power_ic", name: "저전력 회로 설계", desc: "모든 조립 및 회로 공장의 전기 소모 20% 감소", cost: { circuit: 1000, copperPlate: 5000 }, type: 'energyEff', target: [9, 15, 24, 31], value: 0.8, reqResearch: "integrated_circuit" },
-    // 2단계: 스마트 그리드 연산 (채굴 시설 전기 소모 30% 감소)
-    { id: "smart_mining", name: "스마트 그리드 제어", desc: "모든 전기 채굴 시설의 전기 소모 30% 감소", cost: { processor: 500, advCircuit: 1000 }, type: 'energyEff', target: [42, 43, 44, 45, 25, 28], value: 0.7, reqResearch: "low_power_ic" },
-
-    // 3단계: 초전도 코일 이식 (모든 중공업 시설 전기 소모 50% 감소)
-    { id: "superconductor_wire", name: "초전도 코일 이식", desc: "중공업 및 제련 시설의 전기 소모 50% 감소", cost: { nanobots: 500, titaniumPlate: 2000 }, type: 'energyEff', target: [13, 21, 26, 32, 34], value: 0.5, reqResearch: "titanium_alloy" },
-
-    // === [Tier 5: 화학 및 정유 공정] ===
+    { id: "electric_motor", name: "고속 전기 모터", desc: "기초 가공 시설 속도 2배", cost: { gear: 1000, circuit: 300 }, type: 'building', target: [2, 4, 5], value: 2, reqResearch: "integrated_circuit" },
+    { id: "steel_refinement", name: "고급 강철 제련법", desc: "강철 제련소 생산 효율 3배 증가", cost: { steel: 2000, advCircuit: 500 }, type: 'building', target: [13], value: 3, reqResearch: "sulfuric_acid" },
+    { id: "low_power_ic", name: "저전력 회로 설계", desc: "회로 공장 전기 소모 20% 감소", cost: { circuit: 1000, copperPlate: 5000 }, type: 'energyEff', target: [9, 15, 24, 31], value: 0.8, reqResearch: "integrated_circuit" },
+    { id: "smart_mining", name: "스마트 그리드 제어", desc: "채굴 시설 전기 소모 30% 감소", cost: { processor: 500, advCircuit: 1000 }, type: 'energyEff', target: [42, 43, 44, 45, 25, 28], value: 0.7, reqResearch: "low_power_ic" },
+    { id: "superconductor_wire", name: "초전도 코일 이식", desc: "중공업 시설 전기 소모 50% 감소", cost: { nanobots: 500, titaniumPlate: 2000 }, type: 'energyEff', target: [13, 21, 26, 32, 34], value: 0.5, reqResearch: "titanium_alloy" },
     { id: "oil_refining", name: "원유 분별 증류", desc: "원유 시추기 속도 2배", cost: { steel: 500, circuit: 500 }, type: 'building', target: [20], value: 2, reqResearch: "integrated_circuit" },
     { id: "polymer_science", name: "고분자 화학", desc: "석유 정제 시설 속도 2배", cost: { oil: 1000, plastic: 500 }, type: 'building', target: [21], value: 2, reqResearch: "oil_refining" },
     { id: "sulfuric_acid", name: "황산 제련법", desc: "강철 제련소 속도 3배", cost: { sulfur: 500, steel: 1000 }, type: 'building', target: [13], value: 3, reqResearch: "polymer_science" },
-    { 
-    id: "oil_combustion", 
-    name: "원유 연소 최적화", 
-    desc: "원유 발전소의 전력 출력 2배", 
-    cost: { steel: 2000, circuit: 500 }, 
-    type: 'building', 
-    target: [46], 
-    value: 2, 
-    reqResearch: "oil_refining" 
-},
-{ 
-    id: "coal_purification", 
-    name: "석탄 정제 공정", 
-    desc: "제련 시설(강철/티타늄/용광로)의 석탄 소모량 50% 감소", 
-    cost: { steel: 1000, circuit: 500 }, 
-    type: 'consumption', 
-    target: [6, 7, 13, 26], 
-    value: 0.5, 
-    reqResearch: "steel_refinement" 
-},
-{ 
-    id: "bio_acceleration", 
-    name: "성장 촉진 호르몬", 
-    desc: "바이오 수목 배양소의 나무 생산량 3배 증가", 
-    cost: { plastic: 5000, processor: 200 }, 
-    type: 'building', 
-    target: [47], 
-    value: 3, 
-    reqResearch: "polymer_science" 
-},
-{ 
-    id: "efficient_burner", 
-    name: "고효율 연소실", 
-    desc: "석탄 발전소(ID 14)의 석탄 소모량 50% 감소", 
-    cost: { steel: 500, circuit: 200 }, 
-    type: 'consumption', 
-    target: [14], 
-    value: 0.5, 
-    reqResearch: "coal_efficiency" 
-},
-{ 
-    id: "coal_gasification", 
-    name: "석탄 가스화 공정", 
-    desc: "석탄 발전소의 전력 생산량 2배 증가 및 소모량 추가 30% 감소", 
-    cost: { steel: 2000, advCircuit: 500 }, 
-    type: 'building', // 생산량(energy) 증가용
-    target: [14], 
-    value: 2, 
-    reqResearch: "efficient_burner" 
-},
-// (위 연구와 세트로 소모량도 동시에 줄여줍니다)
-{ 
-    id: "coal_gasification_cons", 
-    name: "가스화 소모 절감", 
-    desc: "가스화 공정 적용으로 석탄 소모 30% 감소", 
-    cost: { steel: 1, circuit: 1 }, // 실제론 위 연구와 함께 완료되게 하거나 자동화
-    type: 'consumption', 
-    target: [14], 
-    value: 0.7, 
-    reqResearch: "efficient_burner" 
-},
-
-// 3. 나노 촉매 연소 (최종 단계)
-{ 
-    id: "nano_catalyst", 
-    name: "나노 촉매 연소", 
-    desc: "모든 석탄 사용 시설의 석탄 소모량 60% 감소", 
-    cost: { nanobots: 200, titaniumPlate: 1000 }, 
-    type: 'consumption', 
-    target: [14, 13, 26, 6, 7], // 발전소, 강철, 티타늄, 용광로 모두 포함
-    value: 0.4, 
-    reqResearch: "coal_purification" 
-},
-{ 
-    id: "blasting_tech", 
-    name: "정밀 폭파 공법", 
-    desc: "모든 석재 관련 채굴 시설 속도 2.5배 증가", 
-    cost: { sulfur: 1000, steel: 3000 }, 
-    type: 'building', 
-    target: [2, 45], 
-    value: 2.5, 
-    reqResearch: "stone_excavation" 
-},
-    // === [Tier 6: 첨단 재료 및 티타늄] ===
-    { id: "titanium_alloy", name: "티타늄 합금", desc: "티타늄 채굴기/제련소 속도 2배", cost: { steel: 5000, advCircuit: 200 }, type: 'building', target: [25, 26], value: 2, reqResearch: "sulfuric_acid" },
+    { id: "oil_combustion", name: "원유 연소 최적화", desc: "원유 발전소 출력 2배", cost: { steel: 2000, circuit: 500 }, type: 'building', target: [46], value: 2, reqResearch: "oil_refining" },
+    { id: "coal_purification", name: "석탄 정제 공정", desc: "제련 시설 석탄 소모 50% 감소", cost: { steel: 1000, circuit: 500 }, type: 'consumption', target: [6, 7, 13, 26], value: 0.5, reqResearch: "steel_refinement" },
+    { id: "bio_acceleration", name: "성장 촉진 호르몬", desc: "수목 배양소 생산량 3배 증가", cost: { plastic: 5000, processor: 200 }, type: 'building', target: [47], value: 3, reqResearch: "polymer_science" },
+    { id: "efficient_burner", name: "고효율 연소실", desc: "석탄 발전소 석탄 소모 50% 감소", cost: { steel: 500, circuit: 200 }, type: 'consumption', target: [14], value: 0.5, reqResearch: "coal_efficiency" },
+    { id: "coal_gasification", name: "석탄 가스화 공정", desc: "석탄 발전소 전력 2배 및 소모 감소", cost: { steel: 2000, advCircuit: 500 }, type: 'building', target: [14], value: 2, reqResearch: "efficient_burner" },
+    { id: "coal_gasification_cons", name: "가스화 소모 절감", desc: "가스화 적용 석탄 소모 30% 감소", cost: { steel: 1, circuit: 1 }, type: 'consumption', target: [14], value: 0.7, reqResearch: "efficient_burner" },
+    { id: "nano_catalyst", name: "나노 촉매 연소", desc: "석탄 소모 시설 효율 60% 증가", cost: { nanobots: 200, titaniumPlate: 1000 }, type: 'consumption', target: [14, 13, 26, 6, 7], value: 0.4, reqResearch: "coal_purification" },
+    { id: "blasting_tech", name: "정밀 폭파 공법", desc: "모든 석재 시설 속도 2.5배 증가", cost: { sulfur: 1000, steel: 3000 }, type: 'building', target: [2, 45], value: 2.5, reqResearch: "stone_excavation" },
+    { id: "titanium_alloy", name: "티타늄 합금", desc: "티타늄 시설 속도 2배", cost: { steel: 5000, advCircuit: 200 }, type: 'building', target: [25, 26], value: 2, reqResearch: "sulfuric_acid" },
     { id: "high_precision", name: "나노미터 정밀도", desc: "고급 조립 라인 속도 2배", cost: { advCircuit: 1000, gear: 5000 }, type: 'building', target: [24], value: 2, reqResearch: "titanium_alloy" },
     { id: "supercomputing", name: "슈퍼컴퓨팅", desc: "반도체 클린룸 속도 2배", cost: { processor: 100, optics: 500, advCircuit: 2000 }, type: 'building', target: [31], value: 2, reqResearch: "high_precision" },
-{ 
-    id: "stone_efficiency", 
-    name: "골재 배합 최적화", 
-    desc: "벽돌, 유리, 콘크리트 공장의 돌 소모량 40% 감소", 
-    cost: { processor: 500, optics: 500 }, 
-    type: 'consumption', 
-    target: [5, 18, 16], 
-    value: 0.6, 
-    reqResearch: "component_mini" 
-},
-    // === [Tier 7: 에너지 혁명] ===
+    { id: "stone_efficiency", name: "골재 배합 최적화", desc: "건축 시설 돌 소모 40% 감소", cost: { processor: 500, optics: 500 }, type: 'consumption', target: [5, 18, 16], value: 0.6, reqResearch: "component_mini" },
     { id: "solar_efficiency", name: "광전소자 개선", desc: "태양광 발전소 출력 3배", cost: { optics: 1000, circuit: 5000 }, type: 'building', target: [23], value: 3, reqResearch: "supercomputing" },
     { id: "battery_density", name: "고밀도 배터리", desc: "배터리 공장 생산량 2배", cost: { battery: 500, copperPlate: 10000 }, type: 'building', target: [22], value: 2, reqResearch: "solar_efficiency" },
-
-    // === [Tier 8: 우주 항행 및 엔딩 준비] ===
-    { id: "rocket_dynamics", name: "로켓 역학", desc: "로켓 연료 정제소 속도 2배", cost: { rocketFuel: 100, processor: 500 }, type: 'building', target: [35], value: 2, reqResearch: "supercomputing" },
-    { 
-    id: "cryogenic_fuel", 
-    name: "극저온 연료 냉각", 
-    desc: "로켓 연료 정제소 속도 추가 3배", 
-    cost: { rocketFuel: 1000, titaniumPlate: 5000 }, 
-    type: 'building', 
-    target: [35], 
-    value: 3, 
-    reqResearch: "rocket_dynamics" 
-},
-    { 
-    id: "nanotech_click", 
-    name: "분자 분해 장치", 
-    desc: "수동 채집량 +100", 
-    cost: { processor: 2000, titaniumPlate: 10000 }, 
-    type: 'manual', 
-    value: 100, 
-    reqResearch: "cryogenic_fuel" 
-},
-    { id: "final_prep", name: "지구 이별 준비", desc: "모든 주요 건물 속도 1.2배", cost: { rocketFuel: 5000, processor: 5000, steel: 50000 }, type: 'building', target: [0,1,2,3,4,5,6,7,8,9,13,14,15,16,18,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,38,39,40,41,42,43,44,45,46], value: 1.2, reqResearch: "nanotech_click" }
+    { id: "rocket_dynamics", name: "로켓 역학", desc: "연료 정제소 속도 2배", cost: { rocketFuel: 100, processor: 500 }, type: 'building', target: [35], value: 2, reqResearch: "supercomputing" },
+    { id: "cryogenic_fuel", name: "극저온 연료 냉각", desc: "연료 정제소 속도 추가 3배", cost: { rocketFuel: 1000, titaniumPlate: 5000 }, type: 'building', target: [35], value: 3, reqResearch: "rocket_dynamics" },
+    { id: "nanotech_click", name: "분자 분해 장치", desc: "수동 채집량 +100", cost: { processor: 2000, titaniumPlate: 10000 }, type: 'manual', value: 100, reqResearch: "cryogenic_fuel" },
+    { id: "tectonic_optimization", name: "지각 변동 분석", desc: "심부 드릴 속도 4배 증가", cost: { advAlloy: 1000, processor: 500 }, type: 'building', target: [49], value: 4, reqResearch: "high_precision" },
+    { id: "plasma_smelting", name: "고온 플라즈마 제어", desc: "아크 용광로 효율 3배 증가", cost: { advAlloy: 2000, aiCore: 100 }, type: 'building', target: [50], value: 3, reqResearch: "steel_refinement" },
+    { id: "magnetic_resonance", name: "자기공명 탐사", desc: "자기력 채굴기 출력 3.5배 증가", cost: { titaniumPlate: 5000, quantumData: 200 }, type: 'building', target: [51], value: 3.5, reqResearch: "superconductor_wire" },
+    { id: "molecular_sieve", name: "분자 체 추출 기술", desc: "유황 포집기 속도 3배 증가", cost: { plastic: 10000, nanobots: 300 }, type: 'building', target: [52], value: 3, reqResearch: "sulfuric_acid" },
+    { id: "deep_sea_engineering", name: "심해 수압 내성 구조", desc: "해상 시추 플랫폼 생산량 2.5배 증가", cost: { concrete: 50000, advAlloy: 1000 }, type: 'building', target: [54], value: 2.5, reqResearch: "oil_refining" },
+    { id: "neutron_moderation", name: "중성자 속도 조절", desc: "우라늄 파쇄기 채굴량 3배 증가", cost: { quantumData: 500, aiCore: 200 }, type: 'building', target: [53], value: 3, reqResearch: "supercomputing" },
+    { id: "final_prep", name: "지구 이별 준비", desc: "모든 건물 속도 1.2배", cost: { rocketFuel: 5000, processor: 5000, steel: 50000 }, type: 'building', target: [0,1,2,3,4,5,6,7,8,9,13,14,15,16,18,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54], value: 1.2, reqResearch: "nanotech_click" }
 ];
 
 export const houseStages = [

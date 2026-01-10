@@ -396,33 +396,95 @@ function updatePowerUI() {
 
 export function renderResearchTab() {
     const container = elements.viewResearch.querySelector('#research-list-container') || elements.viewResearch.querySelector('.action-box');
+    if (!container) return;
+    
     container.innerHTML = "";
     if (!gameData.researches) gameData.researches = [];
+
+    // 1. 연구 리스트 분류
+    const availableRes = [];
+    const completedRes = [];
+
     researchList.forEach(r => {
         const isDone = gameData.researches.includes(r.id);
-        let isUnlocked = r.reqResearch ? gameData.researches.includes(r.reqResearch) : true;
-        if (!isDone && !isUnlocked) return;
-        const div = document.createElement('div');
-        div.className = `shop-item ${isDone ? 'done disabled' : ''}`;
-        div.id = `research-${r.id}`;
-        let costTxt = Object.entries(r.cost).map(([k, v]) => `${formatNumber(v)}${resNames[k].split(' ')[1]}`).join(' ');
-        div.innerHTML = `<span class="si-name">${r.name}</span><span class="si-level">${isDone ? '✓' : ''}</span><div class="si-desc">${r.desc}</div><div class="si-cost">${isDone ? '연구 완료' : costTxt}</div>`;
-        if (!isDone) {
-            div.onclick = (e) => {
-                e.stopPropagation();
-                if(Logic.tryBuyResearch(r.id)) {
-                    log(`🔬 [연구 완료] ${r.name}`, true);
-                    renderResearchTab();
-                    // ⭐ 연구 완료 시 건물 상점도 갱신 (효율 반영을 위해)
-                    renderShop(cachedBuyCallback, Logic.getBuildingCost);
-                } else {
-                    log("연구 자원이 부족하거나 선행 연구가 필요합니다.");
-                }
-            };
+        
+        // 해금 조건 체크 (선행 연구 완료 여부)
+        const isPrereqDone = r.reqResearch ? gameData.researches.includes(r.reqResearch) : true;
+        
+        // 타겟 건물 해금 여부 체크 (건물이 상점에 떠야 연구도 뜸)
+        let isTargetVisible = true;
+        if (r.type === 'building' || r.type === 'consumption' || r.type === 'energyEff') {
+            isTargetVisible = r.target.some(targetId => {
+                const b = gameData.buildings.find(build => build.id === targetId);
+                return b && gameData.houseLevel >= (b.reqLevel || 0);
+            });
         }
-        container.appendChild(div);
+
+        if (isDone) {
+            completedRes.push(r);
+        } else if (isPrereqDone && isTargetVisible) {
+            availableRes.push(r);
+        }
     });
+
+    // 2. 진행 가능한 연구 렌더링
+    if (availableRes.length > 0) {
+        const title = document.createElement('div');
+        title.className = 'research-section-title';
+        title.innerHTML = `🔬 진행 가능한 연구 (${availableRes.length})`;
+        container.appendChild(title);
+
+        availableRes.forEach(r => {
+            container.appendChild(createResearchElement(r, false));
+        });
+    }
+
+    // 3. 완료된 연구 렌더링
+    if (completedRes.length > 0) {
+        const title = document.createElement('div');
+        title.className = 'research-section-title';
+        title.style.color = '#8892b0';
+        title.innerHTML = `✅ 완료된 기술 (${completedRes.length})`;
+        container.appendChild(title);
+
+        completedRes.forEach(r => {
+            container.appendChild(createResearchElement(r, true));
+        });
+    }
+    
     updateResearchButtons();
+}
+
+// 개별 연구 아이템을 생성하는 보조 함수 (중복 코드 방지)
+function createResearchElement(r, isDone) {
+    const div = document.createElement('div');
+    div.className = `shop-item research-item ${isDone ? 'done disabled' : ''}`;
+    div.id = `research-${r.id}`;
+    
+    let costTxt = Object.entries(r.cost)
+        .map(([k, v]) => `${formatNumber(v)}${getResNameOnly(k)}`)
+        .join(' ');
+
+    div.innerHTML = `
+        <span class="si-name">${r.name}</span>
+        <span class="si-level">${isDone ? '✓' : ''}</span>
+        <div class="si-desc">${r.desc}</div>
+        <div class="si-cost">${isDone ? '연구 완료' : costTxt}</div>
+    `;
+
+    if (!isDone) {
+        div.onclick = (e) => {
+            e.stopPropagation();
+            if (Logic.tryBuyResearch(r.id)) {
+                log(`🔬 [연구 완료] ${r.name}`, true);
+                renderResearchTab(); // 탭 다시 그리기
+                renderShop(cachedBuyCallback, Logic.getBuildingCost); // 상점 효율 반영
+            } else {
+                log("연구 자원이 부족합니다.");
+            }
+        };
+    }
+    return div;
 }
 
 function updateResearchButtons() {
