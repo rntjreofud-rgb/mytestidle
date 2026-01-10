@@ -2,6 +2,7 @@
 
 import { gameData, houseStages, researchList } from './data.js';
 import * as Logic from './logic.js';
+import * as UI from './ui.js';
 
 // 내부에서 구매 콜백 함수를 기억하기 위한 변수
 let cachedBuyCallback = null;
