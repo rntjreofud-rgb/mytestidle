@@ -419,4 +419,29 @@ header h2 { margin: 0; font-size: 1rem; color: #fff; }
         height: 120px;
         position: relative;
     }
+
+
+
+
+    /* 자원 카테고리 제목 */
+.res-category-title {
+    width: 100%;
+    font-size: 0.85rem;
+    color: #8892b0;
+    margin: 15px 0 5px 0;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #333;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* 자원 그리드 (기존 .resource-grid 대신 사용될 서브 그리드들) */
+.sub-res-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 8px;
+    margin-bottom: 10px;
+}
 }

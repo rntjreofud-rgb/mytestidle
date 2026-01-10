@@ -67,7 +67,44 @@ const resNames = {
     quantumData: "💾 양자데이터", gravityModule: "🛸 중력모듈"
 };
 
+const resourceGroups = {
+    raw: {
+        title: "⛏️ 원자재 (Raw Materials)",
+        items: ['wood', 'stone', 'coal', 'ironOre', 'copperOre', 'oil', 'titaniumOre', 'uraniumOre']
+    },
+    material: {
+        title: "🧱 가공 자재 (Materials)",
+        items: ['plank', 'brick', 'glass', 'concrete', 'ironPlate', 'copperPlate', 'steel', 'titaniumPlate', 'advAlloy', 'sulfur', 'plastic']
+    },
+    component: {
+        title: "⚙️ 부품 및 첨단 (High-Tech)",
+        items: ['gear', 'circuit', 'battery', 'optics', 'advCircuit', 'processor', 'fuelCell', 'rocketFuel', 'nanobots', 'aiCore', 'quantumData', 'gravityModule', 'warpCore']
+    }
+};
 
+let isGridInitialized = false;
+function initResourceGrid() {
+    if (isGridInitialized) return;
+    
+    elements.resGrid.innerHTML = ""; // 기존 그리드 초기화
+    elements.resGrid.style.display = "block"; // CSS grid 속성 제거 (블록으로 변경)
+
+    // 3개의 섹션 생성
+    for (const [key, group] of Object.entries(resourceGroups)) {
+        // 제목
+        const title = document.createElement('div');
+        title.className = 'res-category-title';
+        title.innerText = group.title;
+        elements.resGrid.appendChild(title);
+
+        // 서브 그리드 컨테이너
+        const container = document.createElement('div');
+        container.className = 'sub-res-grid';
+        container.id = `grid-group-${key}`;
+        elements.resGrid.appendChild(container);
+    }
+    isGridInitialized = true;
+}
 
 
 function formatNumber(num) {
@@ -153,30 +190,48 @@ function checkResourceDiscovery() {
 
 export function updateScreen(stats) {
     checkResourceDiscovery();
+    
+    // 그리드 구조가 안 잡혀있으면 잡기
+    initResourceGrid();
 
-    // 현재 전력 상태 확인
+    // 전력 상태 확인
     const powerProd = gameData.resources.energy || 0;
     const powerReq = gameData.resources.energyMax || 0;
-    const isPowerShort = powerProd < powerReq; // 전력 부족 여부
+    const isPowerShort = powerProd < powerReq;
 
     for (let key in gameData.resources) {
         if(key === 'energy' || key === 'energyMax') continue;
         if (!gameData.unlockedResources.includes(key)) continue;
 
+        // 카드가 이미 있는지 확인
         let card = document.getElementById(`card-${key}`);
+        
+        // 없으면 새로 생성하여 올바른 그룹에 넣기
         if (!card) {
             card = createResourceCard(key);
-            elements.resGrid.appendChild(card);
+            
+            // 어느 그룹인지 찾기
+            let targetGroupId = 'grid-group-raw'; // 기본값
+            for (const [groupKey, groupData] of Object.entries(resourceGroups)) {
+                if (groupData.items.includes(key)) {
+                    targetGroupId = `grid-group-${groupKey}`;
+                    break;
+                }
+            }
+            
+            // 해당 그룹 컨테이너에 추가
+            const container = document.getElementById(targetGroupId);
+            if(container) container.appendChild(card);
         }
 
+        // 수치 업데이트 (기존 로직 동일)
         const val = gameData.resources[key] || 0;
         const net = (stats[key].prod - stats[key].cons);
         
         card.querySelector('.res-amount').innerText = formatNumber(val);
         const mpsEl = card.querySelector('.res-mps');
 
-        // 전력이 부족한 상태라면 경고 메시지 추가
-        let powerWarning = isPowerShort ? `<span style="color:#f1c40f; font-size:0.7rem;"> [⚡부족]</span>` : "";
+        let powerWarning = isPowerShort ? `<span style="color:#f1c40f; font-size:0.7rem;">⚡</span>` : "";
 
         if (stats[key].prod > 0 && stats[key].cons > 0) {
             mpsEl.innerHTML = `<span style="color:#2ecc71">+${formatNumber(stats[key].prod)}</span>|<span style="color:#e74c3c">-${formatNumber(stats[key].cons)}</span>/s${powerWarning}`;
@@ -186,7 +241,6 @@ export function updateScreen(stats) {
             else if(net > 0) { mpsEl.style.color = "#2ecc71"; mpsEl.innerText = `▲ ${mpsText}/s`; }
             else { mpsEl.style.color = "#7f8c8d"; mpsEl.innerText = `+0.0/s`; }
             
-            // 전력 부족 시 텍스트 뒤에 경고 아이콘 추가
             if (isPowerShort && net !== 0) mpsEl.innerHTML += powerWarning;
         }
     }
