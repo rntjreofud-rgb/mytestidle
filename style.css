@@ -393,6 +393,44 @@ header h2 { margin: 0; font-size: 1rem; color: #fff; }
 ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
 ::-webkit-scrollbar-track { background: #0b0b10; }
 
+
+/* =================================================================
+   ⭐ [핵심 수정] 자원 및 건물 카테고리 접기/펼치기 기능
+   ================================================================= */
+.res-category-title, .build-category-title {
+    cursor: pointer;
+    display: flex !important;
+    justify-content: space-between;
+    align-items: center;
+    transition: background 0.2s;
+    padding: 8px 10px !important;
+    border-radius: 4px;
+    user-select: none; /* 텍스트 선택 방지 */
+}
+
+.res-category-title:hover, .build-category-title:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* 우측 화살표 아이콘 */
+.toggle-arrow {
+    font-size: 0.7rem;
+    transition: transform 0.3s;
+    color: #556;
+}
+
+/* 접혔을 때 화살표 회전 및 그리드 숨김 */
+.collapsed .toggle-arrow {
+    transform: rotate(-90deg);
+}
+
+.collapsed-content {
+    display: none !important;
+}
+
+
+
+
 /* 모바일 대응 (화면 좁을 때) */
 @media (max-width: 1200px) {
     /* 화면이 좁아지면 구획을 1열로 세움 */

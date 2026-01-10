@@ -412,17 +412,13 @@ export function renderResearchTab() {
     container.innerHTML = "";
     if (!gameData.researches) gameData.researches = [];
 
-    // 1. 연구 리스트 분류
     const availableRes = [];
     const completedRes = [];
 
     researchList.forEach(r => {
         const isDone = gameData.researches.includes(r.id);
-        
-        // 해금 조건 체크 (선행 연구 완료 여부)
         const isPrereqDone = r.reqResearch ? gameData.researches.includes(r.reqResearch) : true;
         
-        // 타겟 건물 해금 여부 체크 (건물이 상점에 떠야 연구도 뜸)
         let isTargetVisible = true;
         if (r.type === 'building' || r.type === 'consumption' || r.type === 'energyEff') {
             isTargetVisible = r.target.some(targetId => {
@@ -431,68 +427,54 @@ export function renderResearchTab() {
             });
         }
 
-        if (isDone) {
-            completedRes.push(r);
-        } else if (isPrereqDone && isTargetVisible) {
-            availableRes.push(r);
-        }
+        if (isDone) completedRes.push(r);
+        else if (isPrereqDone && isTargetVisible) availableRes.push(r);
     });
 
-    // 2. 진행 가능한 연구 렌더링
-    if (availableRes.length > 0) {
-        const title = document.createElement('div');
-        title.className = 'research-section-title';
-        title.innerHTML = `🔬 진행 가능한 연구 (${availableRes.length})`;
-        container.appendChild(title);
-
-        availableRes.forEach(r => {
-            container.appendChild(createResearchElement(r, false));
-        });
-    }
-
-    // 3. 완료된 연구 렌더링
-    if (completedRes.length > 0) {
-        const title = document.createElement('div');
-        title.className = 'research-section-title';
-        title.style.color = '#8892b0';
-        title.innerHTML = `✅ 완료된 기술 (${completedRes.length})`;
-        container.appendChild(title);
-
-        completedRes.forEach(r => {
-            container.appendChild(createResearchElement(r, true));
-        });
-    }
+    if (availableRes.length > 0) renderResearchSection("🔬 진행 가능한 연구", availableRes, false, container);
+    if (completedRes.length > 0) renderResearchSection("✅ 완료된 기술", completedRes, true, container);
     
     updateResearchButtons();
 }
 
-// 개별 연구 아이템을 생성하는 보조 함수 (중복 코드 방지)
+function renderResearchSection(titleText, list, isDone, parentContainer) {
+    const title = document.createElement('div');
+    title.className = 'research-section-title';
+    title.style.cursor = "pointer";
+    title.style.userSelect = "none";
+    title.innerHTML = `${titleText} (${list.length}) <span class="toggle-arrow">▼</span>`;
+
+    const subGrid = document.createElement('div');
+    subGrid.className = 'sub-build-grid'; 
+
+    title.onclick = () => {
+        title.classList.toggle('collapsed');
+        subGrid.classList.toggle('collapsed-content');
+    };
+
+    parentContainer.appendChild(title);
+    parentContainer.appendChild(subGrid);
+    list.forEach(r => subGrid.appendChild(createResearchElement(r, isDone)));
+}
+
 function createResearchElement(r, isDone) {
     const div = document.createElement('div');
     div.className = `shop-item research-item ${isDone ? 'done disabled' : ''}`;
     div.id = `research-${r.id}`;
+    let costTxt = Object.entries(r.cost).map(([k, v]) => `${formatNumber(v)}${getResNameOnly(k)}`).join(' ');
     
-    let costTxt = Object.entries(r.cost)
-        .map(([k, v]) => `${formatNumber(v)}${getResNameOnly(k)}`)
-        .join(' ');
+    // 속도 증가 경고 문구 추가
+    let warning = (r.type === 'building' && r.value > 1) ? `<br><span style="color:#ff7675; font-size:0.7rem;">⚠️ 속도 증가 시 재료 소모량 비례 증가</span>` : "";
 
-    div.innerHTML = `
-        <span class="si-name">${r.name}</span>
-        <span class="si-level">${isDone ? '✓' : ''}</span>
-        <div class="si-desc">${r.desc}</div>
-        <div class="si-cost">${isDone ? '연구 완료' : costTxt}</div>
-    `;
-
+    div.innerHTML = `<span class="si-name">${r.name}</span><span class="si-level">${isDone ? '✓' : ''}</span><div class="si-desc">${r.desc}${warning}</div><div class="si-cost">${isDone ? '연구 완료' : costTxt}</div>`;
     if (!isDone) {
         div.onclick = (e) => {
             e.stopPropagation();
             if (Logic.tryBuyResearch(r.id)) {
                 log(`🔬 [연구 완료] ${r.name}`, true);
-                renderResearchTab(); // 탭 다시 그리기
-                renderShop(cachedBuyCallback, Logic.getBuildingCost); // 상점 효율 반영
-            } else {
-                log("연구 자원이 부족합니다.");
-            }
+                renderResearchTab();
+                renderShop(cachedBuyCallback, Logic.getBuildingCost);
+            } else log("연구 자원이 부족합니다.");
         };
     }
     return div;
@@ -518,40 +500,34 @@ function createResourceCard(key) {
 
 function checkUnlocks() {
     const discovered = gameData.unlockedResources || ['wood', 'stone', 'plank'];
-    const toggle = (el, show) => {
-        if(!el) return;
-        if(show) el.classList.remove('hidden'); else el.classList.add('hidden');
-    };
+    const toggle = (el, show) => { if(!el) return; if(show) el.classList.remove('hidden'); else el.classList.add('hidden'); };
     toggle(elements.btns.wood, true);
     toggle(elements.btns.stone, discovered.includes('stone'));
     toggle(elements.btns.plank, discovered.includes('plank'));
     toggle(elements.btns.coal, discovered.includes('coal'));
     toggle(elements.btns.ironOre, discovered.includes('ironOre'));
     toggle(elements.btns.copperOre, discovered.includes('copperOre'));
-    if(elements.navPower) elements.navPower.style.display = (gameData.houseLevel >= 2) ? 'flex' : 'none';
+    
     if(elements.navPower) {
-    const isPowerUnlocked = (gameData.houseLevel >= 5); // 풍력 발전기 등장 시점
-    elements.navPower.style.display = isPowerUnlocked ? 'flex' : 'none';
-    if(isPowerUnlocked && !elements.navPower.classList.contains('unlocked-flash')) {
-        elements.navPower.classList.add('unlocked-flash');
-        log("⚡ 전력 관리 시스템이 활성화되었습니다!", true);
+        const isPowerUnlocked = (gameData.houseLevel >= 5);
+        elements.navPower.style.display = isPowerUnlocked ? 'flex' : 'none';
+        if(isPowerUnlocked && !elements.navPower.classList.contains('unlocked-flash')) {
+            elements.navPower.classList.add('unlocked-flash');
+            log("⚡ 전력 관리 시스템이 활성화되었습니다!", true);
+        }
     }
-}
 }
 
 export function renderShop(onBuyCallback, getCostFunc) {
     if(onBuyCallback) cachedBuyCallback = onBuyCallback;
-    
     if (!elements.buildingList) return;
     elements.buildingList.innerHTML = "";
-    elements.buildingList.style.display = "block"; // 전체 그리드 대신 블록으로 사용
+    elements.buildingList.style.display = "block";
 
     const wood = gameData.resources.wood || 0;
     const isStoneUnlocked = (gameData.houseLevel >= 1 || wood >= 10 || (gameData.buildings[0] && gameData.buildings[0].count > 0));
 
-    // 그룹별로 순회하며 렌더링
     for (const [groupKey, group] of Object.entries(buildingGroups)) {
-        // 이 그룹에 속한 건물 중 현재 해금된(보이는) 건물이 있는지 확인
         const visibleBuildings = gameData.buildings.filter(b => {
             if (!group.ids.includes(b.id)) return false;
             const req = b.reqLevel || 0;
@@ -559,58 +535,48 @@ export function renderShop(onBuyCallback, getCostFunc) {
             return gameData.houseLevel >= req;
         });
 
-        // 해금된 건물이 하나도 없는 그룹은 제목조차 보여주지 않음 (UI 깔끔)
         if (visibleBuildings.length === 0) continue;
 
-        // 그룹 제목 생성
         const title = document.createElement('div');
         title.className = 'build-category-title';
-        title.innerText = group.title;
-        elements.buildingList.appendChild(title);
-
-        // 그룹 컨테이너(서브 그리드) 생성
+        title.innerHTML = `${group.title} <span class="toggle-arrow">▼</span>`;
         const subGrid = document.createElement('div');
         subGrid.className = 'sub-build-grid';
+        title.onclick = () => {
+            title.classList.toggle('collapsed');
+            subGrid.classList.toggle('collapsed-content');
+        };
+
+        elements.buildingList.appendChild(title);
         elements.buildingList.appendChild(subGrid);
 
-        // 해당 그룹의 건물들 배치
         visibleBuildings.forEach(b => {
             const index = gameData.buildings.findIndex(build => build.id === b.id);
-            const div = createBuildingElement(b, index, getCostFunc);
-            subGrid.appendChild(div);
+            subGrid.appendChild(createBuildingElement(b, index, getCostFunc));
         });
     }
-    
     updateShopButtons(getCostFunc);
 }
 
-// 개별 건물 엘리먼트 생성 보조 함수 (기존 renderShop 내부 로직 분리)
 function createBuildingElement(b, index, getCostFunc) {
     const div = document.createElement('div');
     div.className = `shop-item`;
     div.id = `build-${index}`;
-    
     const cost = getCostFunc(b);
     let costTxt = Object.entries(cost).map(([k, v]) => `${formatNumber(v)}${getResNameOnly(k)}`).join(' ');
-
     let speedMult = Logic.getBuildingMultiplier(b.id);
     let consMult = Logic.getBuildingConsumptionMultiplier(b.id);
     let energyEff = Logic.getEnergyEfficiencyMultiplier(b.id);
-
     let inArr = b.inputs ? Object.entries(b.inputs).map(([k,v]) => {
         let finalVal = v * speedMult * consMult;
         if (k === 'energy') finalVal *= energyEff;
         return `${formatNumber(finalVal)}${k === 'energy' ? '⚡' : getResNameOnly(k)}`;
     }) : [];
-    
     let outArr = b.outputs ? Object.entries(b.outputs).map(([k,v]) => `${formatNumber(v * speedMult)}${k === 'energy' ? '⚡' : getResNameOnly(k)}`) : [];
-    
     let processTxt = "";
     if (inArr.length > 0) processTxt += `<span style="color:#e74c3c">-${inArr.join(',')}</span> `;
     if (outArr.length > 0) processTxt += `➡<span style="color:#2ecc71">+${outArr.join(',')}</span>/s`;
-
     div.innerHTML = `<span class="si-name">${b.name}</span><span class="si-level">Lv.${b.count}</span><div class="si-desc">${processTxt}</div><div class="si-cost">${costTxt}</div>`;
-    
     div.onclick = () => { if(cachedBuyCallback) cachedBuyCallback(index); };
     return div;
 }
@@ -631,9 +597,8 @@ export function updateHouseUI(onUpgrade) {
     const currentStage = houseStages[gameData.houseLevel];
     if(elements.houseName) elements.houseName.innerText = `Lv.${gameData.houseLevel} ${currentStage.name}`;
     if(elements.houseDesc) elements.houseDesc.innerText = currentStage.desc;
-
     if (nextStage) {
-        const reqTxt = Object.entries(nextStage.req).filter(([k,v]) => k !== 'energy').map(([k,v]) => `${resNames[k].split(' ')[1]}${formatNumber(v)}`).join(',');
+        const reqTxt = Object.entries(nextStage.req).filter(([k,v]) => k !== 'energy').map(([k,v]) => `${getResNameOnly(k)}${formatNumber(v)}`).join(',');
         elements.upgradeBtn.innerText = `⬆️ ${nextStage.name} (${reqTxt})`;
         elements.upgradeBtn.onclick = () => onUpgrade(nextStage);
         let canUp = true;
