@@ -21,110 +21,56 @@ export let gameData = {
     houseLevel: 0,
     researches: [], 
    buildings: [
-    // === TIER 1: 원시 및 기초 (Lv.0 ~ 5) ===
     { id: 0, name: "수동 벌목 캠프", cost: { wood: 10 }, inputs: null, outputs: { wood: 0.5 }, count: 0, reqLevel: 0 },
     { id: 1, name: "자동 벌목기", cost: { wood: 50, stone: 10 }, inputs: null, outputs: { wood: 2 }, count: 0, reqLevel: 0.5 },
     { id: 2, name: "채석 작업장", cost: { wood: 100, plank: 10 }, inputs: null, outputs: { stone: 1 }, count: 0, reqLevel: 0.5 },
-    { id: 40, name: "노천 철광산", cost: { stone: 150, plank: 30 }, inputs: null, outputs: { ironOre: 0.8 }, count: 0, reqLevel: 2 },
-    { id: 41, name: "노천 구리광산", cost: { stone: 150, plank: 30 }, inputs: null, outputs: { copperOre: 0.8 }, count: 0, reqLevel: 2 },
     { id: 3, name: "석탄 노천 채굴장", cost: { stone: 200, plank: 50 }, inputs: null, outputs: { coal: 1 }, count: 0, reqLevel: 1 },
     { id: 4, name: "증기압 제재소", cost: { plank: 50, coal: 10 }, inputs: { wood: 3 }, outputs: { plank: 2 }, count: 0, reqLevel: 1 },
     { id: 5, name: "원시 흙 가마", cost: { stone: 50 }, inputs: { stone: 2, wood: 1 }, outputs: { brick: 1 }, count: 0, reqLevel: 0.5 },
-    { 
-    id: 48, 
-    name: "목탄 제조 가마", 
-    cost: { stone: 150, plank: 30 }, 
-    inputs: { wood: 10 },           // 나무 10개 소모
-    outputs: { coal: 2.0 },         // 석탄 2개 생산
-    count: 0, 
-    reqLevel: 3                    // 석탄이 많이 필요해지는 시점(Lv.3)에 해금
-},
-    // === TIER 2: 산업 기초 및 전력 (Lv.5 ~ 10) ===
-    { id: 16, name: "콘크리트 믹서", cost: { ironPlate: 200, brick: 100 }, inputs: { stone: 10, energy: 5 }, outputs: { concrete: 2 }, count: 0, reqLevel: 5 }, // 집 Lv.6 대비
     { id: 6, name: "기초 철 용광로", cost: { brick: 50, stone: 100 }, inputs: { ironOre: 2, coal: 1 }, outputs: { ironPlate: 1 }, count: 0, reqLevel: 4 },
     { id: 7, name: "기초 구리 용광로", cost: { brick: 50, stone: 100 }, inputs: { copperOre: 2, coal: 1 }, outputs: { copperPlate: 1 }, count: 0, reqLevel: 4 },
     { id: 8, name: "풍력 발전기", cost: { plank: 100, ironPlate: 20 }, inputs: null, outputs: { energy: 15 }, count: 0, reqLevel: 5 },
-    { id: 9, name: "기계식 조립대", cost: { ironPlate: 100, copperPlate: 50 }, inputs: { ironPlate: 2 }, outputs: { gear: 1 }, count: 0, reqLevel: 5 }, // Gear 비용 제거로 데드락 해제
-    { id: 42, name: "전기 철 채굴기", cost: { ironPlate: 200, gear: 50 }, inputs: { energy: 15 }, outputs: { ironOre: 2 }, count: 0, reqLevel: 7},
-    { id: 43, name: "전기 구리 채굴기", cost: { ironPlate: 200, gear: 50 }, inputs: { energy: 15 }, outputs: { copperOre: 2 }, count: 0, reqLevel: 7},
-    { id: 44, name: "전기 석탄 채굴기", cost: { copperPlate: 200, gear: 50 }, inputs: { energy: 20 }, outputs: { coal: 5 }, count: 0, reqLevel: 8},
-    { id: 45, name: "전기 석재 채굴기", cost: { copperPlate: 200, gear: 50 }, inputs: { energy: 20 }, outputs: { stone: 2 }, count: 0, reqLevel: 9},
-    { 
-    id: 47, 
-    name: "바이오 수목 배양소", 
-    cost: { steel: 2000, glass: 1000, circuit: 500 }, 
-    inputs: { energy: 40 },       // 전력 소모
-    outputs: { wood: 50.0 },      // 초당 나무 50개 생산 (자동 벌목기의 25배)
-    count: 0, 
-    reqLevel: 14                  // 유리 온실(Lv.13) 이후 바로 해금
-},
-    // === TIER 3: 금속 공학 (Lv.10 ~ 20) ===
-    { id: 13, name: "강철 제련소", cost: { ironPlate: 300, brick: 300 }, inputs: { ironPlate: 4, coal: 5, energy: 10 }, outputs: { steel: 2 }, count: 0, reqLevel: 8 }, // 집 Lv.11 대비
-    { id: 18, name: "유리 용해로", cost: { brick: 500, stone: 500 }, inputs: { stone: 5, coal: 2 }, outputs: { glass: 2 }, count: 0, reqLevel: 10 }, // 집 Lv.12 대비
+    { id: 9, name: "기계식 조립대", cost: { ironPlate: 100, copperPlate: 50 }, inputs: { ironPlate: 2 }, outputs: { gear: 1 }, count: 0, reqLevel: 5 },
+    { id: 13, name: "강철 제련소", cost: { ironPlate: 300, brick: 300 }, inputs: { ironPlate: 4, coal: 5, energy: 10 }, outputs: { steel: 2 }, count: 0, reqLevel: 8 },
     { id: 14, name: "석탄 발전소", cost: { steel: 100, copperPlate: 100 }, inputs: { coal: 3 }, outputs: { energy: 50 }, count: 0, reqLevel: 12 },
-    { id: 15, name: "자동화 회로 공장", cost: { steel: 200, copperPlate: 300 }, inputs: { copperPlate: 3, energy: 8 }, outputs: { circuit: 1 }, count: 0, reqLevel: 9 }, // 집 Lv.10 대비
-    { id: 27, name: "정밀 렌즈 가공기", cost: { glass: 500, steel: 500 }, inputs: { glass: 4, energy: 20 }, outputs: { optics: 1 }, count: 0, reqLevel: 14 },
-    { id: 31, name: "반도체 클린룸", cost: { circuit: 1000, glass: 500 }, inputs: { circuit: 4, plastic: 10, optics: 2, energy: 100 }, outputs: { processor: 1 }, count: 0, reqLevel: 17 }, // 집 Lv.19 대비
-    { id: 22, name: "배터리 화학 공장", cost: { plastic: 500, circuit: 500 }, inputs: { stone: 10, sulfur: 2, energy: 25 }, outputs: { battery: 1 }, count: 0, reqLevel: 16 }, // 집 Lv.19 대비
-    { id: 46, name: "원유 발전소", cost: { steel: 800, copperPlate: 500, gear: 300 }, inputs: { oil: 2 }, outputs: { energy: 250 }, count: 0, reqLevel: 15 },
-    // === TIER 4: 석유 및 고급 소재 (Lv.20 ~ 30) ===
-    { id: 25, name: "티타늄 채굴 드릴", cost: { steel: 2000, circuit: 1000 }, inputs: { energy: 60 }, outputs: { titaniumOre: 2 }, count: 0, reqLevel: 19 }, // 
-    { id: 20, name: "원유 시추 펌프", cost: { steel: 1000, circuit: 500 }, inputs: { energy: 20 }, outputs: { oil: 5 }, count: 0, reqLevel: 13 }, // 집 Lv.14 대비 하향
-    { id: 21, name: "석유 정제 시설", cost: { steel: 2000, copperPlate: 1000 }, inputs: { oil: 10, energy: 30 }, outputs: { plastic: 2, sulfur: 1 }, count: 0, reqLevel: 13 }, // 집 Lv.14 대비 하향
-    { id: 24, name: "고급 조립 라인", cost: { steel: 5000, circuit: 2000 }, inputs: { circuit: 5, plastic: 5, energy: 80 }, outputs: { advCircuit: 1 }, count: 0, reqLevel: 21 }, // 집 Lv.23 대비
-    { id: 35, name: "로켓 연료 정제소", cost: { oil: 10000, sulfur: 5000 }, inputs: { oil: 50, sulfur: 30, energy: 200 }, outputs: { rocketFuel: 2 }, count: 0, reqLevel: 24 }, // 집 Lv.26 대비
-    { id: 33, name: "AI 연산 서버", cost: { processor: 200, battery: 1000 }, inputs: { processor: 5, energy: 500 }, outputs: { aiCore: 1 }, count: 0, reqLevel: 27 }, // 집 Lv.29 대비
+    { id: 15, name: "자동화 회로 공장", cost: { steel: 200, copperPlate: 300 }, inputs: { copperPlate: 3, energy: 8 }, outputs: { circuit: 1 }, count: 0, reqLevel: 9 },
+    { id: 16, name: "콘크리트 믹서", cost: { ironPlate: 200, brick: 100 }, inputs: { stone: 10, energy: 5 }, outputs: { concrete: 2 }, count: 0, reqLevel: 5 },
+    { id: 18, name: "유리 용해로", cost: { brick: 500, stone: 500 }, inputs: { stone: 5, coal: 2 }, outputs: { glass: 2 }, count: 0, reqLevel: 10 },
+    { id: 20, name: "원유 시추 펌프", cost: { steel: 1000, circuit: 500 }, inputs: { energy: 20 }, outputs: { oil: 5 }, count: 0, reqLevel: 13 },
+    { id: 21, name: "석유 정제 시설", cost: { steel: 2000, copperPlate: 1000 }, inputs: { oil: 10, energy: 30 }, outputs: { plastic: 2, sulfur: 1 }, count: 0, reqLevel: 13 },
+    { id: 22, name: "배터리 화학 공장", cost: { plastic: 500, circuit: 500 }, inputs: { stone: 10, sulfur: 2, energy: 25 }, outputs: { battery: 1 }, count: 0, reqLevel: 16 },
     { id: 23, name: "태양광 패널 농장", cost: { glass: 2000, circuit: 2000 }, inputs: null, outputs: { energy: 400 }, count: 0, reqLevel: 25 },
+    { id: 24, name: "고급 조립 라인", cost: { steel: 5000, titaniumPlate: 500, circuit: 2000 }, inputs: { circuit: 5, plastic: 5, optics: 2, energy: 80 }, outputs: { advCircuit: 1 }, count: 0, reqLevel: 21 },
+    { id: 25, name: "티타늄 채굴 드릴", cost: { steel: 2000, circuit: 1000 }, inputs: { energy: 60 }, outputs: { titaniumOre: 2 }, count: 0, reqLevel: 19 },
     { id: 26, name: "티타늄 제련소", cost: { titaniumOre: 1000, steel: 5000 }, inputs: { titaniumOre: 3, coal: 10, energy: 100 }, outputs: { titaniumPlate: 1 }, count: 0, reqLevel: 20 },
-    { 
-    id: 36, 
-    name: "퀀텀 컴퓨터 메인프레임", 
-    cost: { processor: 1000, advCircuit: 2000, titaniumPlate: 5000 }, 
-    inputs: { energy: 500 }, 
-    outputs: { quantumData: 10 }, 
-    count: 0, 
-    reqLevel: 35 
-},
-{ 
-    id: 49, 
-    name: "지각 심부 드릴", 
-    cost: { steel: 5000, titaniumPlate: 2000, gear: 1000 }, 
-    inputs: { energy: 150 }, 
-    outputs: { stone: 50.0 },     // 초당 돌 100개 (전기 채굴기의 20배)
-    count: 0, 
-    reqLevel: 20 
-},
-{ 
-    id: 50, 
-    name: "대형 아크 용광로", 
-    cost: { titaniumPlate: 5000, advCircuit: 1000, concrete: 5000 }, 
-    inputs: { ironOre: 20, copperOre: 20, coal: 10, energy: 300 }, 
-    outputs: { ironPlate: 20, copperPlate: 20, steel: 10 }, // 철판 20개 구리판 20개 강철 10개를 동시에 생산
-    count: 0, 
-    reqLevel: 30 
-},
-{ 
-    id: 37, 
-    name: "중력 제어 연구소", 
-    cost: { nanobots: 1000, advAlloy: 2000, titaniumPlate: 10000 }, 
-    inputs: { energy: 5000, quantumData: 5 }, 
-    outputs: { gravityModule: 1 }, 
-    count: 0, 
-    reqLevel: 37 
-},
-{ id: 52, name: "대기 유황 포집기", cost: { titaniumPlate: 5000, optics: 1000, plastic: 10000 }, inputs: { energy: 200 }, outputs: { sulfur: 30.0 }, count: 0, reqLevel: 28 },
-{ id: 51, name: "초전도 자기력 채굴기", cost: { steel: 10000, advCircuit: 2000, concrete: 5000 }, inputs: { energy: 250 }, outputs: { copperOre: 50.0 }, count: 0, reqLevel: 25 },
-{ id: 53, name: "심부 우라늄 파쇄기", cost: { advAlloy: 5000, aiCore: 200, concrete: 20000 }, inputs: { energy: 500 }, outputs: { uraniumOre: 10.0 }, count: 0, reqLevel: 40 },
-{ id: 54, name: "심해 해상 시추 플랫폼", cost: { steel: 50000, concrete: 30000, advCircuit: 5000 }, inputs: { energy: 400 }, outputs: { oil: 100.0 }, count: 0, reqLevel: 30 },
-    // === TIER 5: 원자력 및 우주 기술 (Lv.30 ~ 50) ===
+    { id: 27, name: "정밀 렌즈 가공기", cost: { glass: 500, steel: 500 }, inputs: { glass: 4, energy: 20 }, outputs: { optics: 1 }, count: 0, reqLevel: 14 },
     { id: 28, name: "우라늄 채굴기", cost: { titaniumPlate: 2000, advCircuit: 500 }, inputs: { energy: 150 }, outputs: { uraniumOre: 1 }, count: 0, reqLevel: 32 },
     { id: 29, name: "원심 분리기", cost: { steel: 10000, gear: 5000 }, inputs: { uraniumOre: 10, energy: 200 }, outputs: { fuelCell: 1 }, count: 0, reqLevel: 35 },
     { id: 30, name: "원자력 발전소", cost: { concrete: 5000, titaniumPlate: 2000 }, inputs: { fuelCell: 1 }, outputs: { energy: 2500 }, count: 0, reqLevel: 38 },
+    { id: 31, name: "반도체 클린룸", cost: { circuit: 1000, glass: 500 }, inputs: { circuit: 4, plastic: 10, optics: 2, energy: 100 }, outputs: { processor: 1 }, count: 0, reqLevel: 17 },
     { id: 32, name: "나노 팩토리", cost: { processor: 500, titaniumPlate: 5000 }, inputs: { processor: 2, steel: 10, energy: 500 }, outputs: { nanobots: 1 }, count: 0, reqLevel: 40 },
+    { id: 33, name: "AI 연산 서버", cost: { processor: 200, battery: 1000 }, inputs: { processor: 5, energy: 500 }, outputs: { aiCore: 1 }, count: 0, reqLevel: 27 },
     { id: 34, name: "고급 합금 용광로", cost: { titaniumPlate: 5000, concrete: 10000 }, inputs: { titaniumPlate: 5, steel: 20, energy: 600 }, outputs: { advAlloy: 2 }, count: 0, reqLevel: 42 },
+    { id: 35, name: "로켓 연료 정제소", cost: { oil: 10000, sulfur: 5000 }, inputs: { oil: 50, sulfur: 30, energy: 200 }, outputs: { rocketFuel: 2 }, count: 0, reqLevel: 24 },
+    { id: 36, name: "퀀텀 컴퓨터 메인프레임", cost: { processor: 1000, advCircuit: 2000, titaniumPlate: 5000 }, inputs: { energy: 500 }, outputs: { quantumData: 10 }, count: 0, reqLevel: 35 },
+    { id: 37, name: "중력 제어 연구소", cost: { nanobots: 1000, advAlloy: 2000, titaniumPlate: 10000 }, inputs: { energy: 5000, quantumData: 5 }, outputs: { gravityModule: 1 }, count: 0, reqLevel: 37 },
     { id: 38, name: "항성간 추진기 공장", cost: { advAlloy: 5000, aiCore: 500, titaniumPlate: 10000 }, inputs: { advAlloy: 10, rocketFuel: 100, energy: 2000 }, outputs: { warpCore: 1 }, count: 0, reqLevel: 45 },
-    { id: 39, name: "다이슨 스웜 송신기", cost: { advAlloy: 20000, aiCore: 1000 }, inputs: null, outputs: { energy: 100000 }, count: 0, reqLevel: 48 }
-    
+    { id: 39, name: "다이슨 스웜 송신기", cost: { advAlloy: 20000, aiCore: 1000 }, inputs: null, outputs: { energy: 100000 }, count: 0, reqLevel: 48 },
+    { id: 40, name: "노천 철광산", cost: { stone: 150, plank: 30 }, inputs: null, outputs: { ironOre: 0.8 }, count: 0, reqLevel: 2 },
+    { id: 41, name: "노천 구리광산", cost: { stone: 150, plank: 30 }, inputs: null, outputs: { copperOre: 0.8 }, count: 0, reqLevel: 2 },
+    { id: 42, name: "전기 철 채굴기", cost: { ironPlate: 200, gear: 50 }, inputs: { energy: 15 }, outputs: { ironOre: 2 }, count: 0, reqLevel: 7 },
+    { id: 43, name: "전기 구리 채굴기", cost: { ironPlate: 200, gear: 50 }, inputs: { energy: 15 }, outputs: { copperOre: 2 }, count: 0, reqLevel: 7 },
+    { id: 44, name: "전기 석탄 채굴기", cost: { copperPlate: 200, gear: 50 }, inputs: { energy: 20 }, outputs: { coal: 5 }, count: 0, reqLevel: 8 },
+    { id: 45, name: "전기 석재 채굴기", cost: { copperPlate: 200, gear: 50 }, inputs: { energy: 20 }, outputs: { stone: 2 }, count: 0, reqLevel: 9 },
+    { id: 46, name: "원유 발전소", cost: { steel: 800, copperPlate: 500, gear: 300 }, inputs: { oil: 2 }, outputs: { energy: 250 }, count: 0, reqLevel: 15 },
+    { id: 47, name: "바이오 수목 배양소", cost: { steel: 2000, glass: 1000, circuit: 500 }, inputs: { energy: 40 }, outputs: { wood: 50.0 }, count: 0, reqLevel: 14 },
+    { id: 48, name: "목탄 제조 가마", cost: { stone: 150, plank: 30 }, inputs: { wood: 10 }, outputs: { coal: 2.0 }, count: 0, reqLevel: 3 },
+    { id: 49, name: "지각 심부 드릴", cost: { steel: 5000, titaniumPlate: 2000, gear: 1000 }, inputs: { energy: 150 }, outputs: { stone: 50.0 }, count: 0, reqLevel: 20 },
+    { id: 50, name: "대형 아크 용광로", cost: { titaniumPlate: 5000, advCircuit: 1000, concrete: 5000 }, inputs: { ironOre: 20, copperOre: 20, coal: 10, energy: 300 }, outputs: { ironPlate: 20, copperPlate: 20, steel: 10 }, count: 0, reqLevel: 30 },
+    { id: 51, name: "초전도 자기력 채굴기", cost: { steel: 10000, advCircuit: 2000, concrete: 5000 }, inputs: { energy: 250 }, outputs: { copperOre: 50.0 }, count: 0, reqLevel: 25 },
+    { id: 52, name: "대기 유황 포집기", cost: { titaniumPlate: 5000, optics: 1000, plastic: 10000 }, inputs: { energy: 200 }, outputs: { sulfur: 30.0 }, count: 0, reqLevel: 28 },
+    { id: 53, name: "심부 우라늄 파쇄기", cost: { advAlloy: 5000, aiCore: 200, concrete: 20000 }, inputs: { energy: 500 }, outputs: { uraniumOre: 10.0 }, count: 0, reqLevel: 40 },
+    { id: 54, name: "심해 해상 시추 플랫폼", cost: { steel: 50000, concrete: 30000, advCircuit: 5000 }, inputs: { energy: 400 }, outputs: { oil: 100.0 }, count: 0, reqLevel: 30 }
 ]
 };
 
