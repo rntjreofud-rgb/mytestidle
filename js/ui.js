@@ -247,17 +247,29 @@ function updatePowerUI() {
         }
     }
 
-    // 2. 상세 내역 렌더링
+    // 2. 상세 내역 렌더링 (DOM 재활용 방식)
     const container = document.getElementById('power-breakdown-container');
     if (!container) return;
 
-    let html = `<table style="width:100%; border-collapse: collapse; font-size: 0.85rem;">
-                <tr style="border-bottom: 1px solid #444; color: #8892b0;">
-                    <th style="text-align:left; padding: 5px;">건물명</th>
-                    <th style="text-align:right; padding: 5px;">개수</th>
-                    <th style="text-align:center; padding: 5px;">전원 제어</th>
-                    <th style="text-align:right; padding: 5px;">에너지</th>
-                </tr>`;
+    // 테이블이 없으면 기본 뼈대 생성 (최초 1회만 실행됨)
+    let table = container.querySelector('table');
+    if (!table) {
+        container.innerHTML = `
+            <table style="width:100%; border-collapse: collapse; font-size: 0.85rem;">
+                <thead>
+                    <tr style="border-bottom: 1px solid #444; color: #8892b0;">
+                        <th style="text-align:left; padding: 5px;">건물명</th>
+                        <th style="text-align:right; padding: 5px;">개수</th>
+                        <th style="text-align:center; padding: 5px;">전원 제어</th>
+                        <th style="text-align:right; padding: 5px;">에너지</th>
+                    </tr>
+                </thead>
+                <tbody id="power-list-body"></tbody>
+            </table>`;
+        table = container.querySelector('table');
+    }
+
+    const tbody = container.querySelector('#power-list-body');
 
     gameData.buildings.forEach(b => {
         if (b.count > 0) {
@@ -270,59 +282,97 @@ function updatePowerUI() {
 
             if (!isProducer && !isConsumer) return;
 
-            let energyTxt = "";
-            let rowStyle = "";
+            // 에너지 텍스트 계산
+            let energyVal = 0;
+            let isPlus = false;
             
-            // 전원 상태에 따른 텍스트 및 스타일
-            // undefined 방지를 위해 false가 아니면 켜진 것으로 간주
-            const isOn = (b.on !== false);
-
-            if (!isOn) {
-                energyTxt = `<span style="color:#7f8c8d;">0 MW</span>`;
-                rowStyle = "opacity: 0.5; filter: grayscale(1);"; 
-            } else {
+            // 켜져 있을 때만 계산
+            if (b.on !== false) { 
                 if (isProducer) {
-                    const totalProd = b.outputs.energy * b.count * speedMult;
-                    energyTxt = `<span style="color:#2ecc71">+${formatNumber(totalProd)} MW</span>`;
+                    energyVal = b.outputs.energy * b.count * speedMult;
+                    isPlus = true;
                 } else {
-                    const totalCons = b.inputs.energy * consMult * energyEff * b.count * speedMult;
-                    energyTxt = `<span style="color:#e74c3c">-${formatNumber(totalCons)} MW</span>`;
+                    energyVal = b.inputs.energy * consMult * energyEff * b.count * speedMult;
                 }
             }
 
-            // ⭐ [핵심 변경] 버튼 2개 생성 (ON 버튼 / OFF 버튼)
-            // 현재 상태인 버튼은 밝게, 아닌 버튼은 어둡게 처리
-            const onStyle = isOn 
-                ? "background:#2ecc71; color:#fff; font-weight:bold; border:1px solid #27ae60;" 
-                : "background:#333; color:#777; border:1px solid #555;";
+            // --- 여기서부터가 핵심: 이미 있는 줄인지 확인 ---
+            let row = document.getElementById(`pwr-row-${b.id}`);
             
-            const offStyle = !isOn 
-                ? "background:#e74c3c; color:#fff; font-weight:bold; border:1px solid #c0392b;" 
-                : "background:#333; color:#777; border:1px solid #555;";
+            // 없으면 새로 만듦 (딱 한 번만 실행됨)
+            if (!row) {
+                row = document.createElement('tr');
+                row.id = `pwr-row-${b.id}`;
+                row.style.borderBottom = "1px solid rgba(255,255,255,0.05)";
+                
+                // 셀 생성
+                row.innerHTML = `
+                    <td class="p-name" style="padding: 5px;"></td>
+                    <td class="p-count" style="text-align:right; padding: 5px; font-weight:bold;"></td>
+                    <td class="p-ctrl" style="text-align:center; padding: 5px; display:flex; justify-content:center; gap:5px;"></td>
+                    <td class="p-energy" style="text-align:right; padding: 5px;"></td>
+                `;
 
-            // class="btn-power-ctrl"와 data-type="on/off" data-id="..."를 사용해 식별
-            const buttonsHtml = `
-                <div style="display:flex; justify-content:center; gap:5px;">
-                    <button class="btn-power-ctrl" data-type="on" data-id="${b.id}" style="${onStyle} padding:4px 8px; border-radius:4px; cursor:pointer;">ON</button>
-                    <button class="btn-power-ctrl" data-type="off" data-id="${b.id}" style="${offStyle} padding:4px 8px; border-radius:4px; cursor:pointer;">OFF</button>
-                </div>
-            `;
+                // ⭐ 버튼 직접 생성 및 이벤트 연결 (HTML 문자열 아님!)
+                const btnOn = document.createElement('button');
+                btnOn.innerText = "ON";
+                btnOn.style.cssText = "padding:4px 8px; border-radius:4px; cursor:pointer; border:1px solid #555;";
+                // ⭐ 여기서 직접 함수를 연결하므로 무조건 작동함
+                btnOn.onclick = function() { 
+                    b.on = true; 
+                    // 즉시 갱신하지 않아도 다음 프레임에 반영되지만, 반응성을 위해 호출
+                    UI.updateScreen(Logic.calculateNetMPS()); 
+                };
 
-            html += `<tr style="${rowStyle} border-bottom: 1px solid rgba(255,255,255,0.05);">
-                <td style="padding: 5px;">${b.name}</td>
-                <td style="text-align:right; padding: 5px; font-weight:bold;">${formatNumber(b.count)}</td>
-                <td style="text-align:center; padding: 5px;">${buttonsHtml}</td>
-                <td style="text-align:right; padding: 5px;">${energyTxt}</td>
-            </tr>`;
+                const btnOff = document.createElement('button');
+                btnOff.innerText = "OFF";
+                btnOff.style.cssText = "padding:4px 8px; border-radius:4px; cursor:pointer; border:1px solid #555;";
+                btnOff.onclick = function() { 
+                    b.on = false; 
+                    UI.updateScreen(Logic.calculateNetMPS()); 
+                };
+
+                // 버튼을 셀에 넣음
+                const ctrlCell = row.querySelector('.p-ctrl');
+                ctrlCell.appendChild(btnOn);
+                ctrlCell.appendChild(btnOff);
+
+                // 버튼 참조를 row에 저장해둠 (나중에 스타일 바꾸려고)
+                row.btnOn = btnOn;
+                row.btnOff = btnOff;
+
+                tbody.appendChild(row);
+            }
+
+            // --- 매 프레임마다 내용(텍스트, 색상)만 업데이트 ---
+            
+            // 1. 이름 및 개수
+            row.querySelector('.p-name').innerHTML = `${b.name}`;
+            row.querySelector('.p-count').innerText = formatNumber(b.count);
+
+            // 2. 에너지 텍스트 및 투명도 처리
+            const energyCell = row.querySelector('.p-energy');
+            if (b.on === false) {
+                energyCell.innerHTML = `<span style="color:#7f8c8d;">0 MW</span>`;
+                row.style.opacity = "0.5";
+            } else {
+                row.style.opacity = "1";
+                if (isPlus) energyCell.innerHTML = `<span style="color:#2ecc71">+${formatNumber(energyVal)} MW</span>`;
+                else energyCell.innerHTML = `<span style="color:#e74c3c">-${formatNumber(energyVal)} MW</span>`;
+            }
+
+            // 3. 버튼 스타일 실시간 변경
+            const isOn = (b.on !== false);
+            
+            row.btnOn.style.background = isOn ? "#2ecc71" : "#333";
+            row.btnOn.style.color = isOn ? "#fff" : "#777";
+            row.btnOn.style.borderColor = isOn ? "#27ae60" : "#555";
+
+            row.btnOff.style.background = !isOn ? "#e74c3c" : "#333";
+            row.btnOff.style.color = !isOn ? "#fff" : "#777";
+            row.btnOff.style.borderColor = !isOn ? "#c0392b" : "#555";
         }
     });
-
-    html += `</table>`;
-    
-    // 내용이 다를 때만 갱신 (깜빡임 최소화)
-    if (container.innerHTML !== html) {
-        container.innerHTML = html;
-    }
 }
 
 export function renderResearchTab() {
