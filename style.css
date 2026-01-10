@@ -412,7 +412,7 @@ header h2 { margin: 0; font-size: 1rem; color: #fff; }
 /* =================================================================
    ⭐ [핵심 수정] 자원 및 건물 카테고리 접기/펼치기 기능
    ================================================================= */
-.res-category-title, .build-category-title {
+.res-category-title, .build-category-title .research-section-title {
     cursor: pointer;
     display: flex !important;
     justify-content: space-between;
@@ -423,7 +423,7 @@ header h2 { margin: 0; font-size: 1rem; color: #fff; }
     user-select: none; /* 텍스트 선택 방지 */
 }
 
-.res-category-title:hover, .build-category-title:hover {
+.res-category-title:hover, .build-category-title:hover .research-section-title:hover {
     background: rgba(255, 255, 255, 0.05);
 }
 

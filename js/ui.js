@@ -90,20 +90,29 @@ function initResourceGrid() {
     if (isGridInitialized) return;
     
     elements.resGrid.innerHTML = ""; // 기존 그리드 초기화
-    elements.resGrid.style.display = "block"; // CSS grid 속성 제거 (블록으로 변경)
+    elements.resGrid.style.display = "block"; // 블록으로 변경하여 섹션별 배치
 
     // 3개의 섹션 생성
     for (const [key, group] of Object.entries(resourceGroups)) {
-        // 제목
+        // 1. 제목 생성 (화살표 <span class="toggle-arrow">▼</span> 추가)
         const title = document.createElement('div');
         title.className = 'res-category-title';
-        title.innerText = group.title;
-        elements.resGrid.appendChild(title);
-
-        // 서브 그리드 컨테이너
+        title.innerHTML = `${group.title} <span class="toggle-arrow">▼</span>`;
+        
+        // 2. 자원 카드를 담을 컨테이너 생성
         const container = document.createElement('div');
         container.className = 'sub-res-grid';
         container.id = `grid-group-${key}`;
+
+        // 3. ⭐ [핵심 추가] 제목 클릭 시 접고 펴는 이벤트 리스너 등록
+        title.onclick = () => {
+            // 제목에 collapsed 클래스를 붙여 화살표 회전 (CSS 필요)
+            title.classList.toggle('collapsed');
+            // 컨테이너에 collapsed-content 클래스를 붙여 숨김 (CSS 필요)
+            container.classList.toggle('collapsed-content');
+        };
+
+        elements.resGrid.appendChild(title);
         elements.resGrid.appendChild(container);
     }
     isGridInitialized = true;
