@@ -30,34 +30,34 @@ export function calculateNetMPS() {
         stats[key] = { prod: 0, cons: 0 };
     }
 
-    // 현재 전력 공급률 계산
+    // 현재 전력 상태 계산
     const totalProd = gameData.resources.energy || 0;
     const totalReq = gameData.resources.energyMax || 0;
     const powerFactor = totalReq > 0 ? Math.min(1.0, totalProd / totalReq) : 1.0;
 
     gameData.buildings.forEach(b => {
-        if (b.count > 0) {
+        // ⭐ [핵심] 건물의 개수가 0보다 크고, 전원이 켜져 있을 때만(false가 아닐 때) 계산
+        if (b.count > 0 && b.on !== false) {
             let speedMult = getBuildingMultiplier(b.id);
             let consMult = getBuildingConsumptionMultiplier(b.id);
-            let energyEff = getEnergyEfficiencyMultiplier(b.id);
-
-            // ⭐ 전력을 사용하는 건물은 powerFactor만큼 효율이 떨어짐
-            let currentEfficiency = speedMult;
+            
+            // 전력을 쓰는 건물은 전력 공급률에 영향을 받음
+            let efficiency = speedMult;
             if (b.inputs && b.inputs.energy) {
-                currentEfficiency *= powerFactor;
+                efficiency *= powerFactor;
             }
 
             if (b.inputs) {
                 for (let res in b.inputs) {
                     if(res !== 'energy') {
-                        // 통계에 실시간 효율(powerFactor) 반영
-                        stats[res].cons += (b.inputs[res] * consMult) * b.count * currentEfficiency;
+                        // 실제 소모량 통계에 반영
+                        stats[res].cons += (b.inputs[res] * consMult) * b.count * efficiency;
                     }
                 }
             }
-            if (b.outputs && !b.outputs.energy) { // 전력 생산 시설은 제외
+            if (b.outputs && !b.outputs.energy) { // 일반 자원 생산량 통계
                 for (let res in b.outputs) {
-                    stats[res].prod += b.outputs[res] * b.count * currentEfficiency;
+                    stats[res].prod += b.outputs[res] * b.count * efficiency;
                 }
             }
         }
@@ -69,16 +69,17 @@ export function produceResources(deltaTime) {
     let totalEnergyProd = 0;
     let totalEnergyReq = 0;
 
-    // --- 1단계: 전력 생산 시설(발전기) 연산 ---
+    // 1단계: 전력 생산 시설 (발전기)
     gameData.buildings.forEach(b => {
-        if (b.count > 0 && b.outputs && b.outputs.energy) {
-            let speedMult = getBuildingMultiplier(b.id); // 연구에 의한 속도 배수
-            let consMult = getBuildingConsumptionMultiplier(b.id); // 연구에 의한 소모량 감소 배수
+        // ⭐ [체크] 건물이 켜져 있을 때만 에너지를 생산함
+        if (b.count > 0 && b.on !== false && b.outputs && b.outputs.energy) {
+            let speedMult = getBuildingMultiplier(b.id);
+            let consMult = getBuildingConsumptionMultiplier(b.id);
             let inputEfficiency = 1.0;
             
             if(b.inputs) {
                 for(let res in b.inputs) {
-                    if (res === 'energy') continue; 
+                    if (res === 'energy') continue;
                     let needed = (b.inputs[res] * consMult) * b.count * speedMult * deltaTime;
                     if((gameData.resources[res] || 0) < needed) {
                         inputEfficiency = Math.min(inputEfficiency, (gameData.resources[res] || 0) / needed);
@@ -86,48 +87,41 @@ export function produceResources(deltaTime) {
                 }
                 for(let res in b.inputs) {
                     if (res === 'energy') continue;
-                    let actualConsume = (b.inputs[res] * consMult) * b.count * speedMult * deltaTime * inputEfficiency;
-                    gameData.resources[res] = Math.max(0, gameData.resources[res] - actualConsume);
+                    gameData.resources[res] = Math.max(0, gameData.resources[res] - (b.inputs[res] * consMult * b.count * speedMult * deltaTime * inputEfficiency));
                 }
             }
             totalEnergyProd += (b.outputs.energy * b.count * speedMult) * inputEfficiency;
         }
     });
 
-    // --- 2단계: 전체 전력 요구량 계산 ---
+    // 2단계: 전력 요구량 계산
     gameData.buildings.forEach(b => {
-        if (b.count > 0 && b.inputs && b.inputs.energy) {
+        // ⭐ [체크] 건물이 켜져 있을 때만 전력을 요구함
+        if (b.count > 0 && b.on !== false && b.inputs && b.inputs.energy) {
             let speedMult = getBuildingMultiplier(b.id);
-            let consMult = getBuildingConsumptionMultiplier(b.id); 
-            // ⭐ [추가] 전기 효율 연구 배수 가져오기
-            let energyEff = getEnergyEfficiencyMultiplier(b.id); 
-            
-            // ⭐ [수정] 전기 소모량 계산 시 energyEff를 추가로 곱함
+            let consMult = getBuildingConsumptionMultiplier(b.id);
+            let energyEff = getEnergyEfficiencyMultiplier(b.id);
             totalEnergyReq += (b.inputs.energy * consMult * energyEff) * b.count * speedMult;
         }
     });
 
-    // 전력망 상태 저장
     gameData.resources.energy = totalEnergyProd;
     gameData.resources.energyMax = totalEnergyReq;
-    
-    // 전력 공급률 계산 (1.0이면 100%, 미만이면 공장 속도 저하)
     let powerFactor = totalEnergyReq > 0 ? Math.min(1.0, totalEnergyProd / totalEnergyReq) : 1.0;
 
-    // --- 3단계: 일반 생산 시설 가동 ---
+    // 3단계: 일반 생산 시설
     gameData.buildings.forEach(b => {
-        if (b.count === 0 || (b.outputs && b.outputs.energy)) return;
+        // ⭐ [체크] 건물이 없거나, 전원이 꺼져있거나, 발전기라면 건너뜀
+        if (b.count === 0 || b.on === false || (b.outputs && b.outputs.energy)) return;
 
         let speedMult = getBuildingMultiplier(b.id);
-        let consMult = getBuildingConsumptionMultiplier(b.id); 
-        
+        let consMult = getBuildingConsumptionMultiplier(b.id);
         let efficiency = speedMult * (b.inputs && b.inputs.energy ? powerFactor : 1.0);
 
         if (b.inputs) {
             let inputEfficiency = 1.0;
             for (let res in b.inputs) {
                 if (res === 'energy') continue;
-                
                 let needed = (b.inputs[res] * consMult) * b.count * deltaTime * efficiency;
                 if(needed > 0 && (gameData.resources[res] || 0) < needed) {
                     inputEfficiency = Math.min(inputEfficiency, (gameData.resources[res] || 0) / needed);
@@ -137,8 +131,7 @@ export function produceResources(deltaTime) {
 
             for (let res in b.inputs) {
                 if (res === 'energy') continue;
-                let actualConsume = (b.inputs[res] * consMult) * b.count * deltaTime * efficiency;
-                gameData.resources[res] = Math.max(0, gameData.resources[res] - actualConsume);
+                gameData.resources[res] = Math.max(0, gameData.resources[res] - (b.inputs[res] * consMult * b.count * deltaTime * efficiency));
             }
         }
 
