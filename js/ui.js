@@ -310,8 +310,12 @@ function updatePowerUI() {
 
     const container = document.getElementById('power-breakdown-container');
     if (!container) return;
-    if (!container.dataset.initialized) { container.innerHTML = ""; container.dataset.initialized = "true"; }
-
+    if (!container.dataset.initialized) {
+    container.innerHTML = ""; 
+    container.style.background = "none"; // 배경 제거
+    container.style.maxHeight = "none";  // 높이 제한 해제
+    container.dataset.initialized = "true";
+    }
     // 2. 카테고리별 루프
     for (const [groupKey, group] of Object.entries(buildingGroups)) {
         const ownedBuildings = gameData.buildings.filter(b => group.ids.includes(b.id) && b.count > 0);
