@@ -302,7 +302,15 @@ export function setGameData(newData) {
     if (newData.buildings) {
         newData.buildings.forEach((savedB) => {
             const currentB = gameData.buildings.find(b => b.id === savedB.id);
-            if (currentB) currentB.count = savedB.count;
+            if (currentB) {
+                currentB.count = savedB.count;
+                // ⭐ 추가: 저장된 전원 상태가 있으면 가져오고, 없으면 true(켜짐)
+                currentB.on = (savedB.on !== undefined) ? savedB.on : true;
+            }
         });
     }
+    gameData.buildings.forEach(b => {
+        if (b.on === undefined) b.on = true;
+    });
+    
 }

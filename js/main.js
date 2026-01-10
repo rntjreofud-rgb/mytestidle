@@ -7,6 +7,7 @@ import * as Storage from './save.js';
 
 function init() {
     Storage.loadGame();
+    window.UI = UI; 
     setupEvents();
     
     // UI 초기화 (handleBuyBuilding 함수 참조를 UI 모듈에 넘겨줍니다)

@@ -3,6 +3,16 @@
 import { gameData, houseStages, researchList } from './data.js';
 import * as Logic from './logic.js';
 
+window.toggleBuildingPower = function(id) {
+    const building = gameData.buildings.find(b => b.id === id);
+    if (building) {
+        building.on = !building.on; // 상태 반전 (true <-> false)
+        // 화면 갱신 (로직 재계산 포함)
+        UI.updateScreen(Logic.calculateNetMPS()); 
+    }
+};
+
+
 // 내부에서 구매 콜백 함수를 기억하기 위한 변수
 let cachedBuyCallback = null;
 
@@ -44,6 +54,9 @@ const resNames = {
     titaniumPlate: "💎 티타늄판", optics: "🔭 광학렌즈", advAlloy: "🛡️ 고급합금",
     quantumData: "💾 양자데이터", gravityModule: "🛸 중력모듈"
 };
+
+
+
 
 function formatNumber(num) {
     if (num == null || isNaN(num)) return "0";
@@ -174,61 +187,91 @@ function updatePowerUI() {
     const prod = gameData.resources.energy || 0;
     const req = gameData.resources.energyMax || 0;
     
-    // 상단 요약 텍스트 및 바 업데이트 (기존 로직)
+    // 1. 상단 요약 텍스트 및 바 업데이트 (기존 로직 유지)
     if(elements.powerDisplay) elements.powerDisplay.innerHTML = `<span style="color:#2ecc71">${formatNumber(prod)} MW</span> 생산 / <span style="color:#e74c3c">${formatNumber(req)} MW</span> 소비`;
-    if(elements.powerBar) {
-    let percent = req > 0 ? (prod / req) * 100 : 100;
-    elements.powerBar.style.width = `${Math.min(100, percent)}%`;
     
-    if (prod < req) {
-        elements.powerBar.classList.add('power-low');
-        elements.powerBar.style.backgroundColor = '#e74c3c';
-    } else {
-        elements.powerBar.classList.remove('power-low');
-        elements.powerBar.style.backgroundColor = '#2ecc71';
+    if(elements.powerBar) {
+        let percent = req > 0 ? (prod / req) * 100 : 100;
+        elements.powerBar.style.width = `${Math.min(100, percent)}%`;
+        
+        if (prod < req) {
+            elements.powerBar.classList.add('power-low'); // 깜빡임 효과
+            elements.powerBar.style.backgroundColor = '#e74c3c';
+        } else {
+            elements.powerBar.classList.remove('power-low');
+            elements.powerBar.style.backgroundColor = '#2ecc71';
+        }
     }
-}
 
-    // --- 상세 내역 렌더링 시작 ---
+    // 2. 상세 내역 렌더링 시작 (ON/OFF 버튼 추가됨)
     const container = document.getElementById('power-breakdown-container');
     if (!container) return;
 
+    // 테이블 헤더에 '상태' 컬럼 추가
     let html = `<table style="width:100%; border-collapse: collapse; font-size: 0.85rem;">
                 <tr style="border-bottom: 1px solid #444; color: #8892b0;">
                     <th style="text-align:left; padding: 5px;">건물명</th>
-                    <th style="text-align:right; padding: 5px;">개수</th>
+                    <th style="text-align:center; padding: 5px;">상태</th> 
                     <th style="text-align:right; padding: 5px;">에너지 (MW)</th>
                 </tr>`;
 
     gameData.buildings.forEach(b => {
         if (b.count > 0) {
+            // 각종 효율 배수 가져오기
             const speedMult = Logic.getBuildingMultiplier(b.id);
+            const consMult = Logic.getBuildingConsumptionMultiplier(b.id);
+            const energyEff = Logic.getEnergyEfficiencyMultiplier(b.id);
             
-            // 1. 생산 건물인 경우
-            if (b.outputs && b.outputs.energy) {
-                const totalProd = b.outputs.energy * b.count * speedMult;
-                html += `<tr>
-                    <td style="padding: 5px;">${b.name}</td>
-                    <td style="text-align:right; padding: 5px;">${b.count}</td>
-                    <td style="text-align:right; padding: 5px; color:#2ecc71;">+${formatNumber(totalProd)}</td>
-                </tr>`;
-            }
+            // 전력 생산 건물인지 소비 건물인지 확인
+            const isProducer = b.outputs && b.outputs.energy;
+            const isConsumer = b.inputs && b.inputs.energy;
+
+            // 전력과 관련 없는 건물은 목록에서 제외
+            if (!isProducer && !isConsumer) return;
+
+            let energyTxt = "";
+            let rowStyle = "";
             
-            // 2. 소비 건물인 경우
-            if (b.inputs && b.inputs.energy) {
-                const totalCons = b.inputs.energy * b.count * speedMult;
-                html += `<tr>
-                    <td style="padding: 5px;">${b.name}</td>
-                    <td style="text-align:right; padding: 5px;">${b.count}</td>
-                    <td style="text-align:right; padding: 5px; color:#e74c3c;">-${formatNumber(totalCons)}</td>
-                </tr>`;
+            // A. 건물이 꺼져있는 경우 (OFF)
+            if (!b.on) {
+                energyTxt = `<span style="color:#7f8c8d;">OFF</span>`; // 회색 텍스트
+                rowStyle = "opacity: 0.5;"; // 행 전체 흐리게
+            } 
+            // B. 건물이 켜져있는 경우 (ON)
+            else {
+                if (isProducer) {
+                    // 생산량 계산
+                    const totalProd = b.outputs.energy * b.count * speedMult;
+                    energyTxt = `<span style="color:#2ecc71">+${formatNumber(totalProd)}</span>`;
+                } else {
+                    // 소비량 계산 (모든 효율 연구 적용)
+                    const totalCons = b.inputs.energy * consMult * energyEff * b.count * speedMult;
+                    energyTxt = `<span style="color:#e74c3c">-${formatNumber(totalCons)}</span>`;
+                }
             }
+
+            // ON/OFF 버튼 스타일
+            const btnColor = b.on ? "#2ecc71" : "#95a5a6"; // 초록색(ON) / 회색(OFF)
+            const btnText = b.on ? "ON" : "OFF";
+            
+            html += `<tr style="${rowStyle} border-bottom: 1px solid rgba(255,255,255,0.05);">
+                <td style="padding: 5px;">
+                    ${b.name} <span style="font-size:0.7rem; color:#666;">(x${b.count})</span>
+                </td>
+                <td style="text-align:center; padding: 5px;">
+                    <button onclick="window.toggleBuildingPower(${b.id})" 
+                            style="background:${btnColor}; color:#fff; border:none; border-radius:3px; cursor:pointer; font-size:0.7rem; padding:2px 6px;">
+                        ${btnText}
+                    </button>
+                </td>
+                <td style="text-align:right; padding: 5px;">${energyTxt}</td>
+            </tr>`;
         }
     });
 
     html += `</table>`;
     
-    // 변화가 있을 때만 DOM 업데이트 (성능 최적화)
+    // 변화가 있을 때만 DOM 업데이트
     if (container.innerHTML !== html) {
         container.innerHTML = html;
     }
