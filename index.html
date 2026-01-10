@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Escape Earth: Idle Game</title>
     <link rel="stylesheet" href="style.css">
-    <!-- 아래 줄 추가: 파비콘을 지구 이모지로 설정 -->
+    <!-- 파비콘 설정 -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌍</text></svg>">
 </head>
 <body>
@@ -23,6 +23,16 @@
             <div class="nav-category">Systems</div>
             <div class="nav-item" id="nav-power"><i>⚡</i> 전력 관리</div>
             <div class="nav-item" id="nav-research"><i>🔬</i> 기술 연구</div>
+
+            <!-- ⭐ [이동] 데이터 관리 구역을 사이드바 하단으로 옮김 -->
+            <div class="nav-category">Data Management</div>
+            <div class="sidebar-data-btns">
+                <!-- 파일 가져오기용 숨겨진 input -->
+                <input type="file" id="import-file" style="display:none" accept=".json">
+                <button id="btn-export" class="side-btn export">내보내기</button>
+                <button id="btn-import" class="side-btn import">가져오기</button>
+                <button id="btn-reset" class="side-btn reset" onclick="if(confirm('정말 진행 상황을 초기화하시겠습니까?')) {localStorage.removeItem('civIdleModularSave');location.reload()}">초기화</button>
+            </div>
         </div>
     </nav>
 
@@ -32,14 +42,7 @@
             <div class="header-status">
                 <span id="message-log">시스템 가동.</span>
             </div>
-             <div style="display: flex; gap: 5px;">
-             <!-- 파일 가져오기용 숨겨진 input -->
-              <input type="file" id="import-file" style="display:none" accept=".json">
-        
-                   <button id="btn-export" style="background:#3498db; border:none; color:white; padding:5px 10px; cursor:pointer; border-radius:4px;">내보내기</button>
-                   <button id="btn-import" style="background:#9b59b6; border:none; color:white; padding:5px 10px; cursor:pointer; border-radius:4px;">가져오기</button>
-                     <button onclick="localStorage.removeItem('civIdleModularSave');location.reload()" style="background:#e74c3c; border:none; color:white; padding:5px 10px; cursor:pointer; border-radius:4px;">초기화</button>
-              </div>
+            <!-- ❌ 헤더에 있던 버튼들은 이제 사이드바에 있습니다. -->
         </header>
 
         <main class="content-area">
@@ -56,33 +59,34 @@
                     </div>
                 </div>
 
+                <!-- 대시보드 메인 전력 바 -->
                 <div id="dash-power-panel" class="info-panel hidden" style="border-left-color: #f1c40f; margin-bottom: 15px; flex-direction:column; align-items:stretch; padding: 10px 15px;">
-                        <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
                         <div style="font-size: 0.85rem; font-weight: bold;">⚡ 메인 전력망 상태</div>
                         <div id="dash-power-text" style="font-size: 0.85rem;">0 MW / 0 MW</div>
                     </div>
-                        <div style="width:100%; height:12px; background:#333; border-radius:6px; overflow:hidden;">
+                    <div style="width:100%; height:12px; background:#333; border-radius:6px; overflow:hidden;">
                         <div id="dash-power-fill" style="width: 0%; height:100%; background:#2ecc71; transition: width 0.3s;"></div>
                     </div>
                 </div>
+
                 <div class="section-title">📦 자원 창고 (Inventory)</div>
                 <div class="resource-grid"></div>
 
-                <!-- ⭐ 레이아웃 핵심: 25% vs 75% -->
                 <div class="action-grid">
-                    <!-- 왼쪽: 수동 (25%) -->
+                    <!-- 왼쪽: 수동 (280px) -->
                     <div class="action-box manual-area">
                         <div class="section-title">🖐️ 수동 작업</div>
                         <div id="manual-btn-list">
                             <button id="btn-gather-wood" class="btn-large">🌲 나무 베기</button>
                             <button id="btn-gather-stone" class="btn-large hidden">🪨 돌 캐기</button>
-                            <button id="btn-gather-coal" class="btn-large hidden" style="border-color:#555;">⚫ 석탄 캐기</button>
-                            <button id="btn-craft-plank" class="btn-large hidden" style="border-color:#f39c12">🪚 판자 깎기 (나무 -2)</button>
+                            <button id="btn-gather-coal" class="btn-large hidden" style="border-color:#555 !important;">⚫ 석탄 캐기</button>
+                            <button id="btn-craft-plank" class="btn-large hidden" style="border-color:#f39c12 !important;">🪚 판자 깎기</button>
                             <button id="btn-gather-iron" class="btn-large hidden">⚙️ 철광석 캐기</button>
                             <button id="btn-gather-copper" class="btn-large hidden">🥉 구리광석 캐기</button>
                         </div>
                     </div>
-                    <!-- 오른쪽: 공장 (75%) -->
+                    <!-- 오른쪽: 공장 (1fr) -->
                     <div class="action-box auto-area">
                         <div class="section-title">🏭 공장 건설 (Automation)</div>
                         <div id="building-list"></div>
@@ -107,8 +111,9 @@
                         <div id="power-fill-bar" style="width: 0%; height:100%; background:#2ecc71; transition: width 0.3s, background 0.3s;"></div>
                     </div>
                 </div>
-                    <div class="section-title" style="margin-top:30px;">📊 전력 상세 내역 (Breakdown)</div>
-                    <div id="power-breakdown-container" style="background: rgba(0,0,0,0.2); border-radius: 8px; padding: 10px;">
+                
+                <div class="section-title" style="margin-top:30px;">📊 전력 상세 내역 (Breakdown)</div>
+                <div id="power-breakdown-container">
                      <!-- 여기에 자바스크립트로 내역이 들어갑니다 -->
                 </div>
             </div>
@@ -122,15 +127,11 @@
                         <p>자원을 투자하여 생산 효율을 높이는 기술을 개발하세요.</p>
                     </div>
                 </div>
-                <div class="action-box">
-                    <!-- 연구 목록도 공장처럼 넓게 쓰기 위해 auto-area 클래스 재사용 가능하지만 별도로 둠 -->
-                    <div id="research-list-container"></div>
-                </div>
+                <div id="research-list-container"></div>
             </div>
 
         </main>
 
-        
         <!-- 하단 로그 -->
         <section class="system-log-area">
             <div class="log-header">📜 System Log</div>
