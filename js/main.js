@@ -5,22 +5,37 @@ import * as UI from './ui.js';
 import * as Logic from './logic.js';
 import * as Storage from './save.js';
 
+
+window.toggleBuildingPower = function(id) {
+    console.log(`[클릭 감지] 건물 ID: ${id}`); // 클릭 확인용 로그
+
+    // 1. 데이터 찾기
+    const building = gameData.buildings.find(b => b.id === id);
+    if (!building) {
+        console.error("건물을 찾을 수 없습니다.");
+        return;
+    }
+
+    // 2. 값 변경 (켜져있으면 끄고, 꺼져있으면 켬)
+    // (undefined일 경우를 대비해 확실하게 boolean 처리)
+    building.on = !building.on;
+
+    // 3. 화면 갱신 (Logic과 UI를 사용)
+    const netMPS = Logic.calculateNetMPS();
+    UI.updateScreen(netMPS);
+    
+    console.log(`[상태 변경] ${building.name} -> ${building.on ? 'ON' : 'OFF'}`);
+};
+
 window.gameData = gameData;
+
+
+
+
 
 function init() {
     // ⭐ [핵심 수정] HTML의 토글 스위치가 이 함수를 찾을 수 있게 강제로 등록
-    window.toggleBuildingPower = function(id) {
-        const building = gameData.buildings.find(b => b.id === id);
-        if (building) {
-            // 상태 반전
-            building.on = !building.on;
-            
-            // 화면 갱신 & 로직 재계산
-            UI.updateScreen(Logic.calculateNetMPS());
-            
-            console.log(`[스위치 조작] ${building.name}: ${building.on ? 'ON' : 'OFF'}`);
-        }
-    };
+   
 
     // 기존 초기화 로직들
     Storage.loadGame();

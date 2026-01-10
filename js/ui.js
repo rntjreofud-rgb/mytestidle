@@ -6,27 +6,6 @@ import * as Logic from './logic.js'; // ⭐ Logic이 반드시 있어야 계산�
 // 내부에서 구매 콜백 함수를 기억하기 위한 변수
 let cachedBuyCallback = null;
 
-// ⭐ [핵심] window 객체에 함수를 강제로 등록해야 HTML의 onclick이 인식합니다.
-window.toggleBuildingPower = function(id) {
-    // 1. 데이터에서 해당 건물 찾기
-    const building = gameData.buildings.find(b => b.id === id);
-    
-    if (building) {
-        // 2. 상태 뒤집기 (undefined일 경우 false로 초기화 후 뒤집기)
-        if (building.on === undefined) building.on = true;
-        building.on = !building.on;
-        
-        // 3. 화면 즉시 갱신
-        // (주의: UI.updateScreen이 아니라, 이 파일 내부의 updateScreen을 직접 호출)
-        const netMPS = Logic.calculateNetMPS();
-        updateScreen(netMPS); 
-        
-        console.log(`건물 ${building.name} 전원: ${building.on ? 'ON' : 'OFF'}`);
-    } else {
-        console.error(`ID ${id} 건물을 찾을 수 없습니다.`);
-    }
-};
-
 
 const elements = {
     viewDashboard: document.getElementById('view-dashboard'),
