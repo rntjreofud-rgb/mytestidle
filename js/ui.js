@@ -247,7 +247,7 @@ function updatePowerUI() {
         }
     }
 
-    // 2. 상세 내역 렌더링 (토글 스위치 적용)
+    // 2. 상세 내역 렌더링
     const container = document.getElementById('power-breakdown-container');
     if (!container) return;
 
@@ -255,7 +255,7 @@ function updatePowerUI() {
                 <tr style="border-bottom: 1px solid #444; color: #8892b0;">
                     <th style="text-align:left; padding: 5px;">건물명</th>
                     <th style="text-align:right; padding: 5px;">개수</th>
-                    <th style="text-align:center; padding: 5px;">전원</th> <!-- 제목 변경 -->
+                    <th style="text-align:center; padding: 5px;">전원</th>
                     <th style="text-align:right; padding: 5px;">에너지</th>
                 </tr>`;
 
@@ -273,7 +273,6 @@ function updatePowerUI() {
             let energyTxt = "";
             let rowStyle = "";
             
-            // 전원이 꺼져있으면 텍스트 흐리게
             if (!b.on) {
                 energyTxt = `<span style="color:#7f8c8d;">0 MW</span>`;
                 rowStyle = "opacity: 0.5; filter: grayscale(1);"; 
@@ -287,14 +286,16 @@ function updatePowerUI() {
                 }
             }
 
-            // ⭐ [핵심] 토글 스위치 HTML 생성
-            // onchange 이벤트로 window.toggleBuildingPower 호출
+            // ⭐ [핵심 수정] 
+            // 1. input의 이벤트를 없애고 pointer-events: none 처리
+            // 2. 감싸고 있는 label(또는 div)에 onclick 이벤트를 부여
+            // 3. event.preventDefault()로 브라우저의 기본 동작(체크박스 자동 변경)을 막고 데이터만 변경
             const checked = b.on ? 'checked' : '';
             const toggleHtml = `
-                <label class="switch">
-                    <input type="checkbox" ${checked} onchange="window.toggleBuildingPower(${b.id})">
+                <div class="switch" onclick="event.preventDefault(); window.toggleBuildingPower(${b.id});" style="cursor: pointer;">
+                    <input type="checkbox" ${checked} style="pointer-events: none;">
                     <span class="slider"></span>
-                </label>
+                </div>
             `;
 
             html += `<tr style="${rowStyle} border-bottom: 1px solid rgba(255,255,255,0.05); transition: opacity 0.3s;">
@@ -308,7 +309,6 @@ function updatePowerUI() {
 
     html += `</table>`;
     
-    // 테이블 갱신 (토글 작동 시 깜빡임 방지를 위해 내용이 다를 때만 갱신)
     if (container.innerHTML !== html) {
         container.innerHTML = html;
     }
