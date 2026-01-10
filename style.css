@@ -205,7 +205,7 @@ input:checked + .slider:before { transform: translateX(20px); }
     .header-status { font-size: 0.75rem; max-width: 60%; text-align: right; }
     .info-panel { flex-direction: column; text-align: center; gap: 10px; padding: 12px; } 
     #upgrade-btn { height: 70px !important; font-size: 0.9rem; } 
-    .sub-res-grid.slim-mode { grid-template-columns: 1fr !important; }
+    .sub-res-grid, .sub-res-grid.slim-mode { grid-template-columns: repeat(2, 1fr) !important; gap: 8px !important; }
 }
 
 .hidden { display: none !important; }
