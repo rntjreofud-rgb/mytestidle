@@ -88,27 +88,20 @@ const buildingGroups = {
 let isGridInitialized = false;
 function initResourceGrid() {
     if (isGridInitialized) return;
-    
-    elements.resGrid.innerHTML = ""; // 기존 그리드 초기화
-    elements.resGrid.style.display = "block"; // 블록으로 변경하여 섹션별 배치
+    elements.resGrid.innerHTML = "";
+    elements.resGrid.style.display = "block";
 
-    // 3개의 섹션 생성
     for (const [key, group] of Object.entries(resourceGroups)) {
-        // 1. 제목 생성 (화살표 <span class="toggle-arrow">▼</span> 추가)
         const title = document.createElement('div');
         title.className = 'res-category-title';
         title.innerHTML = `${group.title} <span class="toggle-arrow">▼</span>`;
         
-        // 2. 자원 카드를 담을 컨테이너 생성
         const container = document.createElement('div');
-        container.className = 'sub-res-grid';
+        container.className = 'sub-res-grid'; // CSS와 이름 일치 확인
         container.id = `grid-group-${key}`;
 
-        // 3. ⭐ [핵심 추가] 제목 클릭 시 접고 펴는 이벤트 리스너 등록
         title.onclick = () => {
-            // 제목에 collapsed 클래스를 붙여 화살표 회전 (CSS 필요)
             title.classList.toggle('collapsed');
-            // 컨테이너에 collapsed-content 클래스를 붙여 숨김 (CSS 필요)
             container.classList.toggle('collapsed-content');
         };
 
@@ -419,7 +412,6 @@ function updatePowerUI() {
 export function renderResearchTab() {
     const container = elements.viewResearch.querySelector('#research-list-container') || elements.viewResearch.querySelector('.action-box');
     if (!container) return;
-    
     container.innerHTML = "";
     if (!gameData.researches) gameData.researches = [];
 
@@ -429,7 +421,6 @@ export function renderResearchTab() {
     researchList.forEach(r => {
         const isDone = gameData.researches.includes(r.id);
         const isPrereqDone = r.reqResearch ? gameData.researches.includes(r.reqResearch) : true;
-        
         let isTargetVisible = true;
         if (r.type === 'building' || r.type === 'consumption' || r.type === 'energyEff') {
             isTargetVisible = r.target.some(targetId => {
@@ -437,34 +428,23 @@ export function renderResearchTab() {
                 return b && gameData.houseLevel >= (b.reqLevel || 0);
             });
         }
-
         if (isDone) completedRes.push(r);
         else if (isPrereqDone && isTargetVisible) availableRes.push(r);
     });
 
-    // 섹션 생성 시 클릭 이벤트가 확실히 먹히도록 renderResearchSection 호출
-    if (availableRes.length > 0) {
-        renderResearchSection("🔬 진행 가능한 연구", availableRes, false, container);
-    }
-    if (completedRes.length > 0) {
-        renderResearchSection("✅ 완료된 기술", completedRes, true, container);
-    }
-    
+    if (availableRes.length > 0) renderResearchSection("🔬 진행 가능한 연구", availableRes, false, container);
+    if (completedRes.length > 0) renderResearchSection("✅ 완료된 기술", completedRes, true, container);
     updateResearchButtons();
 }
 
-// 연구 섹션(제목 + 그리드) 생성 함수
 function renderResearchSection(titleText, list, isDone, parentContainer) {
     const title = document.createElement('div');
-    // CSS에서 .research-section-title 에 대한 스타일이 있어야 합니다.
-    title.className = 'research-section-title'; 
+    title.className = 'research-section-title';
     title.innerHTML = `${titleText} (${list.length}) <span class="toggle-arrow">▼</span>`;
 
     const subGrid = document.createElement('div');
-    // 이전에 해결한 4열 그리드 클래스를 사용합니다.
-    subGrid.className = 'sub-build-grid'; 
+    subGrid.className = 'sub-build-grid'; // CSS와 이름 일치 확인
 
-    // ⭐ [핵심] 클릭 이벤트 리스너 등록
     title.onclick = () => {
         title.classList.toggle('collapsed');
         subGrid.classList.toggle('collapsed-content');
@@ -472,10 +452,7 @@ function renderResearchSection(titleText, list, isDone, parentContainer) {
 
     parentContainer.appendChild(title);
     parentContainer.appendChild(subGrid);
-
-    list.forEach(r => {
-        subGrid.appendChild(createResearchElement(r, isDone));
-    });
+    list.forEach(r => subGrid.appendChild(createResearchElement(r, isDone)));
 }
 
 // 개별 연구 버튼 생성 함수
@@ -569,8 +546,10 @@ export function renderShop(onBuyCallback, getCostFunc) {
         const title = document.createElement('div');
         title.className = 'build-category-title';
         title.innerHTML = `${group.title} <span class="toggle-arrow">▼</span>`;
+        
         const subGrid = document.createElement('div');
-        subGrid.className = 'sub-build-grid';
+        subGrid.className = 'sub-build-grid'; // CSS와 이름 일치 확인
+
         title.onclick = () => {
             title.classList.toggle('collapsed');
             subGrid.classList.toggle('collapsed-content');

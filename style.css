@@ -432,22 +432,19 @@ header h2 { margin: 0; font-size: 1rem; color: #fff; }
     background: rgba(255, 255, 255, 0.05);
 }
 
-/* 우측 화살표 아이콘 */
-.toggle-arrow {
-    display: inline-block; /* 회전 애니메이션을 위해 필수 */
-    font-size: 0.7rem;
-    transition: transform 0.3s;
-    color: #556;
-}
-
-/* 접혔을 때 화살표 회전 */
-.collapsed .toggle-arrow {
-    transform: rotate(-90deg);
-}
-
-/* ⭐ 핵심: 접혔을 때 내용을 숨김 */
-.collapsed-content {
+.sub-res-grid.collapsed-content, 
+.sub-build-grid.collapsed-content {
     display: none !important;
+}
+
+/* 화살표 회전 애니메이션 고정 */
+.toggle-arrow {
+    display: inline-block !important;
+    transition: transform 0.3s ease !important;
+}
+
+.collapsed .toggle-arrow {
+    transform: rotate(-90deg) !important;
 }
 
 
