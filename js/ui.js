@@ -199,7 +199,7 @@ function updatePowerUI() {
     const prod = gameData.resources.energy || 0;
     const req = gameData.resources.energyMax || 0;
     
-    // 1. 상단 요약 텍스트 및 바 업데이트 (기존 로직 유지)
+    // 1. 상단 요약 텍스트 및 바 업데이트 (기존 유지)
     if(elements.powerDisplay) elements.powerDisplay.innerHTML = `<span style="color:#2ecc71">${formatNumber(prod)} MW</span> 생산 / <span style="color:#e74c3c">${formatNumber(req)} MW</span> 소비`;
     
     if(elements.powerBar) {
@@ -207,7 +207,7 @@ function updatePowerUI() {
         elements.powerBar.style.width = `${Math.min(100, percent)}%`;
         
         if (prod < req) {
-            elements.powerBar.classList.add('power-low'); // 깜빡임 효과
+            elements.powerBar.classList.add('power-low');
             elements.powerBar.style.backgroundColor = '#e74c3c';
         } else {
             elements.powerBar.classList.remove('power-low');
@@ -215,61 +215,53 @@ function updatePowerUI() {
         }
     }
 
-    // 2. 상세 내역 렌더링 시작 (ON/OFF 버튼 추가됨)
+    // 2. 상세 내역 렌더링 (4열로 확장)
     const container = document.getElementById('power-breakdown-container');
     if (!container) return;
 
-    // 테이블 헤더에 '상태' 컬럼 추가
+    // ⭐ [수정] 헤더에 '개수' 컬럼 부활
     let html = `<table style="width:100%; border-collapse: collapse; font-size: 0.85rem;">
                 <tr style="border-bottom: 1px solid #444; color: #8892b0;">
                     <th style="text-align:left; padding: 5px;">건물명</th>
-                    <th style="text-align:center; padding: 5px;">상태</th> 
+                    <th style="text-align:right; padding: 5px;">개수</th>
+                    <th style="text-align:center; padding: 5px;">상태</th>
                     <th style="text-align:right; padding: 5px;">에너지 (MW)</th>
                 </tr>`;
 
     gameData.buildings.forEach(b => {
         if (b.count > 0) {
-            // 각종 효율 배수 가져오기
             const speedMult = Logic.getBuildingMultiplier(b.id);
             const consMult = Logic.getBuildingConsumptionMultiplier(b.id);
             const energyEff = Logic.getEnergyEfficiencyMultiplier(b.id);
             
-            // 전력 생산 건물인지 소비 건물인지 확인
             const isProducer = b.outputs && b.outputs.energy;
             const isConsumer = b.inputs && b.inputs.energy;
 
-            // 전력과 관련 없는 건물은 목록에서 제외
             if (!isProducer && !isConsumer) return;
 
             let energyTxt = "";
             let rowStyle = "";
             
-            // A. 건물이 꺼져있는 경우 (OFF)
             if (!b.on) {
-                energyTxt = `<span style="color:#7f8c8d;">OFF</span>`; // 회색 텍스트
-                rowStyle = "opacity: 0.5;"; // 행 전체 흐리게
-            } 
-            // B. 건물이 켜져있는 경우 (ON)
-            else {
+                energyTxt = `<span style="color:#7f8c8d;">OFF</span>`;
+                rowStyle = "opacity: 0.5;";
+            } else {
                 if (isProducer) {
-                    // 생산량 계산
                     const totalProd = b.outputs.energy * b.count * speedMult;
                     energyTxt = `<span style="color:#2ecc71">+${formatNumber(totalProd)}</span>`;
                 } else {
-                    // 소비량 계산 (모든 효율 연구 적용)
                     const totalCons = b.inputs.energy * consMult * energyEff * b.count * speedMult;
                     energyTxt = `<span style="color:#e74c3c">-${formatNumber(totalCons)}</span>`;
                 }
             }
 
-            // ON/OFF 버튼 스타일
-            const btnColor = b.on ? "#2ecc71" : "#95a5a6"; // 초록색(ON) / 회색(OFF)
+            const btnColor = b.on ? "#2ecc71" : "#95a5a6";
             const btnText = b.on ? "ON" : "OFF";
             
+            // ⭐ [수정] 4개의 td로 데이터 분리 (건물명 | 개수 | 버튼 | 에너지)
             html += `<tr style="${rowStyle} border-bottom: 1px solid rgba(255,255,255,0.05);">
-                <td style="padding: 5px;">
-                    ${b.name} <span style="font-size:0.7rem; color:#666;">(x${b.count})</span>
-                </td>
+                <td style="padding: 5px;">${b.name}</td>
+                <td style="text-align:right; padding: 5px; font-weight:bold;">${formatNumber(b.count)}</td>
                 <td style="text-align:center; padding: 5px;">
                     <button onclick="window.toggleBuildingPower(${b.id})" 
                             style="background:${btnColor}; color:#fff; border:none; border-radius:3px; cursor:pointer; font-size:0.7rem; padding:2px 6px;">
@@ -283,7 +275,6 @@ function updatePowerUI() {
 
     html += `</table>`;
     
-    // 변화가 있을 때만 DOM 업데이트
     if (container.innerHTML !== html) {
         container.innerHTML = html;
     }
