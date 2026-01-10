@@ -286,14 +286,13 @@ export function updateScreen(stats) {
     if(!elements.viewResearch.classList.contains('hidden')) updateResearchButtons();
     checkUnlocks();
 }
-
 function updatePowerUI() {
     const prod = gameData.resources.energy || 0;
     const req = gameData.resources.energyMax || 0;
     const percent = req > 0 ? (prod / req) * 100 : 100;
     const powerColor = (prod >= req) ? '#2ecc71' : '#e74c3c';
 
-    // 상단 바 업데이트 (기존 유지)
+    // 1. 상단 바 업데이트
     if(elements.powerDisplay) elements.powerDisplay.innerHTML = `<span style="color:#2ecc71">${formatNumber(prod)} MW</span> 생산 / <span style="color:#e74c3c">${formatNumber(req)} MW</span> 소비`;
     if(elements.powerBar) {
         elements.powerBar.style.width = `${Math.min(100, percent)}%`;
@@ -301,49 +300,102 @@ function updatePowerUI() {
         if (prod < req) elements.powerBar.classList.add('power-low');
         else elements.powerBar.classList.remove('power-low');
     }
+    // 대시보드 연동
+    if (elements.dashPowerPanel && gameData.houseLevel >= 5) {
+        elements.dashPowerPanel.classList.remove('hidden');
+        elements.dashPowerText.innerHTML = `<span style="color:#2ecc71">${formatNumber(prod)}</span> / <span style="color:#e74c3c">${formatNumber(req)} MW</span>`;
+        elements.dashPowerFill.style.width = `${Math.min(100, percent)}%`;
+        elements.dashPowerFill.style.backgroundColor = powerColor;
+    }
 
     const container = document.getElementById('power-breakdown-container');
     if (!container) return;
+    if (!container.dataset.initialized) { container.innerHTML = ""; container.dataset.initialized = "true"; }
 
-    // ⭐ [변경] 카드 대신 심플한 테이블 형식으로 출력
-    let html = `
-        <table style="width:100%; border-collapse: collapse; font-size: 0.85rem; color: #ccc;">
-            <thead>
-                <tr style="border-bottom: 2px solid #444; color: #8892b0; text-align: left;">
-                    <th style="padding: 10px;">건물명</th>
-                    <th style="padding: 10px; text-align: center;">가동/보유</th>
-                    <th style="padding: 10px; text-align: right;">전력 영향</th>
-                </tr>
-            </thead>
-            <tbody>`;
+    // 2. 카테고리별 루프
+    for (const [groupKey, group] of Object.entries(buildingGroups)) {
+        const ownedBuildings = gameData.buildings.filter(b => group.ids.includes(b.id) && b.count > 0);
+        
+        let sectionTitle = document.getElementById(`ctrl-title-${groupKey}`);
+        let sectionGrid = document.getElementById(`ctrl-grid-${groupKey}`);
 
-    gameData.buildings.forEach(b => {
-        if (b.count > 0) {
-            const isProducer = b.outputs && b.outputs.energy;
-            const isConsumer = b.inputs && b.inputs.energy;
-            if (!isProducer && !isConsumer) return;
+        if (ownedBuildings.length === 0) {
+            if(sectionTitle) sectionTitle.style.display = "none";
+            if(sectionGrid) sectionGrid.style.display = "none";
+            continue;
+        }
+
+        if (!sectionTitle) {
+            sectionTitle = document.createElement('div');
+            sectionTitle.id = `ctrl-title-${groupKey}`;
+            sectionTitle.className = 'build-category-title';
+            sectionTitle.innerHTML = `${group.title} <span class="toggle-arrow">▼</span>`;
+            sectionGrid = document.createElement('div');
+            sectionGrid.id = `ctrl-grid-${groupKey}`;
+            sectionGrid.className = 'sub-build-grid';
+            sectionTitle.onclick = () => { sectionTitle.classList.toggle('collapsed'); sectionGrid.classList.toggle('collapsed-content'); };
+            container.appendChild(sectionTitle);
+            container.appendChild(sectionGrid);
+        }
+        sectionTitle.style.display = "flex";
+        sectionGrid.style.display = "grid";
+
+        ownedBuildings.forEach(b => {
+            let ctrlCard = document.getElementById(`ctrl-card-${b.id}`);
+            if (!ctrlCard) {
+                ctrlCard = document.createElement('div');
+                ctrlCard.id = `ctrl-card-${b.id}`;
+                ctrlCard.className = 'shop-item';
+                ctrlCard.style.cursor = "default";
+                ctrlCard.innerHTML = `
+                    <span class="si-name" style="font-size:0.85rem;"></span>
+                    <span class="si-level" style="font-size:0.75rem; color:#ffd700;"></span>
+                    <div class="si-desc" style="bottom:45px; right: 90px;"></div>
+                    <div class="si-cost" style="top:auto; bottom:45px; right:14px; font-size:0.8rem;"></div>
+                    <div class="si-ctrl-btns" style="position:absolute; bottom:8px; left:12px; right:12px; display:flex; gap:3px;">
+                        <button class="b-adj" data-v="-10" style="flex:1; background:#444; color:#fff; border:none; border-radius:3px; cursor:pointer; padding:3px 0;">--</button>
+                        <button class="b-adj" data-v="-1" style="flex:1; background:#e74c3c; color:#fff; border:none; border-radius:3px; cursor:pointer; font-weight:bold;">-</button>
+                        <button class="b-adj" data-v="1" style="flex:1; background:#2ecc71; color:#fff; border:none; border-radius:3px; cursor:pointer; font-weight:bold;">+</button>
+                        <button class="b-adj" data-v="10" style="flex:1; background:#444; color:#fff; border:none; border-radius:3px; cursor:pointer; padding:3px 0;">++</button>
+                    </div>
+                `;
+                ctrlCard.querySelectorAll('.b-adj').forEach(btn => {
+                    btn.onclick = (e) => {
+                        e.stopPropagation();
+                        window.adjustActiveCount(b.id, parseInt(btn.dataset.v));
+                    };
+                });
+                sectionGrid.appendChild(ctrlCard);
+            }
 
             const speedMult = Logic.getBuildingMultiplier(b.id);
             const consMult = Logic.getBuildingConsumptionMultiplier(b.id);
             const energyEff = Logic.getEnergyEfficiencyMultiplier(b.id);
+            const isOn = b.activeCount > 0;
 
-            let energyVal = isProducer 
-                ? (b.outputs.energy * b.activeCount * speedMult)
-                : (b.inputs.energy * b.activeCount * speedMult * consMult * energyEff);
+            let energyImpact = 0;
+            const isProducer = b.outputs && b.outputs.energy;
+            const isConsumer = b.inputs && b.inputs.energy;
+            if (isProducer) energyImpact = b.outputs.energy * b.activeCount * speedMult;
+            else if (isConsumer) energyImpact = b.inputs.energy * b.activeCount * speedMult * consMult * energyEff;
 
-            html += `
-                <tr style="border-bottom: 1px solid #222; ${b.activeCount === 0 ? 'opacity:0.4;' : ''}">
-                    <td style="padding: 10px;">${b.name}</td>
-                    <td style="padding: 10px; text-align: center;">${b.activeCount} / ${b.count}</td>
-                    <td style="padding: 10px; text-align: right; font-weight: bold; color: ${isProducer ? '#2ecc71' : '#e74c3c'}">
-                        ${isProducer ? '+' : '-'}${formatNumber(energyVal)} MW
-                    </td>
-                </tr>`;
-        }
-    });
+            let prodText = "가동 중지";
+            if (isOn && b.outputs) {
+                const resKey = Object.keys(b.outputs).find(k => k !== 'energy');
+                if (resKey) prodText = `<span style="color:#2ecc71">▲ ${formatNumber(b.outputs[resKey] * b.activeCount * speedMult)}${getResNameOnly(resKey)}/s</span>`;
+            }
 
-    html += `</tbody></table>`;
-    container.innerHTML = html;
+            let energyText = "";
+            if (isProducer) energyText = `<span style="color:#2ecc71">+${formatNumber(energyImpact)}MW</span>`;
+            else if (isConsumer) energyText = `<span style="color:#e74c3c">-${formatNumber(energyImpact)}MW</span>`;
+
+            ctrlCard.style.opacity = isOn ? "1" : "0.5";
+            ctrlCard.querySelector('.si-name').innerText = b.name;
+            ctrlCard.querySelector('.si-level').innerText = `${b.activeCount}/${b.count}`;
+            ctrlCard.querySelector('.si-desc').innerHTML = prodText;
+            ctrlCard.querySelector('.si-cost').innerHTML = energyText;
+        });
+    }
 }
 
 export function renderResearchTab() {
@@ -528,33 +580,15 @@ function createBuildingElement(b, index, getCostFunc) {
     if (inArr.length > 0) processTxt += `<span style="color:#e74c3c">-${inArr.join(',')}</span> `;
     if (outArr.length > 0) processTxt += `➡<span style="color:#2ecc71">+${outArr.join(',')}</span>/s`;
 
-    // ⭐ [수정] 카드 디자인: 상단에 구매 버튼, 하단에 가동 조절 버튼 배치
+    // 가동/보유 정보만 이름 옆에 작게 표시
     div.innerHTML = `
-        <div class="shop-clickable-area" style="height:65px; cursor:pointer;">
-            <span class="si-name">${b.name}</span>
-            <span class="si-level">Lv.${b.activeCount}/${b.count}</span>
-            <div class="si-desc">${processTxt}</div>
-            <div class="si-cost">${costTxt}</div>
-        </div>
-        <div class="si-ctrl-bar" style="display:flex; height:30px; border-top:1px solid rgba(255,255,255,0.1);">
-            <button class="b-adj-min" data-v="-10" style="flex:1; background:#222; color:#777; border:none; border-right:1px solid #333; cursor:pointer; font-size:0.7rem;">--</button>
-            <button class="b-adj-min" data-v="-1" style="flex:1; background:#222; color:#e74c3c; border:none; border-right:1px solid #333; cursor:pointer; font-weight:bold;">-</button>
-            <button class="b-adj-min" data-v="1" style="flex:1; background:#222; color:#2ecc71; border:none; border-right:1px solid #333; cursor:pointer; font-weight:bold;">+</button>
-            <button class="b-adj-min" data-v="10" style="flex:1; background:#222; color:#777; border:none; cursor:pointer; font-size:0.7rem;">++</button>
-        </div>
+        <span class="si-name">${b.name} <small style="color:#8892b0; font-weight:normal;">(${b.activeCount}/${b.count})</small></span>
+        <span class="si-level">Lv.${b.count}</span>
+        <div class="si-desc">${processTxt}</div>
+        <div class="si-cost">${costTxt}</div>
     `;
-
-    // 구매 이벤트 (상단 영역 클릭 시)
-    div.querySelector('.shop-clickable-area').onclick = () => { if(cachedBuyCallback) cachedBuyCallback(index); };
-
-    // 조절 이벤트 (하단 버튼 클릭 시)
-    div.querySelectorAll('.b-adj-min').forEach(btn => {
-        btn.onclick = (e) => {
-            e.stopPropagation();
-            window.adjustActiveCount(b.id, parseInt(btn.dataset.v));
-        };
-    });
-
+    
+    div.onclick = () => { if(cachedBuyCallback) cachedBuyCallback(index); };
     return div;
 }
 
