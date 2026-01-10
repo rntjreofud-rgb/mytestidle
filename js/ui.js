@@ -466,11 +466,17 @@ function createResearchElement(r, isDone) {
     if (!isDone) {
         div.onclick = (e) => {
             e.stopPropagation();
-            if (Logic.tryBuyResearch(r.id)) {
+            
+            // 1. 결과를 변수에 담습니다.
+            const result = Logic.tryBuyResearch(r.id); 
+            
+            // 2. ⭐ 'result'가 아니라 'result.success'가 true인지 확인해야 합니다!
+            if (result.success) { 
                 log(`🔬 [연구 완료] ${r.name}`, true);
-                renderResearchTab(); // 다시 그려서 완료 목록으로 이동
+                renderResearchTab();
                 renderShop(cachedBuyCallback, Logic.getBuildingCost);
             } else {
+                // 3. 실패했을 때 어떤 재료가 부족한지 로그 출력
                 const missingNames = result.missing.map(key => getResNameOnly(key)).join(', ');
                 log(`❌ 연구 불가 (부족: ${missingNames})`);
             }
