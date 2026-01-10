@@ -14,6 +14,9 @@ const elements = {
     navDashboard: document.getElementById('nav-dashboard'),
     navPower: document.getElementById('nav-power'),
     navResearch: document.getElementById('nav-research'),
+    dashPowerPanel: document.getElementById('dash-power-panel'),
+    dashPowerText: document.getElementById('dash-power-text'),
+    dashPowerFill: document.getElementById('dash-power-fill'),
     logList: document.getElementById('game-log-list'),
     resGrid: document.querySelector('.resource-grid'),
     houseName: document.getElementById('header-title'),
@@ -237,27 +240,41 @@ export function updateScreen(stats) {
 function updatePowerUI() {
     const prod = gameData.resources.energy || 0;
     const req = gameData.resources.energyMax || 0;
-    
-    // 1. 상단 바 업데이트
-    if(elements.powerDisplay) elements.powerDisplay.innerHTML = `<span style="color:#2ecc71">${formatNumber(prod)} MW</span> 생산 / <span style="color:#e74c3c">${formatNumber(req)} MW</span> 소비`;
-    
+    const percent = req > 0 ? (prod / req) * 100 : 100;
+    const powerColor = (prod >= req) ? '#2ecc71' : '#e74c3c';
+
+    // 1. [전력 관리 탭] 상단 요약 업데이트
+    if(elements.powerDisplay) {
+        elements.powerDisplay.innerHTML = `<span style="color:#2ecc71">${formatNumber(prod)} MW</span> 생산 / <span style="color:#e74c3c">${formatNumber(req)} MW</span> 소비`;
+    }
     if(elements.powerBar) {
-        let percent = req > 0 ? (prod / req) * 100 : 100;
         elements.powerBar.style.width = `${Math.min(100, percent)}%`;
-        if (prod < req) {
-            elements.powerBar.classList.add('power-low');
-            elements.powerBar.style.backgroundColor = '#e74c3c';
+        elements.powerBar.style.backgroundColor = powerColor;
+        // 전력 부족 시 깜빡임 애니메이션 추가/제거
+        if (prod < req) elements.powerBar.classList.add('power-low');
+        else elements.powerBar.classList.remove('power-low');
+    }
+
+    // 2. [메인 대시보드] 전력바 실시간 업데이트 (Lv.5 이상일 때만 표시)
+    if (elements.dashPowerPanel) {
+        if (gameData.houseLevel >= 5) {
+            elements.dashPowerPanel.classList.remove('hidden');
+            if (elements.dashPowerText) {
+                elements.dashPowerText.innerHTML = `<span style="color:#2ecc71">${formatNumber(prod)}</span> / <span style="color:#e74c3c">${formatNumber(req)} MW</span>`;
+            }
+            if (elements.dashPowerFill) {
+                elements.dashPowerFill.style.width = `${Math.min(100, percent)}%`;
+                elements.dashPowerFill.style.backgroundColor = powerColor;
+            }
         } else {
-            elements.powerBar.classList.remove('power-low');
-            elements.powerBar.style.backgroundColor = '#2ecc71';
+            elements.dashPowerPanel.classList.add('hidden');
         }
     }
 
-    // 2. 상세 내역 렌더링 (DOM 재활용 방식)
+    // 3. [전력 상세 내역] 테이블 렌더링 (DOM 재활용 방식)
     const container = document.getElementById('power-breakdown-container');
     if (!container) return;
 
-    // 테이블 틀 생성 (최초 1회)
     let table = container.querySelector('table');
     if (!table) {
         container.innerHTML = `
@@ -276,28 +293,23 @@ function updatePowerUI() {
     }
 
     const tbody = container.querySelector('#power-list-body');
-
-    // 현재 존재하는 건물 ID 목록 (청소용)
     const currentBuildingIds = new Set();
 
     gameData.buildings.forEach(b => {
         if (b.count > 0) {
-            const speedMult = Logic.getBuildingMultiplier(b.id);
-            const consMult = Logic.getBuildingConsumptionMultiplier(b.id);
-            const energyEff = Logic.getEnergyEfficiencyMultiplier(b.id);
-            
             const isProducer = b.outputs && b.outputs.energy;
             const isConsumer = b.inputs && b.inputs.energy;
-
             if (!isProducer && !isConsumer) return;
 
             currentBuildingIds.add(b.id);
 
-            // 에너지 값 계산
+            const speedMult = Logic.getBuildingMultiplier(b.id);
+            const consMult = Logic.getBuildingConsumptionMultiplier(b.id);
+            const energyEff = Logic.getEnergyEfficiencyMultiplier(b.id);
+
             let energyVal = 0;
             let isPlus = false;
             
-            // 켜져 있을 때만 계산
             if (b.on !== false) { 
                 if (isProducer) {
                     energyVal = b.outputs.energy * b.count * speedMult;
@@ -307,16 +319,11 @@ function updatePowerUI() {
                 }
             }
 
-            // --- DOM 요소 찾기 또는 생성 ---
             let row = document.getElementById(`pwr-row-${b.id}`);
-            
             if (!row) {
                 row = document.createElement('tr');
                 row.id = `pwr-row-${b.id}`;
                 row.style.borderBottom = "1px solid rgba(255,255,255,0.05)";
-                row.style.transition = "opacity 0.2s"; // 깜빡임 부드럽게
-                
-                // 셀 구조 생성
                 row.innerHTML = `
                     <td class="p-name" style="padding: 8px; vertical-align: middle;"></td>
                     <td class="p-count" style="text-align:center; padding: 8px; vertical-align: middle; font-weight:bold;"></td>
@@ -326,12 +333,9 @@ function updatePowerUI() {
                     <td class="p-energy" style="text-align:right; padding: 8px; vertical-align: middle;"></td>
                 `;
 
-                // 버튼 생성 (HTML 문자열 아님, 객체 직접 생성)
                 const btnOn = document.createElement('button');
                 btnOn.innerText = "ON";
                 btnOn.style.cssText = "padding: 4px 8px; border-radius: 4px 0 0 4px; cursor: pointer; border: 1px solid #555; font-size: 0.75rem;";
-                
-                // ⭐ [수정] UI.updateScreen -> updateScreen 으로 변경 (에러 해결)
                 btnOn.onclick = function() { 
                     b.on = true; 
                     updateScreen(Logic.calculateNetMPS()); 
@@ -340,34 +344,26 @@ function updatePowerUI() {
                 const btnOff = document.createElement('button');
                 btnOff.innerText = "OFF";
                 btnOff.style.cssText = "padding: 4px 8px; border-radius: 0 4px 4px 0; cursor: pointer; border: 1px solid #555; font-size: 0.75rem; border-left: none;";
-                
-                // ⭐ [수정] UI.updateScreen -> updateScreen 으로 변경
                 btnOff.onclick = function() { 
                     b.on = false; 
                     updateScreen(Logic.calculateNetMPS()); 
                 };
 
-                // 버튼 삽입
                 const btnContainer = row.querySelector('.p-ctrl div');
                 btnContainer.appendChild(btnOn);
                 btnContainer.appendChild(btnOff);
-
-                // 참조 저장
                 row.btnOn = btnOn;
                 row.btnOff = btnOff;
-
                 tbody.appendChild(row);
             }
 
-            // --- 내용 업데이트 (매 프레임) ---
-            
-            // 1. 텍스트
+            // 실시간 내용 업데이트
             row.querySelector('.p-name').innerText = b.name;
             row.querySelector('.p-count').innerText = formatNumber(b.count);
-
-            // 2. 에너지 및 투명도
             const energyCell = row.querySelector('.p-energy');
-            if (b.on === false) {
+            
+            const isOn = (b.on !== false);
+            if (!isOn) {
                 energyCell.innerHTML = `<span style="color:#7f8c8d;">0 MW</span>`;
                 row.style.opacity = "0.5";
             } else {
@@ -376,27 +372,17 @@ function updatePowerUI() {
                 else energyCell.innerHTML = `<span style="color:#e74c3c">-${formatNumber(energyVal)}</span>`;
             }
 
-            // 3. 버튼 스타일 (활성 상태 강조)
-            const isOn = (b.on !== false);
-            
-            // 켜짐 버튼 스타일
             row.btnOn.style.background = isOn ? "#2ecc71" : "#222";
             row.btnOn.style.color = isOn ? "#fff" : "#666";
-            row.btnOn.style.fontWeight = isOn ? "bold" : "normal";
-
-            // 꺼짐 버튼 스타일
             row.btnOff.style.background = !isOn ? "#e74c3c" : "#222";
             row.btnOff.style.color = !isOn ? "#fff" : "#666";
-            row.btnOff.style.fontWeight = !isOn ? "bold" : "normal";
         }
     });
 
-    // 사라진 건물 행 제거 (청소)
+    // 제거된 건물의 행 삭제
     Array.from(tbody.children).forEach(row => {
         const id = parseInt(row.id.replace('pwr-row-', ''));
-        if (!currentBuildingIds.has(id)) {
-            row.remove();
-        }
+        if (!currentBuildingIds.has(id)) row.remove();
     });
 }
 
