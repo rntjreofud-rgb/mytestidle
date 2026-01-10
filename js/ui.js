@@ -580,10 +580,13 @@ function createBuildingElement(b, index, getCostFunc) {
     
     let outArr = b.outputs ? Object.entries(b.outputs).map(([k,v]) => `${formatNumber(v * speedMult)}${k === 'energy' ? '⚡' : getResNameOnly(k)}`) : [];
     
+
     let processTxt = "";
     if (inArr.length > 0) processTxt += `<span style="color:#e74c3c">-${inArr.join(',')}</span> `;
     if (outArr.length > 0) processTxt += `➡<span style="color:#2ecc71">+${outArr.join(',')}</span>/s`;
 
+    const active = b.activeCount || 0;
+    const total = b.count || 0;
     // 가동/보유 정보만 이름 옆에 작게 표시
     div.innerHTML = `
         <span class="si-name">${b.name} <small style="color:#8892b0; font-weight:normal;">(${b.activeCount}/${b.count})</small></span>

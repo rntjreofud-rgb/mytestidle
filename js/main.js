@@ -156,17 +156,24 @@ function handleGather(type) {
 }
 
 function handleBuyBuilding(index) {
-    if (Logic.tryBuyBuilding(index)) {
+    // 1. 먼저 결과를 변수에 담아야 합니다. (객체는 그 자체로 참이기 때문)
+    const result = Logic.tryBuyBuilding(index); 
+    
+    if (result.success) {
         UI.log(`[건설] ${gameData.buildings[index].name} 건설 완료.`);
         UI.renderShop(handleBuyBuilding, Logic.getBuildingCost); 
     } else {
+        // 2. result 객체 안에 있는 missing 배열을 사용합니다.
         const missingNames = result.missing.map(key => UI.getResNameOnly(key)).join(', ');
         UI.log(`🏗️ 건설 불가 (부족: ${missingNames})`, false);
     }
 }
 
 function handleHouseUpgrade(nextStage) {
-    if (Logic.tryUpgradeHouse(nextStage)) {
+    // 1. 결과를 변수에 담아 success 여부를 확인합니다.
+    const result = Logic.tryUpgradeHouse(nextStage);
+    
+    if (result.success) {
         UI.log(`🎉 기술 발전 성공! [${nextStage.name}] 단계로 진입했습니다.`, true);
         
         // ⭐ 중요: 레벨이 올랐으니 새로운 건물이 해금되었을 수 있음. 상점 다시 그리기
@@ -179,6 +186,7 @@ function handleHouseUpgrade(nextStage) {
             Storage.resetGame();
         }
     } else {
+        // 2. 부족한 자원 목록을 로그에 출력합니다.
         const missingNames = result.missing.map(key => UI.getResNameOnly(key)).join(', ');
         UI.log(`⬆️ 업그레이드 불가 (부족: ${missingNames})`, false);
     }
