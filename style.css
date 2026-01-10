@@ -177,6 +177,12 @@ header h2 { margin: 0; font-size: 1rem; color: #fff; }
     gap: 8px !important;
 }
 
+#research-list-container {
+    display: block !important; /* 그리드 해제 (제목이 한 줄을 다 쓰게 함) */
+    width: 100% !important;
+}
+
+
 .auto-area, #building-list {
     width: 100% !important;
     display: block !important;
@@ -215,17 +221,26 @@ header h2 { margin: 0; font-size: 1rem; color: #fff; }
 
 /* 연구 탭 전용 섹션 제목 */
 .research-section-title {
-    width: 100%;
-    margin: 25px 0 10px 0;
-    padding-bottom: 8px;
-    border-bottom: 2px solid var(--bg-panel);
-    color: var(--accent-blue);
-    font-weight: bold;
+    width: 100% !important;
+    display: flex !important;
+    justify-content: space-between;
+    align-items: center;
     font-size: 0.95rem;
-    grid-column: 1 / -1; /* 그리드 전체 너비 차지 */
+    color: var(--accent-blue);
+    margin: 25px 0 12px 0 !important;
+    padding: 8px 10px !important;
+    border-bottom: 2px solid var(--bg-panel);
+    font-weight: bold;
+    cursor: pointer;
 }
 
-
+#research-list-container .sub-build-grid {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important; /* PC 4열 고정 */
+    gap: 12px !important;
+    width: 100% !important;
+    margin-bottom: 30px !important;
+}
 /* --- 2. 건물 카테고리 내부 그리드 (PC 4열 고정) --- */
 
 
