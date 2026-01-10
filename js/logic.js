@@ -36,12 +36,12 @@ export function calculateNetMPS() {
     const powerFactor = totalReq > 0 ? Math.min(1.0, totalProd / totalReq) : 1.0;
 
     gameData.buildings.forEach(b => {
-        // ⭐ [핵심] 건물의 개수가 0보다 크고, 전원이 켜져 있을 때만(false가 아닐 때) 계산
-        if (b.count > 0 && b.on !== false) {
+        // ⭐ [핵심 수정] count 대신 activeCount가 0보다 클 때만 계산
+        if (b.activeCount > 0) {
             let speedMult = getBuildingMultiplier(b.id);
             let consMult = getBuildingConsumptionMultiplier(b.id);
             
-            // 전력을 쓰는 건물은 전력 공급률에 영향을 받음
+            // 전력 공급률에 따른 효율 결정
             let efficiency = speedMult;
             if (b.inputs && b.inputs.energy) {
                 efficiency *= powerFactor;
@@ -50,14 +50,15 @@ export function calculateNetMPS() {
             if (b.inputs) {
                 for (let res in b.inputs) {
                     if(res !== 'energy') {
-                        // 실제 소모량 통계에 반영
-                        stats[res].cons += (b.inputs[res] * consMult) * b.count * efficiency;
+                        // ⭐ [수정] b.count 대신 b.activeCount를 곱함
+                        stats[res].cons += (b.inputs[res] * consMult) * b.activeCount * efficiency;
                     }
                 }
             }
-            if (b.outputs && !b.outputs.energy) { // 일반 자원 생산량 통계
+            if (b.outputs && !b.outputs.energy) {
                 for (let res in b.outputs) {
-                    stats[res].prod += b.outputs[res] * b.count * efficiency;
+                    // ⭐ [수정] b.count 대신 b.activeCount를 곱함
+                    stats[res].prod += b.outputs[res] * b.activeCount * efficiency;
                 }
             }
         }
@@ -69,10 +70,9 @@ export function produceResources(deltaTime) {
     let totalEnergyProd = 0;
     let totalEnergyReq = 0;
 
-    // 1단계: 전력 생산 시설 (발전기)
+    // 1단계: 전력 생산 시설 (activeCount 기준)
     gameData.buildings.forEach(b => {
-        // ⭐ [체크] 건물이 켜져 있을 때만 에너지를 생산함
-        if (b.count > 0 && b.on !== false && b.outputs && b.outputs.energy) {
+        if (b.activeCount > 0 && b.outputs && b.outputs.energy) {
             let speedMult = getBuildingMultiplier(b.id);
             let consMult = getBuildingConsumptionMultiplier(b.id);
             let inputEfficiency = 1.0;
@@ -80,28 +80,31 @@ export function produceResources(deltaTime) {
             if(b.inputs) {
                 for(let res in b.inputs) {
                     if (res === 'energy') continue;
-                    let needed = (b.inputs[res] * consMult) * b.count * speedMult * deltaTime;
+                    // ⭐ activeCount 적용
+                    let needed = (b.inputs[res] * consMult) * b.activeCount * speedMult * deltaTime;
                     if((gameData.resources[res] || 0) < needed) {
                         inputEfficiency = Math.min(inputEfficiency, (gameData.resources[res] || 0) / needed);
                     }
                 }
                 for(let res in b.inputs) {
                     if (res === 'energy') continue;
-                    gameData.resources[res] = Math.max(0, gameData.resources[res] - (b.inputs[res] * consMult * b.count * speedMult * deltaTime * inputEfficiency));
+                    // ⭐ activeCount 적용
+                    let actualConsume = (b.inputs[res] * consMult) * b.activeCount * speedMult * deltaTime * inputEfficiency;
+                    gameData.resources[res] = Math.max(0, gameData.resources[res] - actualConsume);
                 }
             }
-            totalEnergyProd += (b.outputs.energy * b.count * speedMult) * inputEfficiency;
+            totalEnergyProd += (b.outputs.energy * b.activeCount * speedMult) * inputEfficiency;
         }
     });
 
-    // 2단계: 전력 요구량 계산
+    // 2단계: 전력 요구량 계산 (activeCount 기준)
     gameData.buildings.forEach(b => {
-        // ⭐ [체크] 건물이 켜져 있을 때만 전력을 요구함
-        if (b.count > 0 && b.on !== false && b.inputs && b.inputs.energy) {
+        if (b.activeCount > 0 && b.inputs && b.inputs.energy) {
             let speedMult = getBuildingMultiplier(b.id);
             let consMult = getBuildingConsumptionMultiplier(b.id);
             let energyEff = getEnergyEfficiencyMultiplier(b.id);
-            totalEnergyReq += (b.inputs.energy * consMult * energyEff) * b.count * speedMult;
+            // ⭐ activeCount 적용
+            totalEnergyReq += (b.inputs.energy * consMult * energyEff) * b.activeCount * speedMult;
         }
     });
 
@@ -109,10 +112,10 @@ export function produceResources(deltaTime) {
     gameData.resources.energyMax = totalEnergyReq;
     let powerFactor = totalEnergyReq > 0 ? Math.min(1.0, totalEnergyProd / totalEnergyReq) : 1.0;
 
-    // 3단계: 일반 생산 시설
+    // 3단계: 일반 생산 시설 (activeCount 기준)
     gameData.buildings.forEach(b => {
-        // ⭐ [체크] 건물이 없거나, 전원이 꺼져있거나, 발전기라면 건너뜀
-        if (b.count === 0 || b.on === false || (b.outputs && b.outputs.energy)) return;
+        // activeCount가 0이면 아예 연산 안 함
+        if (b.activeCount <= 0 || (b.outputs && b.outputs.energy)) return;
 
         let speedMult = getBuildingMultiplier(b.id);
         let consMult = getBuildingConsumptionMultiplier(b.id);
@@ -122,7 +125,8 @@ export function produceResources(deltaTime) {
             let inputEfficiency = 1.0;
             for (let res in b.inputs) {
                 if (res === 'energy') continue;
-                let needed = (b.inputs[res] * consMult) * b.count * deltaTime * efficiency;
+                // ⭐ activeCount 적용
+                let needed = (b.inputs[res] * consMult) * b.activeCount * deltaTime * efficiency;
                 if(needed > 0 && (gameData.resources[res] || 0) < needed) {
                     inputEfficiency = Math.min(inputEfficiency, (gameData.resources[res] || 0) / needed);
                 }
@@ -131,14 +135,17 @@ export function produceResources(deltaTime) {
 
             for (let res in b.inputs) {
                 if (res === 'energy') continue;
-                gameData.resources[res] = Math.max(0, gameData.resources[res] - (b.inputs[res] * consMult * b.count * deltaTime * efficiency));
+                // ⭐ activeCount 적용
+                let actualConsume = (b.inputs[res] * consMult) * b.activeCount * deltaTime * efficiency;
+                gameData.resources[res] = Math.max(0, gameData.resources[res] - actualConsume);
             }
         }
 
         if (efficiency > 0 && b.outputs) {
             for (let res in b.outputs) {
                 if (res === 'energy') continue;
-                gameData.resources[res] += (b.outputs[res] * b.count * deltaTime * efficiency);
+                // ⭐ activeCount 적용
+                gameData.resources[res] += (b.outputs[res] * b.activeCount * deltaTime * efficiency);
             }
         }
     });
@@ -231,9 +238,10 @@ export function tryBuyBuilding(index) {
     }
     
     b.count++;
+    // ⭐ [수정] 건물을 사면 즉시 가동 개수도 1 늘어납니다.
+    b.activeCount = (b.activeCount || 0) + 1;
     
-    // ⭐ [추가] 건물을 지으면 무조건 전원을 켭니다.
-    if (b.on === undefined) b.on = true;
+    // 하위 호환성 유지
     b.on = true;
 
     return true;

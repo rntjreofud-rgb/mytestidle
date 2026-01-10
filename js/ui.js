@@ -6,6 +6,18 @@ import * as Logic from './logic.js'; // ⭐ Logic이 반드시 있어야 계산�
 // 내부에서 구매 콜백 함수를 기억하기 위한 변수
 let cachedBuyCallback = null;
 
+window.adjustActiveCount = function(id, delta) {
+    const b = gameData.buildings.find(build => build.id === id);
+    if (b) {
+        // 0 ~ 보유 개수(count) 사이로 제한
+        b.activeCount = Math.max(0, Math.min(b.count, b.activeCount + delta));
+        // 즉시 로직 계산 및 화면 갱신
+        const netMPS = Logic.calculateNetMPS();
+        updateScreen(netMPS);
+    }
+};
+
+
 
 const elements = {
     viewDashboard: document.getElementById('view-dashboard'),
@@ -288,18 +300,15 @@ function updatePowerUI() {
     if(elements.powerBar) {
         elements.powerBar.style.width = `${Math.min(100, percent)}%`;
         elements.powerBar.style.backgroundColor = powerColor;
-        // 전력 부족 시 깜빡임 애니메이션 추가/제거
         if (prod < req) elements.powerBar.classList.add('power-low');
         else elements.powerBar.classList.remove('power-low');
     }
 
-    // 2. [메인 대시보드] 전력바 실시간 업데이트 (Lv.5 이상일 때만 표시)
+    // 2. [메인 대시보드] 전력바 실시간 업데이트
     if (elements.dashPowerPanel) {
         if (gameData.houseLevel >= 5) {
             elements.dashPowerPanel.classList.remove('hidden');
-            if (elements.dashPowerText) {
-                elements.dashPowerText.innerHTML = `<span style="color:#2ecc71">${formatNumber(prod)}</span> / <span style="color:#e74c3c">${formatNumber(req)} MW</span>`;
-            }
+            if (elements.dashPowerText) elements.dashPowerText.innerHTML = `<span style="color:#2ecc71">${formatNumber(prod)}</span> / <span style="color:#e74c3c">${formatNumber(req)} MW</span>`;
             if (elements.dashPowerFill) {
                 elements.dashPowerFill.style.width = `${Math.min(100, percent)}%`;
                 elements.dashPowerFill.style.backgroundColor = powerColor;
@@ -309,7 +318,7 @@ function updatePowerUI() {
         }
     }
 
-    // 3. [전력 상세 내역] 테이블 렌더링 (DOM 재활용 방식)
+    // 3. [생산 및 전력 제어 내역] 테이블 렌더링 (가동 레벨 조절 버전)
     const container = document.getElementById('power-breakdown-container');
     if (!container) return;
 
@@ -319,10 +328,9 @@ function updatePowerUI() {
             <table style="width:100%; border-collapse: collapse; font-size: 0.85rem; table-layout: fixed;">
                 <thead>
                     <tr style="border-bottom: 1px solid #444; color: #8892b0;">
-                        <th style="text-align:left; padding: 8px; width: 40%;">건물명</th>
-                        <th style="text-align:center; padding: 8px; width: 15%;">개수</th>
-                        <th style="text-align:center; padding: 8px; width: 25%;">전원 제어</th>
-                        <th style="text-align:right; padding: 8px; width: 20%;">에너지</th>
+                        <th style="text-align:left; padding: 8px; width: 40%;">건물 (가동/보유)</th>
+                        <th style="text-align:center; padding: 8px; width: 35%;">가동 레벨 조절</th>
+                        <th style="text-align:right; padding: 8px; width: 25%;">에너지 (MW)</th>
                     </tr>
                 </thead>
                 <tbody id="power-list-body"></tbody>
@@ -345,17 +353,10 @@ function updatePowerUI() {
             const consMult = Logic.getBuildingConsumptionMultiplier(b.id);
             const energyEff = Logic.getEnergyEfficiencyMultiplier(b.id);
 
-            let energyVal = 0;
-            let isPlus = false;
-            
-            if (b.on !== false) { 
-                if (isProducer) {
-                    energyVal = b.outputs.energy * b.count * speedMult;
-                    isPlus = true;
-                } else {
-                    energyVal = b.inputs.energy * consMult * energyEff * b.count * speedMult;
-                }
-            }
+            // 가동 중인 개수(activeCount) 기준으로 전력량 계산
+            let energyVal = isProducer 
+                ? (b.outputs.energy * b.activeCount * speedMult)
+                : (b.inputs.energy * b.activeCount * speedMult * consMult * energyEff);
 
             let row = document.getElementById(`pwr-row-${b.id}`);
             if (!row) {
@@ -363,57 +364,41 @@ function updatePowerUI() {
                 row.id = `pwr-row-${b.id}`;
                 row.style.borderBottom = "1px solid rgba(255,255,255,0.05)";
                 row.innerHTML = `
-                    <td class="p-name" style="padding: 8px; vertical-align: middle;"></td>
-                    <td class="p-count" style="text-align:center; padding: 8px; vertical-align: middle; font-weight:bold;"></td>
+                    <td class="p-name" style="padding: 8px; vertical-align: middle; line-height: 1.2;"></td>
                     <td class="p-ctrl" style="text-align:center; padding: 8px; vertical-align: middle;">
-                        <div style="display:inline-flex; gap:4px;"></div>
+                        <div style="display:inline-flex; gap:3px;">
+                            <button class="btn-step" data-step="-10" style="padding:3px 6px; background:#444; color:#fff; border:none; border-radius:3px; cursor:pointer; font-size:0.7rem;">--</button>
+                            <button class="btn-step" data-step="-1" style="padding:3px 8px; background:#e74c3c; color:#fff; border:none; border-radius:3px; cursor:pointer; font-weight:bold;">-</button>
+                            <button class="btn-step" data-step="1" style="padding:3px 8px; background:#2ecc71; color:#fff; border:none; border-radius:3px; cursor:pointer; font-weight:bold;">+</button>
+                            <button class="btn-step" data-step="10" style="padding:3px 6px; background:#444; color:#fff; border:none; border-radius:3px; cursor:pointer; font-size:0.7rem;">++</button>
+                        </div>
                     </td>
-                    <td class="p-energy" style="text-align:right; padding: 8px; vertical-align: middle;"></td>
+                    <td class="p-energy" style="text-align:right; padding: 8px; vertical-align: middle; font-weight:bold;"></td>
                 `;
 
-                const btnOn = document.createElement('button');
-                btnOn.innerText = "ON";
-                btnOn.style.cssText = "padding: 4px 8px; border-radius: 4px 0 0 4px; cursor: pointer; border: 1px solid #555; font-size: 0.75rem;";
-                btnOn.onclick = function() { 
-                    b.on = true; 
-                    updateScreen(Logic.calculateNetMPS()); 
-                };
+                // 조절 버튼 이벤트 리스너 연결
+                row.querySelectorAll('.btn-step').forEach(btn => {
+                    btn.onclick = function() {
+                        const step = parseInt(this.dataset.step);
+                        // window.adjustActiveCount를 호출하거나 직접 로직 수행
+                        b.activeCount = Math.max(0, Math.min(b.count, (b.activeCount || 0) + step));
+                        updateScreen(Logic.calculateNetMPS());
+                    };
+                });
 
-                const btnOff = document.createElement('button');
-                btnOff.innerText = "OFF";
-                btnOff.style.cssText = "padding: 4px 8px; border-radius: 0 4px 4px 0; cursor: pointer; border: 1px solid #555; font-size: 0.75rem; border-left: none;";
-                btnOff.onclick = function() { 
-                    b.on = false; 
-                    updateScreen(Logic.calculateNetMPS()); 
-                };
-
-                const btnContainer = row.querySelector('.p-ctrl div');
-                btnContainer.appendChild(btnOn);
-                btnContainer.appendChild(btnOff);
-                row.btnOn = btnOn;
-                row.btnOff = btnOff;
                 tbody.appendChild(row);
             }
 
-            // 실시간 내용 업데이트
-            row.querySelector('.p-name').innerText = b.name;
-            row.querySelector('.p-count').innerText = formatNumber(b.count);
-            const energyCell = row.querySelector('.p-energy');
+            // 내용 실시간 업데이트
+            row.style.opacity = b.activeCount === 0 ? "0.4" : "1";
+            row.querySelector('.p-name').innerHTML = `${b.name}<br><small style="color:#8892b0;">${b.activeCount} / ${b.count} 가동</small>`;
             
-            const isOn = (b.on !== false);
-            if (!isOn) {
-                energyCell.innerHTML = `<span style="color:#7f8c8d;">0 MW</span>`;
-                row.style.opacity = "0.5";
+            const energyCell = row.querySelector('.p-energy');
+            if (isProducer) {
+                energyCell.innerHTML = `<span style="color:#2ecc71">+${formatNumber(energyVal)}</span>`;
             } else {
-                row.style.opacity = "1";
-                if (isPlus) energyCell.innerHTML = `<span style="color:#2ecc71">+${formatNumber(energyVal)}</span>`;
-                else energyCell.innerHTML = `<span style="color:#e74c3c">-${formatNumber(energyVal)}</span>`;
+                energyCell.innerHTML = `<span style="color:#e74c3c">-${formatNumber(energyVal)}</span>`;
             }
-
-            row.btnOn.style.background = isOn ? "#2ecc71" : "#222";
-            row.btnOn.style.color = isOn ? "#fff" : "#666";
-            row.btnOff.style.background = !isOn ? "#e74c3c" : "#222";
-            row.btnOff.style.color = !isOn ? "#fff" : "#666";
         }
     });
 

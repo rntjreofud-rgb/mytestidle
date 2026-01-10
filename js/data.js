@@ -200,21 +200,16 @@ export const houseStages = [
 ];
 
 export function setGameData(newData) {
-    // 1. 자원 데이터 복구 및 신규 자원 추가
-    // (게임에 존재하는 모든 자원 키를 순회하며 확인)
+    // 1. 자원 데이터 복구 및 신규 자원 추가 (NaN 및 null 방지)
     for (let key in gameData.resources) {
         if (newData.resources && newData.resources[key] !== undefined) {
             let val = newData.resources[key];
-            
-            // ⭐ [중요] 저장된 값이 NaN(에러)이거나 null이면 0으로 강제 복구
             if (val === null || isNaN(val)) {
-                console.warn(`자원 데이터 복구됨: ${key} (NaN -> 0)`);
                 gameData.resources[key] = 0;
             } else {
                 gameData.resources[key] = val;
             }
         } else {
-            // 구버전 세이브에 없는 신규 자원은 0으로 시작
             gameData.resources[key] = 0;
         }
     }
@@ -224,35 +219,37 @@ export function setGameData(newData) {
     gameData.researches = Array.isArray(newData.researches) ? newData.researches : [];
     gameData.unlockedResources = Array.isArray(newData.unlockedResources) ? newData.unlockedResources : ['wood', 'stone', 'plank'];
 
-    // 3. 건물 데이터 복구 (가장 중요한 부분)
+    // 3. 건물 데이터 및 가동 레벨(activeCount) 복구
     if (newData.buildings && Array.isArray(newData.buildings)) {
         newData.buildings.forEach((savedB) => {
-            // 현재 코드의 건물 리스트에서 ID로 찾기
             const currentB = gameData.buildings.find(b => b.id === savedB.id);
             if (currentB) {
-                // 개수 복구
+                // 보유 개수 복구
                 currentB.count = savedB.count || 0;
                 
-                // ⭐ [ON/OFF 복구] 저장된 값이 있으면 쓰고, 없으면 무조건 켜짐(true)
-                if (savedB.on !== undefined) {
-                    currentB.on = savedB.on;
+                // ⭐ [가동 개수 복구 핵심]
+                if (savedB.activeCount !== undefined) {
+                    // 최신 세이브라면 저장된 가동 개수 로드
+                    currentB.activeCount = savedB.activeCount;
+                } else if (savedB.on === false) {
+                    // 구버전(스위치) 세이브인데 꺼져있었다면 가동 개수 0
+                    currentB.activeCount = 0;
                 } else {
-                    currentB.on = true; // 구버전 데이터는 켜짐으로 간주
+                    // 신규 건물이거나 구버전에서 켜져있었다면 보유 개수만큼 전체 가동
+                    currentB.activeCount = currentB.count;
                 }
             }
         });
     }
 
-    // 4. 안전장치: 혹시라도 on 속성이 누락된 건물이 있다면 강제로 켬
+    // 4. 안전장치: 누락된 속성 채우기 및 범위 제한
     gameData.buildings.forEach(b => {
-        if (b.on === false) {
-            // 명시적으로 꺼진 건 유지
-            b.on = false;
-        } else {
-            // undefined거나 null이면 켜짐으로 설정
-            b.on = true;
-        }
+        if (b.activeCount === undefined) b.activeCount = b.count || 0;
+        // 가동 개수가 보유 개수보다 많아지지 않도록 보정
+        if (b.activeCount > b.count) b.activeCount = b.count;
+        // 하위 호환성을 위해 on 속성값도 동기화 (activeCount가 0이면 꺼짐 처리)
+        b.on = b.activeCount > 0;
     });
 
-    console.log("세이브 데이터 호환성 패치 완료.");
+    console.log("세이브 데이터 및 가동 레벨(activeCount) 호환성 패치 완료.");
 }
