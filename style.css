@@ -319,7 +319,25 @@ header h2 { margin: 0; font-size: 1rem; color: #fff; }
     border-bottom: 1px solid rgba(255,255,255,0.05);
 }
 
+.sub-res-grid {
+    display: grid;
+    /* 카드의 최소 너비를 150px로 설정하여, 화면이 넓으면 자동으로 옆으로 채워짐 */
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); 
+    gap: 10px;
+    margin-bottom: 20px;
+    width: 100%;
+}
 
+/* 2. 자원 카드 디자인 다듬기 */
+.res-card {
+    width: 100%;         /* 그리드 칸에 맞춰 꽉 차게 */
+    height: 100px;       /* 높이 고정 (들쑥날쑥 방지) */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 12px;
+    box-sizing: border-box;
+}
 
 .hidden { display: none !important; }
 
@@ -437,11 +455,5 @@ header h2 { margin: 0; font-size: 1rem; color: #fff; }
     gap: 5px;
 }
 
-/* 자원 그리드 (기존 .resource-grid 대신 사용될 서브 그리드들) */
-.sub-res-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-    gap: 8px;
-    margin-bottom: 10px;
-}
+
 }
