@@ -587,7 +587,9 @@ header h2 { margin: 0; font-size: 1rem; color: #fff; }
         grid-template-columns: 1fr !important; 
         gap: 8px;
     }
-
+    #research-list-container .sub-build-grid {
+        grid-template-columns: 1fr !important; /* 모바일 1열 */
+    }
 
     /* 자원 카테고리 제목 */
 .res-category-title {
