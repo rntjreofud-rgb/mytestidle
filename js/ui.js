@@ -635,5 +635,34 @@ export function updateHouseUI(onUpgrade) {
         elements.upgradeBtn.disabled = true;
     }
 }
+// 오프라인 보고서 모달 표시 함수
+export function showOfflineReport(seconds, statsBefore) {
+    const modal = document.getElementById('offline-modal');
+    const timeText = document.getElementById('offline-time-text');
+    const reportDiv = document.getElementById('offline-report');
+    
+    if (!modal) return;
+    
+    const hours = Math.floor(seconds / 3600);
+    const mins = Math.floor((seconds % 3600) / 60);
+    timeText.innerText = `${hours}시간 ${mins}분 동안의 성과입니다.`;
+    
+    // 이전에 계산된 순수 MPS(stats)를 활용해 획득량 표시
+    let reportHtml = "";
+    for (let res in gameData.resources) {
+        const net = (Logic.calculateNetMPS()[res]?.prod || 0) - (Logic.calculateNetMPS()[res]?.cons || 0);
+        if (net > 0) {
+            const gain = net * seconds;
+            reportHtml += `<div>${resNames[res] || res}: <span style="color:#2ecc71">+${formatNumber(gain)}</span></div>`;
+        }
+    }
+    
+    reportDiv.innerHTML = reportHtml || "획득한 자원이 없습니다.";
+    modal.classList.remove('hidden');
+}
+
+
+
+
 
 export const uiElements = elements;

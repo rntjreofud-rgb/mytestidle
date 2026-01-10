@@ -34,17 +34,31 @@ window.gameData = gameData;
 
 
 function init() {
-    // ⭐ [핵심 수정] HTML의 토글 스위치가 이 함수를 찾을 수 있게 강제로 등록
-   
-
-    // 기존 초기화 로직들
-    Storage.loadGame();
+    window.UI = UI; 
+    
+    // 1. 게임을 로드하며 오프라인 시간을 가져옴
+    const offlineSeconds = Storage.loadGame(); 
+    
     setupEvents();
     UI.renderShop(handleBuyBuilding, Logic.getBuildingCost);
     UI.updateHouseUI(handleHouseUpgrade);
+
+    // 2. ⭐ 오프라인 자원 계산 및 처리
+    if (offlineSeconds > 10) { // 10초 이상 자리를 비웠을 때만 실행
+        // 최대 오프라인 시간 제한 (예: 12시간 = 43200초)
+        const cappedSeconds = Math.min(offlineSeconds, 43200); 
+        
+        // 현재 생산량 기준으로 자원 생성
+        Logic.produceResources(cappedSeconds); 
+        
+        const hours = Math.floor(cappedSeconds / 3600);
+        const mins = Math.floor((cappedSeconds % 3600) / 60);
+        UI.log(`💤 자리를 비운 ${hours}시간 ${mins}분 동안 자원이 축적되었습니다!`, true);
+        
+        // 어떤 자원을 얼마나 얻었는지 팝업으로 보여주면 더 좋음 (선택사항)
+    }
+
     UI.log("시스템 로드 완료. Escape Earth 가동 시작.");
-    
-    // 게임 루프 시작
     requestAnimationFrame(gameLoop);
     setInterval(() => Storage.saveGame(), 10000);
 }

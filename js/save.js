@@ -3,8 +3,10 @@ import { gameData, setGameData } from './data.js';
 const SAVE_KEY = 'civIdleModularSave';
 
 export function saveGame() {
+    // ⭐ 현재 시간을 타임스탬프로 기록
+    gameData.lastTimestamp = Date.now(); 
     localStorage.setItem(SAVE_KEY, JSON.stringify(gameData));
-    console.log("게임 저장됨");
+    console.log("게임 자동 저장됨");
 }
 
 export function loadGame() {
@@ -13,14 +15,17 @@ export function loadGame() {
         try {
             const parsed = JSON.parse(save);
             setGameData(parsed);
-            console.log("게임 불러옴");
-            return true;
+            
+            // ⭐ 오프라인 시간 계산 (밀리초 -> 초)
+            if (parsed.lastTimestamp) {
+                const offlineSeconds = Math.floor((Date.now() - parsed.lastTimestamp) / 1000);
+                return offlineSeconds; // 오프라인 시간 반환
+            }
         } catch (e) {
             console.error("세이브 파일 손상", e);
-            return false;
         }
     }
-    return false;
+    return 0;
 }
 
 
