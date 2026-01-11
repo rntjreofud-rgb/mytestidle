@@ -51,7 +51,7 @@ export let gameData = {
     { id: 32, name: "나노 팩토리", cost: { processor: 500, titaniumPlate: 5000 }, inputs: { processor: 2, steel: 10, energy: 500 }, outputs: { nanobots: 1 }, count: 0, reqLevel: 40 },
     { id: 33, name: "AI 연산 서버", cost: { processor: 200, battery: 1000 }, inputs: { processor: 5, energy: 500 }, outputs: { aiCore: 1 }, count: 0, reqLevel: 27 },
     { id: 34, name: "고급 합금 용광로", cost: { titaniumPlate: 5000, concrete: 10000 }, inputs: { titaniumPlate: 5, steel: 20, energy: 600 }, outputs: { advAlloy: 2 }, count: 0, reqLevel: 42 },
-    { id: 35, name: "로켓 연료 정제소", cost: { oil: 10000, sulfur: 5000 }, inputs: { oil: 50, sulfur: 30, energy: 200 }, outputs: { rocketFuel: 2 }, count: 0, reqLevel: 24 },
+    { id: 35, name: "로켓 연료 정제소", cost: { oil: 10000, sulfur: 5000 }, inputs: { oil: 40, sulfur: 20, energy: 200 }, outputs: { rocketFuel: 2 }, count: 0, reqLevel: 24 },
     { id: 36, name: "퀀텀 컴퓨터 메인프레임", cost: { processor: 1000, advCircuit: 2000, titaniumPlate: 5000 }, inputs: { energy: 500 }, outputs: { quantumData: 10 }, count: 0, reqLevel: 35 },
     { id: 37, name: "중력 제어 연구소", cost: { nanobots: 1000, advAlloy: 2000, titaniumPlate: 10000 }, inputs: { energy: 5000, quantumData: 5 }, outputs: { gravityModule: 1 }, count: 0, reqLevel: 37 },
     { id: 38, name: "항성간 추진기 공장", cost: { advAlloy: 5000, aiCore: 500, titaniumPlate: 10000 }, inputs: { advAlloy: 10, rocketFuel: 100, energy: 2000 }, outputs: { warpCore: 1 }, count: 0, reqLevel: 45 },
@@ -122,7 +122,7 @@ export const researchList = [
 { id: "mass_concrete_tech", name: "대용량 배합 기술", desc: "대형 콘크리트 플랜트의 생산 속도 2.5배 증가", cost: { titaniumPlate: 2000, concrete: 5000 }, type: 'building', target: [59], value: 2.5, reqResearch: "stone_efficiency" },
 { id: "nanoscale_printing", name: "나노 적층 인쇄", desc: "정밀 회로 인쇄기의 생산 속도 4배 증가", cost: { optics: 1000, processor: 1000 }, type: 'building', target: [60], value: 4.0, reqResearch: "supercomputing" },
 { id: "material_thrift", name: "정밀 재료 절감", desc: "CNC, 콘크리트, 회로 인쇄기의 재료 소모량 30% 감소", cost: { aiCore: 200, quantumData: 500 }, type: 'consumption', target: [58, 59, 60], value: 0.7, reqResearch: "automated_machining" },
-{ id: "oil_recovery", name: "원유 회수 시스템", desc: "석유 관련 시설의 원유 소모량 40% 감소 (생산 속도 유지)", cost: { plastic: 5000, advCircuit: 1000 }, type: 'consumption', value: 0.6, target: [21, 46], reqResearch: "oil_combustion" },
+{ id: "oil_recovery", name: "원유 회수 시스템", desc: "석유 관련 시설의 원유 소모량 40% 감소 (생산 속도 유지)", cost: { plastic: 5000, advCircuit: 1000 }, type: 'consumption', value: 0.6, target: [21, 46, 35], reqResearch: "oil_combustion" },
     { id: "component_mini", name: "부품 미세화 기술", desc: "회로 및 프로세서 공장의 재료 소모 25% 감소 (생산 속도 유지)", cost: { processor: 1000, optics: 1000 }, type: 'consumption', value: 0.75, target: [15, 31, 24], reqResearch: "integrated_circuit" },
     { id: "coal_mining_tech", name: "탄층 탐사 최적화", desc: "석탄 채굴기들의 석탄 채굴 속도 2.5배 증가", cost: { gear: 1000, ironPlate: 2000 }, type: 'building', target: [3, 44], value: 2.5, reqResearch: "mining_drill_bit" },
     { id: "high_torque_drill", name: "고토크 회전 드릴", desc: "전기 석재 채굴기의 돌 생산 속도 3배 증가", cost: { steel: 1000, gear: 500 }, type: 'building', target: [45], value: 3, reqResearch: "electric_motor" },
@@ -164,6 +164,7 @@ export const researchList = [
     { id: "molecular_sieve", name: "분자 체 추출 기술", desc: "대기 유황 포집기의 유황 생산 속도 3배 증가", cost: { plastic: 10000, nanobots: 300 }, type: 'building', target: [52], value: 3, reqResearch: "sulfuric_acid" },
     { id: "deep_sea_engineering", name: "심해 수압 내성 구조", desc: "심해 해상 시추 플랫폼의 원유 생산 속도 2.5배 증가", cost: { concrete: 50000, advAlloy: 1000 }, type: 'building', target: [54], value: 2.5, reqResearch: "oil_refining" },
     { id: "neutron_moderation", name: "중성자 속도 조절", desc: "심부 우라늄 파쇄기의 우라늄 생산 속도 3배 증가", cost: { quantumData: 500, aiCore: 200 }, type: 'building', target: [53], value: 3, reqResearch: "supercomputing" },
+    { id: "fuel_catalyst", name: "연료 합성 촉매", desc: "로켓 연료 정제소의 유황 소모량 70% 감소 (생산량 유지)", cost: { aiCore: 200, advAlloy: 1000, nanobots: 500 }, type: 'consumption', target: [35], value: 0.3, reqResearch: "rocket_dynamics" },
     { id: "final_prep", name: "지구 이별 준비", desc: "모든 시설의 생산 및 소모 속도 1.2배 증가", cost: { rocketFuel: 5000, processor: 5000, steel: 50000 }, type: 'building', target: [0,1,2,3,4,5,6,7,8,9,13,14,15,16,18,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54], value: 1.2, reqResearch: "nanotech_click" }
     
 ];
