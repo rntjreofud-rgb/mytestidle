@@ -24,6 +24,8 @@ const elements = {
     viewPower: document.getElementById('view-power'),
     viewResearch: document.getElementById('view-research'),
     navDashboard: document.getElementById('nav-dashboard'),
+    viewTechTree: document.getElementById('view-tech-tree'),
+    navTechTree: document.getElementById('nav-tech-tree'),
     navPower: document.getElementById('nav-power'),
     navResearch: document.getElementById('nav-research'),
     dashPowerPanel: document.getElementById('dash-power-panel'),
@@ -185,7 +187,12 @@ export function switchTab(tabName) {
         elements.viewResearch.classList.remove('hidden');
         elements.navResearch.classList.add('active');
         renderResearchTab();
+    } else if (tabName === 'tech-tree') {
+        elements.viewTechTree.classList.remove('hidden');
+        elements.navTechTree.classList.add('active');
+        renderTechTree(); // 계통도 그리기
     }
+    
 }
 
 export function log(msg, isImportant = false) {
@@ -660,6 +667,73 @@ export function updateHouseUI(onUpgrade) {
         };
     }
 }
+// 2. 연구 계통도 깊이 계산 함수
+function getResearchDepth(id) {
+    const research = researchList.find(r => r.id === id);
+    if (!research || !research.reqResearch) return 0;
+    return 1 + getResearchDepth(research.reqResearch);
+}
+
+// 3. 계통도 렌더링 함수
+export function renderTechTree() {
+    const container = document.getElementById('tech-tree-content');
+    if (!container) return;
+    container.innerHTML = "";
+
+    const tiers = {};
+    researchList.forEach(r => {
+        const depth = getResearchDepth(r.id);
+        if (!tiers[depth]) tiers[depth] = [];
+        tiers[depth].push(r);
+    });
+
+    Object.keys(tiers).sort((a,b) => a-b).forEach(tierIdx => {
+        const column = document.createElement('div');
+        column.className = 'tree-tier-column';
+        column.innerHTML = `<div class="tree-tier-title">ERA ${parseInt(tierIdx) + 1}</div>`;
+
+        tiers[tierIdx].forEach(r => {
+            const isDone = gameData.researches.includes(r.id);
+            const isPrereqDone = r.reqResearch ? gameData.researches.includes(r.reqResearch) : true;
+            
+            const node = document.createElement('div');
+            node.className = `tree-node ${isDone ? 'done' : (isPrereqDone ? 'available' : 'locked')}`;
+            
+            node.innerHTML = `
+                <span class="tree-node-name">${r.name}</span>
+                <span class="tree-node-status">${isDone ? '✅ 연구됨' : (isPrereqDone ? '💡 연구 가능' : '🔒 잠김')}</span>
+            `;
+
+            if (isPrereqDone && !isDone) {
+                node.onclick = () => {
+                    // 기술 연구 탭으로 이동시켜 구매 유도
+                    switchTab('research');
+                    const targetEl = document.getElementById(`research-${r.id}`);
+                    if(targetEl) targetEl.scrollIntoView({ behavior: 'smooth' });
+                    
+                };
+            }
+            column.appendChild(node);
+        });
+        container.appendChild(column);
+    });
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // 오프라인 보고서 모달 표시 함수
 export function showOfflineReport(seconds, statsBefore) {
     const modal = document.getElementById('offline-modal');

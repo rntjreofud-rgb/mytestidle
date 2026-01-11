@@ -96,7 +96,7 @@ function setupEvents() {
     if(UI.uiElements.navDashboard) UI.uiElements.navDashboard.addEventListener('click', () => UI.switchTab('dashboard'));
     if(UI.uiElements.navPower) UI.uiElements.navPower.addEventListener('click', () => UI.switchTab('power'));
     if(UI.uiElements.navResearch) UI.uiElements.navResearch.addEventListener('click', () => UI.switchTab('research'));
-
+    if(UI.uiElements.navTechTree) UI.uiElements.navTechTree.addEventListener('click', () => UI.switchTab('tech-tree'));
     UI.uiElements.btns.wood.addEventListener('click', () => handleGather('wood'));
     UI.uiElements.btns.stone.addEventListener('click', () => handleGather('stone'));
     if(UI.uiElements.btns.coal) UI.uiElements.btns.coal.addEventListener('click', () => handleGather('coal'));

@@ -207,6 +207,70 @@ input:checked + .slider:before { transform: translateX(20px); }
 }
 
 
+/* =================================================================
+   6-1. 기술 계통도 스타일 (Tech Tree)
+   ================================================================= */
+#tech-tree-content {
+    display: flex;
+    flex-direction: row;
+    gap: 50px;
+    padding: 20px;
+    overflow-x: auto; /* 가로 스크롤 */
+    background: rgba(0,0,0,0.2);
+    border-radius: 10px;
+    min-height: 70vh;
+    align-items: flex-start;
+}
+
+.tree-tier-column {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    min-width: 200px;
+    flex-shrink: 0;
+}
+
+.tree-tier-title {
+    text-align: center;
+    font-size: 0.8rem;
+    color: #556;
+    border-bottom: 1px solid #333;
+    padding-bottom: 5px;
+    margin-bottom: 10px;
+}
+
+/* 계통도 전용 노드 스타일 (작고 심플하게) */
+.tree-node {
+    background: var(--bg-button);
+    border: 1px solid #444;
+    padding: 10px;
+    border-radius: 6px;
+    position: relative;
+    font-size: 0.8rem;
+    transition: 0.2s;
+}
+
+.tree-node.done { border-color: var(--accent-green); background: rgba(46, 204, 113, 0.1); }
+.tree-node.available { border-color: var(--accent-blue); cursor: pointer; }
+.tree-node.locked { opacity: 0.4; filter: grayscale(1); }
+
+.tree-node-name { display: block; font-weight: bold; margin-bottom: 4px; }
+.tree-node-status { font-size: 0.7rem; color: #8892b0; }
+
+/* 연결선 느낌 (간단하게) */
+.tree-node::after {
+    content: '→';
+    position: absolute;
+    right: -30px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #333;
+}
+.tree-tier-column:last-child .tree-node::after { display: none; }
+
+
+
+
 
 /* =================================================================
    7. 반응형 레이아웃 (Media Queries)
