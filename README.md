@@ -1,4 +1,9 @@
 # mytestidle
-
-
 https://rntjreofud-rgb.github.io/mytestidle/
+
+
+지구를탈출하면 엔딩을 볼수있는 IDLE 게임입니다.
+
+50단계까지 있으면 그이후로 환생이 가능합니다.
+
+감사합니다.
