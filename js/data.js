@@ -78,7 +78,8 @@ export let gameData = {
     { id: 59, name: "대형 콘크리트 플랜트", cost: { steel: 5000, brick: 10000, concrete: 2000 }, inputs: { stone: 50, energy: 150 }, outputs: { concrete: 40.0 }, count: 0, reqLevel: 25 },
     { id: 60, name: "정밀 회로 인쇄기", cost: { steel: 3000, copperPlate: 5000, circuit: 1000 }, inputs: { copperPlate: 10, energy: 120 }, outputs: { circuit: 10.0 }, count: 0, reqLevel: 22 },
     { id: 61, name: "대규모 고분자 화학 공장", cost: { steel: 10000, titaniumPlate: 2000, circuit: 1000 }, inputs: { oil: 50, energy: 200 }, outputs: { plastic: 50.0 }, count: 0, reqLevel: 25 },
-    { id: 62, name: "석탄 액화 공장", cost: { steel: 800, brick: 1000, circuit: 100 }, inputs: { coal: 30, energy: 80 }, outputs: { oil: 15.0, sulfur: 3.0 }, count: 0, reqLevel: 15 }  
+    { id: 62, name: "석탄 액화 공장", cost: { steel: 800, brick: 1000, circuit: 100 }, inputs: { coal: 30, energy: 80 }, outputs: { oil: 15.0, sulfur: 3.0 }, count: 0, reqLevel: 15 },  
+    { id: 63, name: "산업용 전자기 제련소", cost: { steel: 20000, concrete: 10000, aiCore: 500 }, inputs: { titaniumOre: 20, energy: 400 }, outputs: { titaniumPlate: 15.0 }, count: 0, reqLevel: 35 }
 ]
 };
 
@@ -151,6 +152,10 @@ export const researchList = [
     { id: "glass_refinement", name: "유리 정제 기술", desc: "유리 용해로의 유리 생산 및 재료 소모 속도 3배 증가", cost: { steel: 1000, coal: 500 }, type: 'building', target: [18], value: 3.0, reqResearch: "smelting_upgrade" },
     { id: "coal_conversion_opt", name: "액화 반응 촉매", desc: "석탄 액화 공장의 가동 속도 3배 증가", cost: { steel: 1500, circuit: 300 }, type: 'building', target: [62], value: 3.0, reqResearch: "oil_refining" },
     { id: "coal_usage_cut", name: "액화 공정 효율화", desc: "석탄 액화 공장의 석탄 및 에너지 소모량 40% 감소", cost: { ironPlate: 5000, plastic: 500 }, type: 'consumption', target: [62], value: 0.6, reqResearch: "coal_conversion_opt" },
+
+    { id: "electromagnetic_smelting", name: "전자기 제련 기술", desc: "전자기 제련소(ID 63) 및 티타늄 제련소(ID 26)의 가동 속도 4배 증가", cost: { advAlloy: 1000, quantumData: 500 }, type: 'building', target: [26, 63], value: 4.0, reqResearch: "titanium_alloy" },
+{ id: "titanium_recycling", name: "티타늄 재순환 공정", desc: "모든 티타늄 제련 시설의 광석 소모량 50% 감소 (생산 속도 유지)", cost: { nanobots: 1000, aiCore: 500 }, type: 'consumption', target: [26, 63], value: 0.5, reqResearch: "electromagnetic_smelting" },
+
 
     { id: "silica_purity", name: "규사 순도 강화", desc: "유리 용해로의 돌 소모량 50% 감소 (생산량 유지)", cost: { processor: 200, optics: 100 }, type: 'consumption', target: [18], value: 0.5, reqResearch: "glass_refinement" },
     { id: "polymer_optimization", name: "고분자 사슬 최적화", desc: "플라스틱 생산 시설의 생산 속도 3배 증가", cost: { processor: 500, optics: 500 }, type: 'building', target: [21, 61], value: 3.0, reqResearch: "polymer_science" },
