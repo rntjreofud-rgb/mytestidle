@@ -305,7 +305,7 @@ export function updateScreen(stats) {
     updatePowerUI();
     if(!elements.viewResearch.classList.contains('hidden')) updateResearchButtons();
     checkUnlocks();
-    updatePrestigeUI();
+    updatePrestigeUI()
 }
 function updatePowerUI() {
     const prod = gameData.resources.energy || 0;
