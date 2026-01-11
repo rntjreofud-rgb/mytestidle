@@ -260,6 +260,10 @@ export function setGameData(newData) {
     gameData.researches = Array.isArray(newData.researches) ? newData.researches : [];
     gameData.unlockedResources = Array.isArray(newData.unlockedResources) ? newData.unlockedResources : ['wood', 'stone', 'plank'];
 
+// ⭐ 환생 레벨 복구 (없으면 0)
+    gameData.prestigeLevel = newData.prestigeLevel || 0;
+
+
     // 3. 건물 데이터 및 가동 레벨(activeCount) 복구
     if (newData.buildings && Array.isArray(newData.buildings)) {
         newData.buildings.forEach((savedB) => {

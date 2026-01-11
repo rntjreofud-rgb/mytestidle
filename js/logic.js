@@ -11,6 +11,7 @@ export function getBuildingCost(building) {
 
 export function getBuildingMultiplier(buildingId) {
     let multiplier = 1.0;
+    
     // ⭐ [안전장치] 연구 데이터가 없으면 빈 배열로 취급
     const completed = gameData.researches || [];
     
@@ -21,6 +22,11 @@ export function getBuildingMultiplier(buildingId) {
             }
         }
     });
+
+    if (gameData.prestigeLevel > 0) {
+        multiplier *= Math.pow(1.2, gameData.prestigeLevel);
+    }
+
     return multiplier;
 }
 

@@ -174,23 +174,56 @@ function handleHouseUpgrade(nextStage) {
     const result = Logic.tryUpgradeHouse(nextStage);
     
     if (result.success) {
-        UI.log(`🎉 기술 발전 성공! [${nextStage.name}] 단계로 진입했습니다.`, true);
-        
-        // ⭐ 중요: 레벨이 올랐으니 새로운 건물이 해금되었을 수 있음. 상점 다시 그리기
-        UI.renderShop(handleBuyBuilding, Logic.getBuildingCost);
-        
-        UI.updateHouseUI(handleHouseUpgrade);
-        if(gameData.houseLevel >= houseStages.length - 1) {
-            UI.log("🚀 우주 진출 조건 달성! 엔딩 시퀀스 시작.", true);
-            alert("엔딩: 행성 탈출 성공!");
-            Storage.resetGame();
+         if (gameData.houseLevel >= houseStages.length - 1) {
+            UI.log("🚀 [지구 탈출 성공] 대기권을 돌파하여 우주로 나아갑니다!", true);
+            
+            setTimeout(() => {
+                if (confirm(`🎉 축하합니다! 지구를 탈출했습니다!\n\n우주 항해를 통해 얻은 데이터로 숙련도가 상승합니다.\n현재 숙련도: Lv.${gameData.prestigeLevel}\n\n숙련도 Lv.${gameData.prestigeLevel + 1}로 다음 회차를 시작하시겠습니까?\n(영구 생산 속도 20% 보너스 부여)`)) {
+                    performPrestige();
+                }
+            }, 1000);
+            return;
         }
+
+        UI.log(`🎉 기술 발전 성공! [${nextStage.name}]`, true);
+        UI.renderShop(handleBuyBuilding, Logic.getBuildingCost);
+        UI.updateHouseUI(handleHouseUpgrade);
     } else {
         // 2. 부족한 자원 목록을 로그에 출력합니다.
         const missingNames = result.missing.map(key => UI.getResNameOnly(key)).join(', ');
         UI.log(`⬆️ 업그레이드 불가 (부족: ${missingNames})`, false);
     }
 }
+
+function performPrestige() {
+    // 1. 환생 레벨 상승
+    gameData.prestigeLevel++;
+
+    // 2. 자원 초기화 (0으로)
+    for (let key in gameData.resources) {
+        gameData.resources[key] = 0;
+    }
+    gameData.resources.energy = 0;
+    gameData.resources.energyMax = 0;
+
+    // 3. 건물 초기화
+    gameData.buildings.forEach(b => {
+        b.count = 0;
+        b.activeCount = 0;
+        b.on = true;
+    });
+
+    // 4. 연구 및 레벨 초기화
+    gameData.researches = [];
+    gameData.houseLevel = 0;
+    gameData.unlockedResources = ['wood', 'stone', 'plank'];
+
+    // 5. 저장 및 재시작
+    Storage.saveGame();
+    location.reload(); 
+}
+
+
 
 let lastTime = performance.now();
 

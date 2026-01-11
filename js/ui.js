@@ -285,6 +285,7 @@ export function updateScreen(stats) {
     updatePowerUI();
     if(!elements.viewResearch.classList.contains('hidden')) updateResearchButtons();
     checkUnlocks();
+    updatePrestigeUI()
 }
 function updatePowerUI() {
     const prod = gameData.resources.energy || 0;
@@ -615,6 +616,15 @@ export function updateShopButtons(getCostFunc) {
         if (canBuy) div.classList.remove('disabled'); else div.classList.add('disabled');
     });
 }
+
+function updatePrestigeUI() {
+    const badge = document.querySelector('.logo-area small');
+    if (badge && gameData.prestigeLevel > 0) {
+        badge.innerHTML = `우주 항해 숙련도 <b style="color:#f1c40f;">Lv.${gameData.prestigeLevel}</b>`;
+        badge.style.color = "#f1c40f";
+    }
+}
+
 
 export function updateHouseUI(onUpgrade) {
     const nextStage = houseStages[gameData.houseLevel + 1];
