@@ -75,7 +75,7 @@ export let gameData = {
     { id: 56, name: "전기 구리 용광로", cost: { steel: 1000, circuit: 500, gear: 300 }, inputs: { copperOre: 10, energy: 60 }, outputs: { copperPlate: 12.0 }, count: 0, reqLevel: 15 },
     { id: 57, name: "산업용 벽돌 공장", cost: { steel: 500, gear: 200, copperPlate: 300 }, inputs: { stone: 20, energy: 30 }, outputs: { brick: 20.0 }, count: 0, reqLevel: 10 },
     { id: 58, name: "고속 CNC 선반", cost: { steel: 2000, ironPlate: 5000, gear: 1000 }, inputs: { steel: 5, energy: 100 }, outputs: { gear: 15.0 }, count: 0, reqLevel: 20 },
-    { id: 59, name: "대형 콘크리트 플랜트", cost: { steel: 5000, brick: 10000, concrete: 2000 }, inputs: { stone: 50, energy: 150 }, outputs: { concrete: 40.0 }, count: 0, reqLevel: 25 },
+    { id: 59, name: "대형 콘크리트 플랜트", cost: { steel: 5000, brick: 10000, concrete: 2000 }, inputs: { stone: 50, energy: 150 }, outputs: { concrete: 40.0 }, count: 0, reqLevel: 21 },
     { id: 60, name: "정밀 회로 인쇄기", cost: { steel: 3000, copperPlate: 5000, circuit: 1000 }, inputs: { copperPlate: 10, energy: 120 }, outputs: { circuit: 10.0 }, count: 0, reqLevel: 22 },
     { id: 61, name: "대규모 고분자 화학 공장", cost: { steel: 10000, titaniumPlate: 2000, circuit: 1000 }, inputs: { oil: 50, energy: 200 }, outputs: { plastic: 50.0 }, count: 0, reqLevel: 25 },
     { id: 62, name: "석탄 액화 공장", cost: { steel: 800, brick: 1000, circuit: 100 }, inputs: { coal: 30, energy: 80 }, outputs: { oil: 15.0, sulfur: 3.0 }, count: 0, reqLevel: 15 },  
