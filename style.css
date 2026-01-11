@@ -298,6 +298,18 @@ input:checked + .slider:before { transform: translateX(20px); }
     #power-breakdown-container .sub-build-grid {
         grid-template-columns: 1fr !important;
     }
+    .logo-area small { 
+        display: block !important; /* 모바일에서도 숙련도는 표시 */
+        font-size: 0.7rem !important;
+        margin-top: 2px;
+    }
+    
+    /* 헤더 타이틀과 숙련도가 한 줄에 잘 보이게 조정 */
+    header h2 {
+        display: flex;
+        align-items: center;
+        font-size: 0.9rem;
+    }
 }
 
 .hidden { display: none !important; }

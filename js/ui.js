@@ -305,7 +305,7 @@ export function updateScreen(stats) {
     updatePowerUI();
     if(!elements.viewResearch.classList.contains('hidden')) updateResearchButtons();
     checkUnlocks();
-    updatePrestigeUI()
+    updatePrestigeUI();
 }
 function updatePowerUI() {
     const prod = gameData.resources.energy || 0;
@@ -866,7 +866,25 @@ export function renderLegacyTab() {
 }
 
 
+export function updatePrestigeUI() {
+    const level = gameData.prestigeLevel || 0;
+    if (level <= 0) return; // 환생 전이면 표시 안 함
 
+    const prestigeText = `(⭐Lv.${level})`;
+
+    // [A] 상단 헤더 업데이트 (모바일/PC 공통)
+    const headerPrestige = document.getElementById('header-prestige');
+    if (headerPrestige) {
+        headerPrestige.innerText = prestigeText;
+    }
+
+    // [B] 사이드바 로고 영역 업데이트
+    const sideSmall = document.querySelector('.logo-area small');
+    if (sideSmall) {
+        sideSmall.innerHTML = `우주 항해 숙련도 <b style="color:#f1c40f;">Lv.${level}</b>`;
+        sideSmall.style.color = "#f1c40f";
+    }
+}
 
 
 
