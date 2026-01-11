@@ -118,7 +118,7 @@ export const researchList = [
 { id: "ai_logic_opt", name: "AI 알고리즘 최적화", desc: "AI 연산 서버의 프로세서 소모량 50% 감소 (생산량 유지)", cost: { aiCore: 100, quantumData: 200 }, type: 'consumption', value: 0.5, target: [33], reqResearch: "supercomputing" },
 { id: "alloy_smelting_opt", name: "합금 배합 고도화", desc: "고급 합금 용광로의 재료 소모량 30% 감소 (생산량 유지)", cost: { advAlloy: 500, titaniumPlate: 5000 }, type: 'consumption', value: 0.7, target: [34], reqResearch: "steel_refinement" },
 { id: "arc_furnace_eff", name: "아크 플라즈마 제어", desc: "대형 아크 용광로의 광석 소모량 40% 감소 (생산량 유지)", cost: { advAlloy: 1000, aiCore: 200 }, type: 'consumption', value: 0.6, target: [50], reqResearch: "plasma_smelting" },
-{ id: "nuclear_recycling", name: "핵연료 재처리", desc: "원자력 발전소의 연료봉 소모량 50% 감소 (전력 유지)", cost: { concrete: 20000, lead: 0, uraniumOre: 5000 }, type: 'consumption', value: 0.5, target: [30], reqResearch: "battery_density" },
+{ id: "nuclear_recycling", name: "핵연료 재처리", desc: "원자력 발전소의 연료봉 소모량 50% 감소 (전력 유지)", cost: { concrete: 20000, uraniumOre: 5000 }, type: 'consumption', value: 0.5, target: [30], reqResearch: "battery_density" },
 { id: "warp_field_stab", name: "워프 필드 안정화", desc: "추진기 공장 및 중력 연구소 재료 소모량 25% 감소", cost: { warpCore: 5, aiCore: 1000 }, type: 'consumption', value: 0.75, target: [37, 38], reqResearch: "final_prep" },
 { id: "automated_machining", name: "무인 가공 시스템", desc: "고속 CNC 선반의 생산 속도 3배 증가", cost: { processor: 500, advCircuit: 1000 }, type: 'building', target: [58], value: 3.0, reqResearch: "high_precision" },
 { id: "mass_concrete_tech", name: "대용량 배합 기술", desc: "대형 콘크리트 플랜트의 생산 속도 2.5배 증가", cost: { titaniumPlate: 2000, concrete: 5000 }, type: 'building', target: [59], value: 2.5, reqResearch: "stone_efficiency" },
