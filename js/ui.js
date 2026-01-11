@@ -89,7 +89,7 @@ const buildingGroups = {
     },
     production: {
         title: "🔬 첨단 제조 및 부품 (Manufacturing)",
-        ids: [9, 15, 22, 24, 27, 31, 32, 33, 35, 36, 37, 38, 47]
+        ids: [9, 15, 22, 24, 27, 31, 32, 33, 35, 36, 37, 38, 47, 58, 59, 60]
     },
     power: {
         title: "⚡ 에너지 발전 (Power Generation)",
