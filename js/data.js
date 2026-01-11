@@ -16,6 +16,8 @@ export let gameData = {
         // 시스템
         energy: 0, energyMax: 0 
     },
+
+    
     // ⭐ 'plank'를 기본 해금 목록에 추가합니다.
     unlockedResources: ['wood', 'stone', 'plank'], 
     houseLevel: 0,
@@ -245,61 +247,71 @@ export const houseStages = [
     { name: "지구 탈출 성공", desc: "축하합니다! 당신은 마침내 지구를 떠났습니다.", req: { warpCore: 10, aiCore: 500, nanobots: 1000, rocketFuel: 20000, energy: 10000 }, unlock: "end" }
 ];
 
+export const legacyList = [
+    { id: "start_resource", name: "선구자의 보급품", desc: "시작 시 나무 500, 돌 500, 판자 100 보유", cost: 1 },
+    { id: "cheap_build", name: "나노 건축 설계", desc: "모든 건물 건설 비용 20% 영구 감소", cost: 3 },
+    { id: "power_boost", name: "암흑 물질 발전", desc: "모든 발전 시설의 전력 생산량 50% 증가", cost: 5 },
+    { id: "infinite_storage", name: "압축 창고", desc: "모든 자원 생산 효율 20% 추가 증가", cost: 10 }
+];
+
+
+gameData.prestigeLevel = 0;   // 환생 횟수
+gameData.cosmicData = 0;      // 환생 포인트
+gameData.legacyUpgrades = []; // 구매한 유산 ID 목록
+
 export function setGameData(newData) {
-    // 1. 자원 데이터 복구 및 신규 자원 추가 (NaN 및 null 방지)
+    // 1. 자원 복구 (NaN/null 방지)
     for (let key in gameData.resources) {
         if (newData.resources && newData.resources[key] !== undefined) {
             let val = newData.resources[key];
-            if (val === null || isNaN(val)) {
-                gameData.resources[key] = 0;
-            } else {
-                gameData.resources[key] = val;
-            }
+            gameData.resources[key] = (val === null || isNaN(val)) ? 0 : val;
         } else {
             gameData.resources[key] = 0;
         }
     }
 
-    // 2. 기본 정보 복구
-    gameData.houseLevel = typeof newData.houseLevel === 'number' ? newData.houseLevel : 0;
-    gameData.researches = Array.isArray(newData.researches) ? newData.researches : [];
-    gameData.unlockedResources = Array.isArray(newData.unlockedResources) ? newData.unlockedResources : ['wood', 'stone', 'plank'];
+    // 2. 기초 진행도 복구
+    gameData.houseLevel = newData.houseLevel || 0;
+    gameData.researches = newData.researches || [];
+    gameData.unlockedResources = newData.unlockedResources || ['wood', 'stone', 'plank'];
 
-// ⭐ 환생 레벨 복구 (없으면 0)
+    // 3. ⭐ 환생 및 유산 데이터 복구 및 소급 적용
     gameData.prestigeLevel = newData.prestigeLevel || 0;
+    gameData.legacyUpgrades = newData.legacyUpgrades || [];
+    
+    // [소급 지급 로직]
+    // 환생 포인트가 없거나 0인데, 환생 횟수는 있는 구버전 유저인 경우
+    if (newData.cosmicData === undefined || newData.cosmicData === 0) {
+        if (gameData.prestigeLevel > 0 && gameData.legacyUpgrades.length === 0) {
+            // 환생 1회당 5점씩 계산해서 소급 지급
+            gameData.cosmicData = gameData.prestigeLevel * 5; 
+            console.log(`구버전 환생 유저 확인: ${gameData.cosmicData} 데이터 소급 지급됨.`);
+        } else {
+            gameData.cosmicData = newData.cosmicData || 0;
+        }
+    } else {
+        gameData.cosmicData = newData.cosmicData;
+    }
 
-
-    // 3. 건물 데이터 및 가동 레벨(activeCount) 복구
+    // 4. 건물 및 가동 레벨 복구
     if (newData.buildings && Array.isArray(newData.buildings)) {
         newData.buildings.forEach((savedB) => {
             const currentB = gameData.buildings.find(b => b.id === savedB.id);
             if (currentB) {
-                // 보유 개수 복구
                 currentB.count = savedB.count || 0;
-                
-                // ⭐ [가동 개수 복구 핵심]
                 if (savedB.activeCount !== undefined) {
-                    // 최신 세이브라면 저장된 가동 개수 로드
                     currentB.activeCount = savedB.activeCount;
-                } else if (savedB.on === false) {
-                    // 구버전(스위치) 세이브인데 꺼져있었다면 가동 개수 0
-                    currentB.activeCount = 0;
                 } else {
-                    // 신규 건물이거나 구버전에서 켜져있었다면 보유 개수만큼 전체 가동
-                    currentB.activeCount = currentB.count;
+                    // 구버전 호환 (on 속성이 false면 0개, 아니면 전체 가동)
+                    currentB.activeCount = (savedB.on === false) ? 0 : currentB.count;
                 }
             }
         });
     }
 
-    // 4. 안전장치: 누락된 속성 채우기 및 범위 제한
+    // 5. 최종 안전장치
     gameData.buildings.forEach(b => {
         if (b.activeCount === undefined) b.activeCount = b.count || 0;
-        // 가동 개수가 보유 개수보다 많아지지 않도록 보정
         if (b.activeCount > b.count) b.activeCount = b.count;
-        // 하위 호환성을 위해 on 속성값도 동기화 (activeCount가 0이면 꺼짐 처리)
-        b.on = b.activeCount > 0;
     });
-
-    console.log("세이브 데이터 및 가동 레벨(activeCount) 호환성 패치 완료.");
 }

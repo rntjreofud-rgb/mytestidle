@@ -28,6 +28,10 @@ const elements = {
     navTechTree: document.getElementById('nav-tech-tree'),
     navPower: document.getElementById('nav-power'),
     navResearch: document.getElementById('nav-research'),
+
+    viewLegacy: document.getElementById('view-legacy'),
+    navLegacy: document.getElementById('nav-legacy'),
+
     dashPowerPanel: document.getElementById('dash-power-panel'),
     dashPowerText: document.getElementById('dash-power-text'),
     dashPowerFill: document.getElementById('dash-power-fill'),
@@ -518,6 +522,11 @@ function createResourceCard(key) {
 function checkUnlocks() {
     const discovered = gameData.unlockedResources || ['wood', 'stone', 'plank'];
     const toggle = (el, show) => { if(!el) return; if(show) el.classList.remove('hidden'); else el.classList.add('hidden'); };
+    const isLegacyUnlocked = (gameData.houseLevel >= 50 || gameData.prestigeLevel > 0);
+    const navLegacy = document.getElementById('nav-legacy');
+    const legacyCategory = navLegacy ? navLegacy.previousElementSibling : null;
+    
+    
     toggle(elements.btns.wood, true);
     toggle(elements.btns.stone, discovered.includes('stone'));
     toggle(elements.btns.plank, discovered.includes('plank'));
@@ -525,6 +534,8 @@ function checkUnlocks() {
     toggle(elements.btns.ironOre, discovered.includes('ironOre'));
     toggle(elements.btns.copperOre, discovered.includes('copperOre'));
     
+
+
     if(elements.navPower) {
         const isPowerUnlocked = (gameData.houseLevel >= 5);
         elements.navPower.style.display = isPowerUnlocked ? 'flex' : 'none';
@@ -533,6 +544,10 @@ function checkUnlocks() {
             log("⚡ 전력 관리 시스템이 활성화되었습니다!", true);
         }
     }
+    const isLegacyVisible = (gameData.houseLevel >= 50 || gameData.prestigeLevel > 0);
+    elements.navLegacy.style.display = isLegacyVisible ? 'flex' : 'none';
+    document.getElementById('legacy-cat').style.display = isLegacyVisible ? 'block' : 'none';
+
 }
 
 export function renderShop(onBuyCallback, getCostFunc) {
@@ -640,36 +655,81 @@ export function updateHouseUI(onUpgrade) {
     const nextStage = houseStages[gameData.houseLevel + 1];
     const currentStage = houseStages[gameData.houseLevel];
     
+    // 1. 현재 단계 이름 및 설명 업데이트
     if(elements.houseName) elements.houseName.innerText = `Lv.${gameData.houseLevel} ${currentStage.name}`;
     if(elements.houseDesc) elements.houseDesc.innerText = currentStage.desc;
 
+    const btnContainer = elements.upgradeBtn.parentElement; // 버튼을 감싸는 부모 div
+
     if (nextStage) {
-        // 일반 업그레이드 상태
-        const reqTxt = Object.entries(nextStage.req).filter(([k,v]) => k !== 'energy').map(([k,v]) => `${getResNameOnly(k)}${formatNumber(v)}`).join(',');
-        elements.upgradeBtn.innerText = `⬆️ ${nextStage.name} (${reqTxt})`;
-        elements.upgradeBtn.classList.remove('prestige-ready');
-        elements.upgradeBtn.onclick = () => onUpgrade(nextStage);
+        // --- [일반 진행 모드: Lv.0 ~ Lv.49] ---
+        elements.upgradeBtn.style.display = "flex";
         
+        // 요구 자원 텍스트 생성
+        const reqTxt = Object.entries(nextStage.req)
+            .filter(([k]) => k !== 'energy')
+            .map(([k, v]) => `${getResNameOnly(k)} ${formatNumber(v)}`)
+            .join(', ');
+
+        elements.upgradeBtn.innerText = `⬆️ ${nextStage.name} (${reqTxt})`;
+        
+        // 자원 충족 여부 확인 (버튼 활성화/비활성화)
         let canUp = true;
         for(let k in nextStage.req) {
-            if (k === 'energy') { if((gameData.resources.energy || 0) < nextStage.req[k]) canUp = false; }
-            else { if((gameData.resources[k] || 0) < nextStage.req[k]) canUp = false; }
+            if (k === 'energy') { 
+                if((gameData.resources.energy || 0) < nextStage.req[k]) canUp = false; 
+            } else { 
+                if((gameData.resources[k] || 0) < nextStage.req[k]) canUp = false; 
+            }
         }
         elements.upgradeBtn.disabled = !canUp;
-    } else {
-        // ⭐ [핵심 추가] 엔딩 도달 시 환생 버튼으로 전환
-        elements.upgradeBtn.innerText = `🚀 은하계 원정 시작 (숙련도 Lv.${gameData.prestigeLevel + 1}로 환생)`;
-        elements.upgradeBtn.classList.add('prestige-ready');
-        elements.upgradeBtn.disabled = false; // 버튼 활성화
         
-        // 클릭 시 main.js에 등록된 전역 환생 함수 호출
-        elements.upgradeBtn.onclick = () => {
-            if(confirm("지구를 떠나 새로운 행성으로 향하시겠습니까?\n모든 자원과 건물이 초기화되지만, 영구 생산 보너스 20%가 부여됩니다.")) {
-                window.performPrestige();
-            }
-        };
+        // 클릭 시 업그레이드 실행
+        elements.upgradeBtn.onclick = () => onUpgrade(nextStage);
+        
+        // 환생 후 다시 시작할 때 엔딩 선택지 버튼이 남아있다면 제거
+        const choiceDiv = document.getElementById('ending-choices');
+        if(choiceDiv) choiceDiv.remove();
+
+    } else {
+        // --- [엔딩 달성 모드: Lv.50] ---
+        elements.upgradeBtn.style.display = "none"; // 기존 업그레이드 버튼 숨김
+        
+        // 엔딩 선택지 버튼 세트 생성 (중복 생성 방지)
+        if (!document.getElementById('ending-choices')) {
+            const choiceDiv = document.createElement('div');
+            choiceDiv.id = 'ending-choices';
+            choiceDiv.style.cssText = "display:flex; gap:10px; width:100%;";
+
+            choiceDiv.innerHTML = `
+                <button id="btn-prestige-final" class="prestige-ready" style="flex:1; height:95px; font-weight:bold; border-radius:6px; cursor:pointer;">
+                    ✨ 우주 유산 남기기<br><small>(데이터 +3 및 환생)</small>
+                </button>
+                <button id="btn-new-world" style="flex:1; height:95px; background:#4db5ff; color:#fff; font-weight:bold; border:none; border-radius:6px; cursor:pointer;">
+                    🌌 새로운 세상 탐사<br><small>(시즌 2 진행 - 준비 중)</small>
+                </button>
+            `;
+            btnContainer.appendChild(choiceDiv);
+
+            // 1. 환생 버튼 클릭 이벤트
+            document.getElementById('btn-prestige-final').onclick = () => {
+                if(confirm("지구를 떠나시겠습니까? 모든 자원과 건물은 초기화되지만 영구적인 유산 보너스를 얻습니다.")) {
+                    if (typeof window.performPrestige === 'function') {
+                        window.performPrestige();
+                    } else {
+                        console.error("performPrestige 함수가 등록되지 않았습니다.");
+                    }
+                }
+            };
+
+            // 2. 시즌 2 버튼 클릭 이벤트
+            document.getElementById('btn-new-world').onclick = () => {
+                alert("우주선이 화성 궤도에 진입했습니다! 시즌 2 콘텐츠는 다음 업데이트에서 공개됩니다. (현재는 무한 모드로 계속 플레이 가능합니다)");
+            };
+        }
     }
 }
+
 // 2. 연구 계통도 깊이 계산 함수
 function getResearchDepth(id) {
     const research = researchList.find(r => r.id === id);
@@ -755,7 +815,29 @@ export function renderTechTree() {
     });
 }
 
+// 레거시 업그레이드 탭 렌더링 함수
 
+export function renderLegacyTab() {
+    const listContainer = document.getElementById('legacy-upgrade-list');
+    document.getElementById('cosmic-data-count').innerText = gameData.cosmicData;
+    listContainer.innerHTML = "";
+    import('./data.js').then(m => {
+        m.legacyList.forEach(u => {
+            const isBought = gameData.legacyUpgrades.includes(u.id);
+            const div = document.createElement('div');
+            div.className = `shop-item ${isBought ? 'done' : (gameData.cosmicData >= u.cost ? '' : 'disabled')}`;
+            div.innerHTML = `<span class="si-name">${u.name}</span><span class="si-level">${isBought ? '해금됨' : '비용: '+u.cost}</span><div class="si-desc">${u.desc}</div><div class="si-cost">${isBought ? '영구 적용' : '구매 가능'}</div>`;
+            if (!isBought && gameData.cosmicData >= u.cost) {
+                div.onclick = () => {
+                    gameData.cosmicData -= u.cost;
+                    gameData.legacyUpgrades.push(u.id);
+                    renderLegacyTab();
+                };
+            }
+            listContainer.appendChild(div);
+        });
+    });
+}
 
 
 

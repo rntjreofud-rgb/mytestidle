@@ -259,7 +259,13 @@ input:checked + .slider:before { transform: translateX(20px); }
 .tree-node-name { display: block; font-weight: bold; font-size: 0.9rem; color: #fff; }
 .tree-node-status { font-size: 0.7rem; margin-top: 5px; display: block; }
 
-
+/* 환생포인트 */
+#btn-prestige-final {
+    background: linear-gradient(135deg, #f1c40f, #f39c12) !important;
+    color: #000 !important; font-weight: bold; border: none; cursor: pointer;
+    box-shadow: 0 0 15px rgba(241, 196, 15, 0.4);
+}
+#btn-prestige-final:hover { filter: brightness(1.2); }
 
 
 /* =================================================================

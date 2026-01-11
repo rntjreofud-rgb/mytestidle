@@ -25,6 +25,8 @@
             <div class="nav-item" id="nav-research"><i>🔬</i> 기술 연구</div>
             <!-- ⭐ [이동] 기술 계통도 버튼을 Systems 카테고리로 배치 -->
             <div class="nav-item" id="nav-tech-tree"><i>🌳</i> 기술 계통도</div>
+            <div class="nav-category" id="legacy-cat" style="display: none;">Legacy</div>
+            <div class="nav-item" id="nav-legacy" style="display: none;"><i>✨</i> 우주 유산</div>
 
             <div class="nav-category">Data Management</div>
             <div class="sidebar-data-btns">
@@ -132,7 +134,17 @@
                 </div>
                 <div id="tech-tree-content"></div>
             </div>
-
+            <!-- 5. 우주 유산 뷰 -->
+             <div id="view-legacy" class="hidden">
+                <div class="section-title">✨ 우주 유산 (Legacy of the Stars)</div>
+                <div class="info-panel" style="border-left-color: #f1c40f;">
+                    <div class="info-text">
+                        <h3>보유한 우주 데이터: <span id="cosmic-data-count" style="color:#f1c40f;">0</span></h3>
+                        <p>지구를 탈출할 때마다 획득하는 데이터로 영구 보너스를 해금하세요.</p>
+                    </div>
+                </div>
+                <div id="legacy-upgrade-list" class="sub-build-grid"></div>
+            </div>
         </main>
 
         <!-- 하단 로그 -->

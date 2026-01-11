@@ -10,33 +10,33 @@ window.gameData = gameData;
 
 
 window.performPrestige = function() {
-    // 1. 환생 레벨 상승
+    if(!confirm("지구를 떠나시겠습니까? 자원과 건물이 초기화되지만 영구 보너스 포인트 3를 얻습니다.")) return;
+
+    // 1. 유산 포인트 지급
+    gameData.cosmicData = (gameData.cosmicData || 0) + 3;
     gameData.prestigeLevel = (gameData.prestigeLevel || 0) + 1;
 
-    // 2. 자원 초기화
-    for (let key in gameData.resources) {
-        gameData.resources[key] = 0;
-    }
-    gameData.resources.energy = 0;
-    gameData.resources.energyMax = 0;
-
-    // 3. 건물 초기화
-    gameData.buildings.forEach(b => {
-        b.count = 0;
-        b.activeCount = 0;
-        b.on = true;
-    });
-
-    // 4. 연구 및 레벨 초기화
+    // 2. 핵심 데이터 초기화
+    for (let key in gameData.resources) { gameData.resources[key] = 0; }
+    gameData.buildings.forEach(b => { b.count = 0; b.activeCount = 0; });
     gameData.researches = [];
     gameData.houseLevel = 0;
     gameData.unlockedResources = ['wood', 'stone', 'plank'];
 
-    // 5. 저장 및 리로드
+    // 3. '선구자의 보급품' 보너스 적용
+    if (gameData.legacyUpgrades.includes('start_resource')) {
+        gameData.resources.wood = 500;
+        gameData.resources.stone = 500;
+        gameData.resources.plank = 100;
+    }
+
     Storage.saveGame();
-    UI.log(`✨ 숙련도 Lv.${gameData.prestigeLevel} 달성! 새로운 항해가 시작됩니다.`, true);
     location.reload(); 
 };
+
+
+// setupEvents에 네비게이션 추가
+UI.uiElements.navLegacy.addEventListener('click', () => UI.switchTab('legacy'));
 
 window.toggleBuildingPower = function(id) {
     console.log(`[클릭 감지] 건물 ID: ${id}`); // 클릭 확인용 로그
@@ -103,6 +103,7 @@ function setupEvents() {
     UI.uiElements.btns.ironOre.addEventListener('click', () => handleGather('ironOre'));
     UI.uiElements.btns.copperOre.addEventListener('click', () => handleGather('copperOre'));
     UI.uiElements.btns.plank.addEventListener('click', () => handleGather('plank'));
+    UI.uiElements.navLegacy.addEventListener('click', () => UI.switchTab('legacy'));
 
     // 파일 내보내기 버튼
     document.getElementById('btn-export').addEventListener('click', () => {

@@ -1,33 +1,33 @@
 import { gameData, researchList } from './data.js';
 
-export function getBuildingCost(building) {
-    let multiplier = Math.pow(1.2, building.count);
-    let currentCost = {};
-    for (let r in building.cost) {
-        currentCost[r] = Math.floor(building.cost[r] * multiplier);
-    }
-    return currentCost;
-}
-
 export function getBuildingMultiplier(buildingId) {
     let multiplier = 1.0;
-    
-    // ⭐ [안전장치] 연구 데이터가 없으면 빈 배열로 취급
     const completed = gameData.researches || [];
-    
     researchList.forEach(r => {
-        if (completed.includes(r.id)) {
-            if (r.type === 'building' && r.target.includes(buildingId)) {
-                multiplier *= r.value;
-            }
+        if (completed.includes(r.id) && r.type === 'building' && r.target.includes(buildingId)) {
+            multiplier *= r.value;
         }
     });
 
-    if (gameData.prestigeLevel > 0) {
-        multiplier *= Math.pow(1.2, gameData.prestigeLevel);
-    }
+    // ⭐ [추가] 환생 레벨당 20% 보너스
+    if (gameData.prestigeLevel > 0) multiplier *= Math.pow(1.2, gameData.prestigeLevel);
+    // ⭐ [추가] '압축 창고' 유산 보유 시 20% 추가
+    if (gameData.legacyUpgrades.includes('infinite_storage')) multiplier *= 1.2;
 
     return multiplier;
+}
+
+// 2. 건설 비용 계산 함수 수정
+export function getBuildingCost(building) {
+    let multiplier = Math.pow(1.2, building.count);
+    // ⭐ [추가] '나노 건축 설계' 유산 보유 시 비용 20% 감소
+    let discount = gameData.legacyUpgrades.includes('cheap_build') ? 0.8 : 1.0;
+    
+    let currentCost = {};
+    for (let r in building.cost) {
+        currentCost[r] = Math.floor(building.cost[r] * multiplier * discount);
+    }
+    return currentCost;
 }
 
 export function calculateNetMPS() {
