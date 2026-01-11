@@ -677,7 +677,20 @@ function getResearchDepth(id) {
     return 1 + getResearchDepth(research.reqResearch);
 }
 
-// 3. 계통도 렌더링 함수
+const tierTitles = {
+    0: "Tier 1: 생존의 시작",
+    1: "Tier 1: 생존의 시작",
+    2: "Tier 2: 원시 산업",
+    3: "Tier 2: 원시 산업",
+    4: "Tier 3: 전기 및 회로 시대",
+    5: "Tier 3: 전기 및 회로 시대",
+    6: "Tier 4: 화학 및 정유",
+    7: "Tier 4: 화학 및 정유",
+    8: "Tier 5: 첨단 소재 및 티타늄",
+    9: "Tier 5: 첨단 소재 및 티타늄",
+    10: "Tier 6: 지구 이별 준비"
+};
+
 export function renderTechTree() {
     const container = document.getElementById('tech-tree-content');
     if (!container) return;
@@ -690,25 +703,41 @@ export function renderTechTree() {
         tiers[depth].push(r);
     });
 
-    // 세로형 배치를 위해 티어별로 가로 한 줄씩 생성
-    Object.keys(tiers).sort((a,b) => a-b).forEach(tierIdx => {
-        const row = document.createElement('div');
-        row.className = 'tree-tier-row'; // 클래스명 변경
-        row.innerHTML = `<div class="tree-tier-label">ERA ${parseInt(tierIdx) + 1}</div>`;
+    const sortedDepths = Object.keys(tiers).sort((a,b) => a-b);
+    
+    // 티어 이름이 바뀔 때만 헤더를 뿌려주기 위해 이전 티어이름 저장
+    let lastTierName = "";
+
+    sortedDepths.forEach(depth => {
+        const currentTierName = tierTitles[depth] || `Tier ${parseInt(depth/2) + 1}: 심화 기술`;
+        
+        // 새로운 티어 구역(Header) 생성
+        if (currentTierName !== lastTierName) {
+            const header = document.createElement('div');
+            header.className = 'tree-tier-header';
+            header.innerText = currentTierName;
+            container.appendChild(header);
+            lastTierName = currentTierName;
+        }
 
         const nodesContainer = document.createElement('div');
         nodesContainer.className = 'tree-nodes-container';
 
-        tiers[tierIdx].forEach(r => {
+        tiers[depth].forEach(r => {
             const isDone = gameData.researches.includes(r.id);
             const isPrereqDone = r.reqResearch ? gameData.researches.includes(r.reqResearch) : true;
             
             const node = document.createElement('div');
             node.className = `tree-node ${isDone ? 'done' : (isPrereqDone ? 'available' : 'locked')}`;
             
+            // 선행 연구 이름 가져오기
+            const parent = researchList.find(p => p.id === r.reqResearch);
+            const parentName = parent ? `[${parent.name}]에서 연결` : "시작 기술";
+
             node.innerHTML = `
+                <div class="tree-node-parent">${parentName}</div>
                 <span class="tree-node-name">${r.name}</span>
-                <span class="tree-node-status">${isDone ? '✅ 연구됨' : (isPrereqDone ? '💡 연구 가능' : '🔒 잠김')}</span>
+                <span class="tree-node-status">${isDone ? '✅ 완료' : (isPrereqDone ? '💡 연구 가능' : '🔒 잠김')}</span>
             `;
 
             if (isPrereqDone && !isDone) {
@@ -722,12 +751,9 @@ export function renderTechTree() {
             }
             nodesContainer.appendChild(node);
         });
-        row.appendChild(nodesContainer);
-        container.appendChild(row);
+        container.appendChild(nodesContainer);
     });
 }
-
-
 
 
 
