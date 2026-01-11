@@ -271,25 +271,25 @@ export function setGameData(newData) {
 
     // 2. 기초 진행도 복구
     gameData.houseLevel = newData.houseLevel || 0;
-    gameData.researches = newData.researches || [];
-    gameData.unlockedResources = newData.unlockedResources || ['wood', 'stone', 'plank'];
+    gameData.researches = Array.isArray(newData.researches) ? newData.researches : [];
+    gameData.unlockedResources = Array.isArray(newData.unlockedResources) ? newData.unlockedResources : ['wood', 'stone', 'plank'];
 
-    // 3. ⭐ 환생 및 유산 데이터 복구 및 소급 적용
+    // 3. 환생 및 유산 데이터 복구
     gameData.prestigeLevel = newData.prestigeLevel || 0;
     gameData.legacyUpgrades = newData.legacyUpgrades || [];
     
-    // [소급 지급 로직]
-    // 환생 포인트가 없거나 0인데, 환생 횟수는 있는 구버전 유저인 경우
-    if (newData.cosmicData === undefined || newData.cosmicData === 0) {
-        if (gameData.prestigeLevel > 0 && gameData.legacyUpgrades.length === 0) {
-            // 환생 1회당 5점씩 계산해서 소급 지급
-            gameData.cosmicData = gameData.prestigeLevel * 3; 
-            console.log(`구버전 환생 유저 확인: ${gameData.cosmicData} 데이터 소급 지급됨.`);
-        } else {
-            gameData.cosmicData = newData.cosmicData || 0;
-        }
+    // ⭐ [수정된 소급 지급 및 보정 로직]
+    // 환생 횟수가 있는데 유산 업그레이드를 하나도 안 한 '구버전' 유저이거나,
+    // 현재 포인트가 이전 계산법(5점)으로 되어 있는 경우를 위해 3점으로 재계산합니다.
+    const correctPoints = gameData.prestigeLevel * 3; // 환생당 3점으로 변경
+    
+    if (newData.cosmicData === undefined || (gameData.legacyUpgrades.length === 0 && newData.cosmicData > correctPoints)) {
+        // 업그레이드를 아직 안 샀다면 정확한 수치(3점)로 강제 고정
+        gameData.cosmicData = correctPoints;
+        console.log(`구버전 포인트 보정 완료: ${gameData.cosmicData} 데이터로 재설정됨.`);
     } else {
-        gameData.cosmicData = newData.cosmicData;
+        // 이미 업그레이드를 샀다면 저장된 값을 존중하되 없으면 0
+        gameData.cosmicData = newData.cosmicData || 0;
     }
 
     // 4. 건물 및 가동 레벨 복구
@@ -301,7 +301,6 @@ export function setGameData(newData) {
                 if (savedB.activeCount !== undefined) {
                     currentB.activeCount = savedB.activeCount;
                 } else {
-                    // 구버전 호환 (on 속성이 false면 0개, 아니면 전체 가동)
                     currentB.activeCount = (savedB.on === false) ? 0 : currentB.count;
                 }
             }
