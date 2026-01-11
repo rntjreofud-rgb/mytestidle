@@ -629,12 +629,17 @@ function updatePrestigeUI() {
 export function updateHouseUI(onUpgrade) {
     const nextStage = houseStages[gameData.houseLevel + 1];
     const currentStage = houseStages[gameData.houseLevel];
+    
     if(elements.houseName) elements.houseName.innerText = `Lv.${gameData.houseLevel} ${currentStage.name}`;
     if(elements.houseDesc) elements.houseDesc.innerText = currentStage.desc;
+
     if (nextStage) {
+        // 일반 업그레이드 상태
         const reqTxt = Object.entries(nextStage.req).filter(([k,v]) => k !== 'energy').map(([k,v]) => `${getResNameOnly(k)}${formatNumber(v)}`).join(',');
         elements.upgradeBtn.innerText = `⬆️ ${nextStage.name} (${reqTxt})`;
+        elements.upgradeBtn.classList.remove('prestige-ready');
         elements.upgradeBtn.onclick = () => onUpgrade(nextStage);
+        
         let canUp = true;
         for(let k in nextStage.req) {
             if (k === 'energy') { if((gameData.resources.energy || 0) < nextStage.req[k]) canUp = false; }
@@ -642,8 +647,17 @@ export function updateHouseUI(onUpgrade) {
         }
         elements.upgradeBtn.disabled = !canUp;
     } else {
-        elements.upgradeBtn.innerText = "🚀 완료";
-        elements.upgradeBtn.disabled = true;
+        // ⭐ [핵심 추가] 엔딩 도달 시 환생 버튼으로 전환
+        elements.upgradeBtn.innerText = `🚀 은하계 원정 시작 (숙련도 Lv.${gameData.prestigeLevel + 1}로 환생)`;
+        elements.upgradeBtn.classList.add('prestige-ready');
+        elements.upgradeBtn.disabled = false; // 버튼 활성화
+        
+        // 클릭 시 main.js에 등록된 전역 환생 함수 호출
+        elements.upgradeBtn.onclick = () => {
+            if(confirm("지구를 떠나 새로운 행성으로 향하시겠습니까?\n모든 자원과 건물이 초기화되지만, 영구 생산 보너스 20%가 부여됩니다.")) {
+                window.performPrestige();
+            }
+        };
     }
 }
 // 오프라인 보고서 모달 표시 함수

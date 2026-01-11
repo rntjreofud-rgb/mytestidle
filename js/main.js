@@ -5,6 +5,38 @@ import * as UI from './ui.js';
 import * as Logic from './logic.js';
 import * as Storage from './save.js';
 
+// 전역으로 게임 데이터를 노출 (디버그 및 콘솔용)
+window.gameData = gameData;
+
+
+window.performPrestige = function() {
+    // 1. 환생 레벨 상승
+    gameData.prestigeLevel = (gameData.prestigeLevel || 0) + 1;
+
+    // 2. 자원 초기화
+    for (let key in gameData.resources) {
+        gameData.resources[key] = 0;
+    }
+    gameData.resources.energy = 0;
+    gameData.resources.energyMax = 0;
+
+    // 3. 건물 초기화
+    gameData.buildings.forEach(b => {
+        b.count = 0;
+        b.activeCount = 0;
+        b.on = true;
+    });
+
+    // 4. 연구 및 레벨 초기화
+    gameData.researches = [];
+    gameData.houseLevel = 0;
+    gameData.unlockedResources = ['wood', 'stone', 'plank'];
+
+    // 5. 저장 및 리로드
+    Storage.saveGame();
+    UI.log(`✨ 숙련도 Lv.${gameData.prestigeLevel} 달성! 새로운 항해가 시작됩니다.`, true);
+    location.reload(); 
+};
 
 window.toggleBuildingPower = function(id) {
     console.log(`[클릭 감지] 건물 ID: ${id}`); // 클릭 확인용 로그
@@ -26,10 +58,6 @@ window.toggleBuildingPower = function(id) {
     
     console.log(`[상태 변경] ${building.name} -> ${building.on ? 'ON' : 'OFF'}`);
 };
-
-window.gameData = gameData;
-
-
 
 
 

@@ -194,6 +194,20 @@ input:checked + .slider:before { transform: translateX(20px); }
 .log-time { color: #556; min-width: 65px; }
 .log-highlight { color: var(--accent-green); }
 
+/* ⭐ 업그레이드 버튼 - 프레스티지 가능 상태 강조 */
+#upgrade-btn.prestige-ready {
+    background: linear-gradient(135deg, #f1c40f, #f39c12) !important;
+    color: #000 !important;
+    box-shadow: 0 0 15px rgba(241, 196, 15, 0.5);
+    border: 1px solid #fff !important;
+}
+#upgrade-btn.prestige-ready:hover {
+    filter: brightness(1.2);
+    transform: scale(1.02) translateY(-2px);
+}
+
+
+
 /* =================================================================
    7. 반응형 레이아웃 (Media Queries)
    ================================================================= */
