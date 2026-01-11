@@ -168,17 +168,21 @@ function formatNumber(num) {
 }
 
 export function switchTab(tabName) {
+    // 모든 뷰 숨기기 (여기에 Tech Tree 추가)
     elements.viewDashboard.classList.add('hidden');
     elements.viewPower.classList.add('hidden');
     elements.viewResearch.classList.add('hidden');
+    if (elements.viewTechTree) elements.viewTechTree.classList.add('hidden'); // 추가
+
+    // 모든 메뉴 활성화 해제
     elements.navDashboard.classList.remove('active');
     elements.navPower.classList.remove('active');
     elements.navResearch.classList.remove('active');
+    if (elements.navTechTree) elements.navTechTree.classList.remove('active'); // 추가
 
     if (tabName === 'dashboard') {
         elements.viewDashboard.classList.remove('hidden');
         elements.navDashboard.classList.add('active');
-        // ⭐ 저장된 콜백을 사용하여 상점을 다시 그림
         renderShop(cachedBuyCallback, Logic.getBuildingCost);
     } else if (tabName === 'power') {
         elements.viewPower.classList.remove('hidden');
@@ -187,12 +191,11 @@ export function switchTab(tabName) {
         elements.viewResearch.classList.remove('hidden');
         elements.navResearch.classList.add('active');
         renderResearchTab();
-    } else if (tabName === 'tech-tree') {
+    } else if (tabName === 'tech-tree') { // 추가
         elements.viewTechTree.classList.remove('hidden');
         elements.navTechTree.classList.add('active');
-        renderTechTree(); // 계통도 그리기
+        renderTechTree();
     }
-    
 }
 
 export function log(msg, isImportant = false) {
@@ -687,10 +690,14 @@ export function renderTechTree() {
         tiers[depth].push(r);
     });
 
+    // 세로형 배치를 위해 티어별로 가로 한 줄씩 생성
     Object.keys(tiers).sort((a,b) => a-b).forEach(tierIdx => {
-        const column = document.createElement('div');
-        column.className = 'tree-tier-column';
-        column.innerHTML = `<div class="tree-tier-title">ERA ${parseInt(tierIdx) + 1}</div>`;
+        const row = document.createElement('div');
+        row.className = 'tree-tier-row'; // 클래스명 변경
+        row.innerHTML = `<div class="tree-tier-label">ERA ${parseInt(tierIdx) + 1}</div>`;
+
+        const nodesContainer = document.createElement('div');
+        nodesContainer.className = 'tree-nodes-container';
 
         tiers[tierIdx].forEach(r => {
             const isDone = gameData.researches.includes(r.id);
@@ -706,16 +713,17 @@ export function renderTechTree() {
 
             if (isPrereqDone && !isDone) {
                 node.onclick = () => {
-                    // 기술 연구 탭으로 이동시켜 구매 유도
                     switchTab('research');
-                    const targetEl = document.getElementById(`research-${r.id}`);
-                    if(targetEl) targetEl.scrollIntoView({ behavior: 'smooth' });
-                    
+                    setTimeout(() => {
+                        const targetEl = document.getElementById(`research-${r.id}`);
+                        if(targetEl) targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }, 100);
                 };
             }
-            column.appendChild(node);
+            nodesContainer.appendChild(node);
         });
-        container.appendChild(column);
+        row.appendChild(nodesContainer);
+        container.appendChild(row);
     });
 }
 
