@@ -305,7 +305,7 @@ export function updateScreen(stats) {
     updatePowerUI();
     if(!elements.viewResearch.classList.contains('hidden')) updateResearchButtons();
     checkUnlocks();
-    updatePrestigeUI()
+    updatePrestigeUI();
 }
 function updatePowerUI() {
     const prod = gameData.resources.energy || 0;
@@ -649,22 +649,36 @@ export function updateShopButtons(getCostFunc) {
 }
 
 export function updatePrestigeUI() {
-    const level = gameData.prestigeLevel || 0;
-    if (level <= 0) return; // 환생 전이면 표시 안 함
-
-    const prestigeText = `(⭐Lv.${level})`;
-
-    // [A] 상단 헤더 업데이트 (모바일/PC 공통)
+    // gameData가 없거나 prestigeLevel이 없는 경우를 대비해 안전하게 가져옴
+    const level = (gameData && gameData.prestigeLevel) ? gameData.prestigeLevel : 0;
+    
     const headerPrestige = document.getElementById('header-prestige');
-    if (headerPrestige) {
-        headerPrestige.innerText = prestigeText;
-    }
-
-    // [B] 사이드바 로고 영역 업데이트
     const sideSmall = document.querySelector('.logo-area small');
-    if (sideSmall) {
-        sideSmall.innerHTML = `우주 항해 숙련도 <b style="color:#f1c40f;">Lv.${level}</b>`;
-        sideSmall.style.color = "#f1c40f";
+
+    if (level > 0) {
+        // --- 환생 레벨이 1 이상일 때 (황금색 표시) ---
+        const prestigeText = `(⭐Lv.${level})`;
+
+        if (headerPrestige) {
+            headerPrestige.innerText = prestigeText;
+            headerPrestige.style.display = "inline"; // 보이게 함
+        }
+
+        if (sideSmall) {
+            sideSmall.innerHTML = `우주 항해 숙련도 <b style="color:#f1c40f;">Lv.${level}</b>`;
+            sideSmall.style.color = "#f1c40f";
+        }
+    } else {
+        // --- 환생 전(Lv.0)이거나 초기화되었을 때 (기본값 복구) ---
+        if (headerPrestige) {
+            headerPrestige.innerText = "";
+            headerPrestige.style.display = "none"; // 공간 차지하지 않게 숨김
+        }
+
+        if (sideSmall) {
+            sideSmall.innerText = "IDLE GAME"; // 원래 초기 텍스트
+            sideSmall.style.color = "#f39c12"; // 원래 주황색
+        }
     }
 }
 
@@ -878,25 +892,7 @@ export function renderLegacyTab() {
 }
 
 
-export function updatePrestigeUI() {
-    const level = gameData.prestigeLevel || 0;
-    if (level <= 0) return; // 환생 전이면 표시 안 함
 
-    const prestigeText = `(⭐Lv.${level})`;
-
-    // [A] 상단 헤더 업데이트 (모바일/PC 공통)
-    const headerPrestige = document.getElementById('header-prestige');
-    if (headerPrestige) {
-        headerPrestige.innerText = prestigeText;
-    }
-
-    // [B] 사이드바 로고 영역 업데이트
-    const sideSmall = document.querySelector('.logo-area small');
-    if (sideSmall) {
-        sideSmall.innerHTML = `우주 항해 숙련도 <b style="color:#f1c40f;">Lv.${level}</b>`;
-        sideSmall.style.color = "#f1c40f";
-    }
-}
 
 
 
