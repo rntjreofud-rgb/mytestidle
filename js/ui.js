@@ -1,7 +1,7 @@
 // js/ui.js 전체 교체
 
-import { gameData, houseStages, researchList } from './data.js';
-import * as Logic from './logic.js'; // ⭐ Logic이 반드시 있어야 계산을 다시 합니다.
+import { gameData, houseStages, researchList, legacyList } from './data.js'; // ⭐ legacyList 추가
+import * as Logic from './logic.js';
 
 // 내부에서 구매 콜백 함수를 기억하기 위한 변수
 let cachedBuyCallback = null;
@@ -172,17 +172,19 @@ function formatNumber(num) {
 }
 
 export function switchTab(tabName) {
-    // 모든 뷰 숨기기 (여기에 Tech Tree 추가)
+    // 모든 뷰 숨기기 (Tech Tree 및 Legacy 추가)
     elements.viewDashboard.classList.add('hidden');
     elements.viewPower.classList.add('hidden');
     elements.viewResearch.classList.add('hidden');
-    if (elements.viewTechTree) elements.viewTechTree.classList.add('hidden'); // 추가
+    if (elements.viewTechTree) elements.viewTechTree.classList.add('hidden');
+    if (elements.viewLegacy) elements.viewLegacy.classList.add('hidden'); // ⭐ 유산 뷰 숨김 추가
 
     // 모든 메뉴 활성화 해제
     elements.navDashboard.classList.remove('active');
     elements.navPower.classList.remove('active');
     elements.navResearch.classList.remove('active');
-    if (elements.navTechTree) elements.navTechTree.classList.remove('active'); // 추가
+    if (elements.navTechTree) elements.navTechTree.classList.remove('active');
+    if (elements.navLegacy) elements.navLegacy.classList.remove('active'); // ⭐ 유산 메뉴 해제 추가
 
     if (tabName === 'dashboard') {
         elements.viewDashboard.classList.remove('hidden');
@@ -195,10 +197,14 @@ export function switchTab(tabName) {
         elements.viewResearch.classList.remove('hidden');
         elements.navResearch.classList.add('active');
         renderResearchTab();
-    } else if (tabName === 'tech-tree') { // 추가
+    } else if (tabName === 'tech-tree') {
         elements.viewTechTree.classList.remove('hidden');
         elements.navTechTree.classList.add('active');
         renderTechTree();
+    } else if (tabName === 'legacy') { // ⭐ 우주 유산 탭 활성화
+        if (elements.viewLegacy) elements.viewLegacy.classList.remove('hidden');
+        if (elements.navLegacy) elements.navLegacy.classList.add('active');
+        renderLegacyTab(); // 유산 리스트 그리기
     }
 }
 
@@ -819,23 +825,43 @@ export function renderTechTree() {
 
 export function renderLegacyTab() {
     const listContainer = document.getElementById('legacy-upgrade-list');
-    document.getElementById('cosmic-data-count').innerText = gameData.cosmicData;
+    const dataDisplay = document.getElementById('cosmic-data-count');
+    
+    if (!listContainer || !dataDisplay) return;
+
+    // 보유 포인트 표시
+    dataDisplay.innerText = formatNumber(gameData.cosmicData || 0);
     listContainer.innerHTML = "";
-    import('./data.js').then(m => {
-        m.legacyList.forEach(u => {
-            const isBought = gameData.legacyUpgrades.includes(u.id);
-            const div = document.createElement('div');
-            div.className = `shop-item ${isBought ? 'done' : (gameData.cosmicData >= u.cost ? '' : 'disabled')}`;
-            div.innerHTML = `<span class="si-name">${u.name}</span><span class="si-level">${isBought ? '해금됨' : '비용: '+u.cost}</span><div class="si-desc">${u.desc}</div><div class="si-cost">${isBought ? '영구 적용' : '구매 가능'}</div>`;
-            if (!isBought && gameData.cosmicData >= u.cost) {
-                div.onclick = () => {
+
+    // 유산 목록 출력
+    legacyList.forEach(u => {
+        const isBought = gameData.legacyUpgrades.includes(u.id);
+        const canAfford = (gameData.cosmicData || 0) >= u.cost;
+        
+        const div = document.createElement('div');
+        // 구매 완료면 done, 돈 없으면 disabled 클래스 부여
+        div.className = `shop-item ${isBought ? 'done' : (canAfford ? '' : 'disabled')}`;
+        
+        div.innerHTML = `
+            <span class="si-name">${u.name}</span>
+            <span class="si-level">${isBought ? '✅ 적용 중' : '미해금'}</span>
+            <div class="si-desc">${u.desc}</div>
+            <div class="si-cost">${isBought ? '영구 보너스' : '비용: ' + u.cost + ' 데이터'}</div>
+        `;
+
+        // 아직 안 샀고 돈이 있으면 클릭 이벤트 연결
+        if (!isBought && canAfford) {
+            div.style.cursor = "pointer";
+            div.onclick = () => {
+                if (confirm(`'${u.name}' 보너스를 해금하시겠습니까?`)) {
                     gameData.cosmicData -= u.cost;
                     gameData.legacyUpgrades.push(u.id);
-                    renderLegacyTab();
-                };
-            }
-            listContainer.appendChild(div);
-        });
+                    log(`✨ 유산 보너스 해금: ${u.name}`, true);
+                    renderLegacyTab(); // 즉시 새로고침
+                }
+            };
+        }
+        listContainer.appendChild(div);
     });
 }
 
