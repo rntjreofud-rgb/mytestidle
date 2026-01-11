@@ -883,7 +883,15 @@ export function renderLegacyTab() {
                     gameData.cosmicData -= u.cost;
                     gameData.legacyUpgrades.push(u.id);
                     log(`✨ 유산 보너스 해금: ${u.name}`, true);
-                    renderLegacyTab(); // 즉시 새로고침
+                    // 1. 현재 유산 탭 새로고침
+                    renderLegacyTab(); 
+                    
+                    // 2. ⭐ [중요] 상점(건물 목록)의 가격 텍스트도 즉시 갱신
+                    // cachedBuyCallback과 Logic.getBuildingCost를 사용하여 상점을 다시 그립니다.
+                    if (typeof renderShop === 'function') {
+                        renderShop(cachedBuyCallback, Logic.getBuildingCost);
+                    }
+
                 }
             };
         }
