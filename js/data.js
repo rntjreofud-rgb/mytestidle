@@ -283,7 +283,7 @@ export function setGameData(newData) {
     if (newData.cosmicData === undefined || newData.cosmicData === 0) {
         if (gameData.prestigeLevel > 0 && gameData.legacyUpgrades.length === 0) {
             // 환생 1회당 5점씩 계산해서 소급 지급
-            gameData.cosmicData = gameData.prestigeLevel * 5; 
+            gameData.cosmicData = gameData.prestigeLevel * 3; 
             console.log(`구버전 환생 유저 확인: ${gameData.cosmicData} 데이터 소급 지급됨.`);
         } else {
             gameData.cosmicData = newData.cosmicData || 0;
