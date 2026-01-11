@@ -76,7 +76,8 @@ export let gameData = {
     { id: 57, name: "산업용 벽돌 공장", cost: { steel: 500, gear: 200, copperPlate: 300 }, inputs: { stone: 20, energy: 30 }, outputs: { brick: 20.0 }, count: 0, reqLevel: 10 },
     { id: 58, name: "고속 CNC 선반", cost: { steel: 2000, ironPlate: 5000, gear: 1000 }, inputs: { steel: 5, energy: 100 }, outputs: { gear: 15.0 }, count: 0, reqLevel: 20 },
     { id: 59, name: "대형 콘크리트 플랜트", cost: { steel: 5000, brick: 10000, concrete: 2000 }, inputs: { stone: 50, energy: 150 }, outputs: { concrete: 40.0 }, count: 0, reqLevel: 25 },
-    { id: 60, name: "정밀 회로 인쇄기", cost: { steel: 3000, copperPlate: 5000, circuit: 1000 }, inputs: { copperPlate: 10, energy: 120 }, outputs: { circuit: 10.0 }, count: 0, reqLevel: 22 }
+    { id: 60, name: "정밀 회로 인쇄기", cost: { steel: 3000, copperPlate: 5000, circuit: 1000 }, inputs: { copperPlate: 10, energy: 120 }, outputs: { circuit: 10.0 }, count: 0, reqLevel: 22 },
+    { id: 61, name: "대규모 고분자 화학 공장", cost: { steel: 10000, titaniumPlate: 2000, circuit: 1000 }, inputs: { oil: 50, energy: 200 }, outputs: { plastic: 50.0 }, count: 0, reqLevel: 25 }
     ]
 };
 
@@ -148,6 +149,8 @@ export const researchList = [
     { id: "supercomputing", name: "슈퍼컴퓨팅", desc: "반도체 클린룸의 프로세서 생산 및 재료 소모 속도 2배 증가", cost: { processor: 100, optics: 500, advCircuit: 2000 }, type: 'building', target: [31], value: 2, reqResearch: "high_precision" },
     { id: "glass_refinement", name: "유리 정제 기술", desc: "유리 용해로의 유리 생산 및 재료 소모 속도 3배 증가", cost: { steel: 1000, coal: 500 }, type: 'building', target: [18], value: 3.0, reqResearch: "smelting_upgrade" },
     { id: "silica_purity", name: "규사 순도 강화", desc: "유리 용해로의 돌 소모량 50% 감소 (생산량 유지)", cost: { processor: 200, optics: 100 }, type: 'consumption', target: [18], value: 0.5, reqResearch: "glass_refinement" },
+    { id: "polymer_optimization", name: "고분자 사슬 최적화", desc: "플라스틱 생산 시설(ID 21, 61)의 생산 속도 3배 증가", cost: { processor: 500, optics: 500 }, type: 'building', target: [21, 61], value: 3.0, reqResearch: "polymer_science" },
+{ id: "catalytic_cracking", name: "촉매 분해 기술", desc: "플라스틱 생산 시 원유 소모량 50% 감소 (생산량 유지)", cost: { aiCore: 200, advAlloy: 500 }, type: 'consumption', target: [21, 61], value: 0.5, reqResearch: "polymer_optimization" },
     { id: "high_refraction_lens", name: "고굴절 렌즈 가공", desc: "정밀 렌즈 가공기의 광학 렌즈 생산 및 재료 소모 속도 3.5배 증가", cost: { plastic: 5000, advCircuit: 500 }, type: 'building', target: [27], value: 3.5, reqResearch: "glass_refinement" },
     { id: "stone_efficiency", name: "골재 배합 최적화", desc: "건축 자재 생산 시설들의 돌 소모량 40% 감소", cost: { processor: 500, optics: 500 }, type: 'consumption', value: 0.6, target: [5, 18, 16], reqResearch: "component_mini" },
     { id: "solar_efficiency", name: "광전소자 개선", desc: "태양광 발전소의 전력 생산 속도 3배 증가", cost: { optics: 1000, circuit: 5000 }, type: 'building', target: [23], value: 3, reqResearch: "supercomputing" },
