@@ -79,7 +79,8 @@ export let gameData = {
     { id: 60, name: "정밀 회로 인쇄기", cost: { steel: 3000, copperPlate: 5000, circuit: 1000 }, inputs: { copperPlate: 10, energy: 120 }, outputs: { circuit: 10.0 }, count: 0, reqLevel: 22 },
     { id: 61, name: "대규모 고분자 화학 공장", cost: { steel: 10000, titaniumPlate: 2000, circuit: 1000 }, inputs: { oil: 50, energy: 200 }, outputs: { plastic: 50.0 }, count: 0, reqLevel: 25 },
     { id: 62, name: "석탄 액화 공장", cost: { steel: 800, brick: 1000, circuit: 100 }, inputs: { coal: 30, energy: 80 }, outputs: { oil: 15.0, sulfur: 3.0 }, count: 0, reqLevel: 15 },  
-    { id: 63, name: "산업용 전자기 제련소", cost: { steel: 20000, concrete: 10000, aiCore: 500 }, inputs: { titaniumOre: 20, energy: 400 }, outputs: { titaniumPlate: 15.0 }, count: 0, reqLevel: 35 }
+    { id: 63, name: "산업용 전자기 제련소", cost: { steel: 20000, concrete: 10000, aiCore: 500 }, inputs: { titaniumOre: 20, energy: 400 }, outputs: { titaniumPlate: 15.0 }, count: 0, reqLevel: 35 },
+    { id: 64, name: "산업용 화학 공장", cost: { steel: 3000, concrete: 1000, circuit: 500 }, inputs: { oil: 10, energy: 100 }, outputs: { plastic: 12.0, sulfur: 6.0 }, count: 0, reqLevel: 18 }
 ]
 };
 
@@ -125,6 +126,10 @@ export const researchList = [
 { id: "nanoscale_printing", name: "나노 적층 인쇄", desc: "정밀 회로 인쇄기의 생산 속도 4배 증가", cost: { optics: 1000, processor: 1000 }, type: 'building', target: [60], value: 4.0, reqResearch: "supercomputing" },
 { id: "material_thrift", name: "정밀 재료 절감", desc: "CNC, 콘크리트, 회로 인쇄기의 재료 소모량 30% 감소", cost: { aiCore: 200, quantumData: 500 }, type: 'consumption', target: [58, 59, 60], value: 0.7, reqResearch: "automated_machining" },
 { id: "oil_recovery", name: "원유 회수 시스템", desc: "석유 관련 시설의 원유 소모량 40% 감소 (생산 속도 유지)", cost: { plastic: 5000, advCircuit: 1000 }, type: 'consumption', value: 0.6, target: [21, 46, 35], reqResearch: "oil_combustion" },
+    
+    { id: "chem_process_opt", name: "화학 공정 최적화", desc: "산업용 화학 공장(ID 64)의 생산 및 소모 속도 3배 증가", cost: { plastic: 2000, circuit: 1000 }, type: 'building', target: [64], value: 3.0, reqResearch: "polymer_science" },
+{ id: "chem_input_cut", name: "원유 재처리 기술", desc: "화학 공장들의 원유 소모량 40% 감소 (생산 속도 유지)", cost: { optics: 500, processor: 200 }, type: 'consumption', target: [21, 64], value: 0.6, reqResearch: "chem_process_opt" },
+
     { id: "component_mini", name: "부품 미세화 기술", desc: "회로 및 프로세서 공장의 재료 소모 25% 감소 (생산 속도 유지)", cost: { processor: 1000, optics: 1000 }, type: 'consumption', value: 0.75, target: [15, 31, 24], reqResearch: "integrated_circuit" },
     { id: "coal_mining_tech", name: "탄층 탐사 최적화", desc: "석탄 채굴기들의 석탄 채굴 속도 2.5배 증가", cost: { gear: 1000, ironPlate: 2000 }, type: 'building', target: [3, 44], value: 2.5, reqResearch: "mining_drill_bit" },
     { id: "high_torque_drill", name: "고토크 회전 드릴", desc: "전기 석재 채굴기의 돌 생산 속도 3배 증가", cost: { steel: 1000, gear: 500 }, type: 'building', target: [45], value: 3, reqResearch: "electric_motor" },
