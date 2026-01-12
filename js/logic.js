@@ -29,9 +29,10 @@ export function calculateCurrentPrestigeGain(level, planet) {
  */
 export function getBuildingMultiplier(buildingId) {
     let multiplier = 1.0;
-    const researchList = getActiveResearch(); 
+    const researchList = getActiveResearch();
     const completed = gameData.researches || [];
-    
+    const legacy = gameData.legacyUpgrades || [];
+
     // [연구 보너스]
     researchList.forEach(r => {
         if (completed.includes(r.id) && r.type === 'building' && r.target.includes(buildingId)) {
@@ -39,15 +40,13 @@ export function getBuildingMultiplier(buildingId) {
         }
     });
 
-    // [환생 보너스] 레벨당 20% 복리
-    if (gameData.prestigeLevel > 0) {
-        multiplier *= Math.pow(1.2, gameData.prestigeLevel);
-    }
+    // [환생 기본 보너스] 레벨당 20% 복리
+    if (gameData.prestigeLevel > 0) multiplier *= Math.pow(1.2, gameData.prestigeLevel);
 
-    // [유산 보너스] '압축 창고' 보유 시 20% 추가
-    if (gameData.legacyUpgrades && gameData.legacyUpgrades.includes('infinite_storage')) {
-        multiplier *= 1.2;
-    }
+    // [유산 보너스]
+    if (legacy.includes('infinite_storage')) multiplier *= 1.2; // 압축 창고
+    if (legacy.includes('legacy_mutant_boost') && [207, 212].includes(buildingId)) multiplier *= 1.3; // 변이 적응 (ID 확인 필요)
+    if (legacy.includes('legacy_gene_boost') && [214, 215, 218].includes(buildingId)) multiplier *= 1.25; // 유전자 기억
 
     return multiplier;
 }
@@ -57,7 +56,15 @@ export function getBuildingMultiplier(buildingId) {
  */
 export function getBuildingCost(building) {
     let multiplier = Math.pow(1.2, building.count || 0);
-    let discount = (gameData.legacyUpgrades && gameData.legacyUpgrades.includes('cheap_build')) ? 0.8 : 1.0;
+    const legacy = gameData.legacyUpgrades || [];
+    
+    let discount = 1.0;
+    if (legacy.includes('cheap_build')) discount *= 0.8; // 나노 건축 (-20%)
+    
+    // 신속 기지 전개: 건물 레벨 2까지 비용 50% 추가 할인
+    if (legacy.includes('aurelia_fast_setup') && (building.count || 0) < 2) {
+        discount *= 0.5;
+    }
     
     let currentCost = {};
     for (let r in building.cost) {
@@ -73,12 +80,18 @@ export function getBuildingConsumptionMultiplier(buildingId) {
     let multiplier = 1.0;
     const researchList = getActiveResearch();
     const completed = gameData.researches || [];
-    
+    const legacy = gameData.legacyUpgrades || [];
+
     researchList.forEach(r => {
         if (completed.includes(r.id) && r.type === 'consumption' && r.target.includes(buildingId)) {
             multiplier *= r.value;
         }
     });
+
+    // [유산 보너스: 소모 절감]
+    if (legacy.includes('legacy_less_fiber') && [203, 204, 205, 212, 214].includes(buildingId)) multiplier *= 0.85; // 섬유 재활용
+    if (legacy.includes('aurelia_scrap_recycle') && [103, 104, 107, 110, 112, 114].includes(buildingId)) multiplier *= 0.8; // 스크랩 재활용
+
     return multiplier;
 }
 
@@ -178,14 +191,25 @@ export function calculateNetMPS() {
 export function produceResources(deltaTime) {
     let totalEnergyProd = 0;
     let totalEnergyReq = 0;
+    const legacy = gameData.legacyUpgrades || [];
+    
+    // [유산: 발효 잔열] 유기섬유 자동 생산
+    if (legacy.includes('legacy_biofuel_trickle')) {
+        gameData.resources.bioFiber += 0.1 * deltaTime;
+    }
 
-    // --- 1단계: 전력 생산 시설 (에너지는 최우선 순위) ---
+    // --- 1단계: 전력 생산 시설 (발전기) ---
     gameData.buildings.forEach(b => {
         if (b.activeCount > 0 && b.outputs && b.outputs.energy) {
             let speedMult = getBuildingMultiplier(b.id);
             let consMult = getBuildingConsumptionMultiplier(b.id);
             let inputEfficiency = 1.0;
             
+            // [유산: 과충전 프로토콜] 발전기 생산량 25% 증가
+            if (legacy.includes('aurelia_generator_boost')) speedMult *= 1.25;
+            // [유산: 항성 항해 데이터] 환생 1회당 전기 생산 +4%
+            if (legacy.includes('aurelia_prestige_drive')) speedMult *= (1 + (gameData.prestigeLevel * 0.04));
+
             if(b.inputs) {
                 for(let res in b.inputs) {
                     if (res === 'energy') continue;
@@ -209,6 +233,10 @@ export function produceResources(deltaTime) {
             let speedMult = getBuildingMultiplier(b.id);
             let consMult = getBuildingConsumptionMultiplier(b.id);
             let energyEff = getEnergyEfficiencyMultiplier(b.id);
+
+            // ⭐ [추가] [유산: 핵융합 최적화] 고급 에너지 시설(ID 30, 111 등) 전력 소모 30% 감소
+            if (legacy.includes('aurelia_fusion_eff') && [30, 111].includes(b.id)) energyEff *= 0.7;
+
             totalEnergyReq += (b.inputs.energy * consMult * energyEff) * b.activeCount * speedMult;
         }
     });
@@ -217,9 +245,9 @@ export function produceResources(deltaTime) {
     gameData.resources.energyMax = totalEnergyReq;
     let powerFactor = totalEnergyReq > 0 ? Math.min(1.0, totalEnergyProd / totalEnergyReq) : 1.0;
 
-    // --- 3단계: 일반 공정의 "공평 배분(Proportional)" 연산 ---
+    // --- 3단계: 일반 공정 (공평 배분) ---
 
-    // A. 현재 프레임의 전체 수요량 파악
+    // A. 전체 수요량 파악
     let frameDemand = {};
     gameData.buildings.forEach(b => {
         if (b.activeCount <= 0 || (b.outputs && b.outputs.energy)) return;
@@ -235,23 +263,28 @@ export function produceResources(deltaTime) {
         }
     });
 
-    // B. 자원별 공급 가능 비율 계산
+    // B. 공급 비율 계산
     let shortageFactor = {};
     for (let res in frameDemand) {
         let available = gameData.resources[res] || 0;
         shortageFactor[res] = (frameDemand[res] > available && available >= 0) ? (available / frameDemand[res]) : 1.0;
     }
 
-    // C. 공평하게 나눠서 소모 및 생산
+    // C. 실제 생산/소모
     gameData.buildings.forEach(b => {
         if (b.activeCount <= 0 || (b.outputs && b.outputs.energy)) return;
 
         let speedMult = getBuildingMultiplier(b.id);
         let consMult = getBuildingConsumptionMultiplier(b.id);
         let energyEff = getEnergyEfficiencyMultiplier(b.id);
+        
+        // ⭐ [추가] [유산: 자동 채굴 알고리즘] 채굴 건물(ID 40~45, 100~102 등) 생산량 30% 증가
+        if (legacy.includes('aurelia_miner_boost') && (b.id >= 40 && b.id <= 45 || b.id <= 3 || b.id >= 100 && b.id <= 102)) {
+            speedMult *= 1.3;
+        }
+
         let baseEfficiency = speedMult * (b.inputs && b.inputs.energy ? powerFactor : 1.0);
 
-        // 건물이 필요로 하는 재료 중 가장 부족한 것의 비율을 따름
         let inputShortage = 1.0;
         if (b.inputs) {
             for (let res in b.inputs) {
@@ -263,7 +296,6 @@ export function produceResources(deltaTime) {
         let finalEfficiency = baseEfficiency * inputShortage;
 
         if (finalEfficiency > 0) {
-            // 자원 실제 소모
             if (b.inputs) {
                 for (let res in b.inputs) {
                     if (res === 'energy') continue;
@@ -271,7 +303,6 @@ export function produceResources(deltaTime) {
                     gameData.resources[res] = Math.max(0, gameData.resources[res] - consume);
                 }
             }
-            // 자원 실제 생산
             if (b.outputs) {
                 for (let res in b.outputs) {
                     if (res === 'energy') continue;

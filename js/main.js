@@ -9,6 +9,44 @@ import * as Storage from './save.js';
 window.gameData = gameData;
 
 
+
+function applyLegacyStartBonuses() {
+    const legacy = gameData.legacyUpgrades || [];
+    console.log("유산 보너스 적용 시작...", legacy);
+
+    // 1. 시작 자원 보급 (지구/아우렐리아/베리디안 통합)
+    if (legacy.includes('start_resource') && gameData.currentPlanet === 'earth') {
+        gameData.resources.wood += 500;
+        gameData.resources.stone += 500;
+        gameData.resources.plank += 100;
+    }
+    if (legacy.includes('legacy_spore_start') && gameData.currentPlanet === 'veridian') {
+        gameData.resources.spore += 200;
+    }
+    if (legacy.includes('aurelia_start_metal') && gameData.currentPlanet === 'aurelia') {
+        gameData.resources.scrapMetal += 300;
+    }
+
+    // 2. 초기 자율 건설 (첫 번째 건물 레벨업)
+    let startBuildLevel = 0;
+    if (legacy.includes('legacy_auto_build2')) startBuildLevel = 10;
+    else if (legacy.includes('legacy_auto_build1')) startBuildLevel = 5;
+
+    if (startBuildLevel > 0) {
+        // 현재 행성의 첫 번째 건물 강제 활성화
+        if (gameData.buildings && gameData.buildings[0]) {
+            gameData.buildings[0].count = startBuildLevel;
+            gameData.buildings[0].activeCount = startBuildLevel;
+            gameData.buildings[0].on = true;
+        }
+    }
+}
+
+
+
+
+
+
 /**
  * 특정 행성에 착륙하여 새로운 시즌을 시작하는 함수
  * @param {string} planetKey - 'aurelia' 또는 'veridian'
@@ -17,28 +55,25 @@ window.landOnPlanet = function(planetKey) {
     const planetName = { earth: '지구', aurelia: '아우렐리아', veridian: '베리디안' }[planetKey];
     if (!confirm(`${planetName} 행성에 진입하시겠습니까? 현재의 모든 인프라가 파괴됩니다.`)) return;
 
-    UI.triggerWarpEffect(planetName, () => {
+     UI.triggerWarpEffect(planetName, () => {
+        // 정산
         const gain = Logic.calculateCurrentPrestigeGain(gameData.houseLevel, gameData.currentPlanet);
         gameData.cosmicData = (gameData.cosmicData || 0) + gain;
         if (gameData.houseLevel >= 50) gameData.prestigeLevel = (gameData.prestigeLevel || 0) + 1;
 
+        // 리셋
         gameData.currentPlanet = planetKey;
         gameData.houseLevel = 0;
         gameData.researches = [];
         for (let key in gameData.resources) { gameData.resources[key] = 0; }
         gameData.buildings = []; 
+        
+        // 초기 자원 해금 목록 설정
+        const planetInitRes = { earth: ['wood', 'stone', 'plank'], aurelia: ['scrapMetal'], veridian: ['bioFiber'] };
+        gameData.unlockedResources = [...(planetInitRes[planetKey] || ['wood'])];
 
-        // ⭐ [핵심 수정] 행성별 초기 자원만 남기고 나머지는 삭제
-        const planetInitRes = {
-            earth: ['wood', 'stone', 'plank'],
-            aurelia: ['scrapMetal'],
-            veridian: ['bioFiber']
-        };
-        gameData.unlockedResources = [...planetInitRes[planetKey]];
-
-        if (planetKey === 'earth' && gameData.legacyUpgrades.includes('start_resource')) {
-            gameData.resources.wood = 500; gameData.resources.stone = 500; gameData.resources.plank = 100;
-        }
+        // ⭐ [추가] 유산 보너스 즉시 적용
+        applyLegacyStartBonuses();
 
         Storage.saveGame();
         location.reload(); 
@@ -55,20 +90,15 @@ window.performPrestige = function() {
         gameData.cosmicData = (gameData.cosmicData || 0) + gain;
         gameData.prestigeLevel = (gameData.prestigeLevel || 0) + 1;
 
-        // [초기화]
         gameData.currentPlanet = 'earth';
         gameData.houseLevel = 0;
         gameData.researches = [];
         for (let key in gameData.resources) { gameData.resources[key] = 0; }
         gameData.buildings = [];
-        
-        // ⭐ [핵심 수정] 해금 목록을 지구 기초 자원으로 완전히 덮어씌움
         gameData.unlockedResources = ['wood', 'stone', 'plank']; 
 
-        // [유산] 보급품 체크
-        if (gameData.legacyUpgrades.includes('start_resource')) {
-            gameData.resources.wood = 500; gameData.resources.stone = 500; gameData.resources.plank = 100;
-        }
+        // ⭐ [추가] 유산 보너스 즉시 적용
+        applyLegacyStartBonuses();
 
         Storage.saveGame();
         location.reload();
@@ -228,12 +258,7 @@ function setupEvents() {
                     gameData.buildings = [];
                     gameData.unlockedResources = ['wood', 'stone', 'plank'];
 
-                    // [유산 보너스 적용]
-                    if (gameData.legacyUpgrades && gameData.legacyUpgrades.includes('start_resource')) {
-                        gameData.resources.wood = 500;
-                        gameData.resources.stone = 500;
-                        gameData.resources.plank = 100;
-                    }
+                    applyLegacyStartBonuses();
 
                     Storage.saveGame();
                     location.reload();
@@ -322,33 +347,8 @@ function handleHouseUpgrade(nextStage) {
     }
 }
 
-function performPrestige() {
-    // 1. 환생 레벨 상승
-    gameData.prestigeLevel++;
 
-    // 2. 자원 초기화 (0으로)
-    for (let key in gameData.resources) {
-        gameData.resources[key] = 0;
-    }
-    gameData.resources.energy = 0;
-    gameData.resources.energyMax = 0;
 
-    // 3. 건물 초기화
-    gameData.buildings.forEach(b => {
-        b.count = 0;
-        b.activeCount = 0;
-        b.on = true;
-    });
-
-    // 4. 연구 및 레벨 초기화
-    gameData.researches = [];
-    gameData.houseLevel = 0;
-    gameData.unlockedResources = ['wood', 'stone', 'plank'];
-
-    // 5. 저장 및 재시작
-    Storage.saveGame();
-    location.reload(); 
-}
 
 
 

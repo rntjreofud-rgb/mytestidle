@@ -137,8 +137,23 @@ export function setGameData(newData) {
 
 
 export const legacyList = [
-    { id: "start_resource", name: "선구자의 보급품", desc: "매 회차 시작 시 나무 500, 돌 500, 판자 100 보유", cost: 1 },
-    { id: "fast_click", name: "초공간 클릭", desc: "수동 채집 효율 5배 영구 증가", cost: 2 },
-    { id: "cheap_build", name: "나노 건축 설계", desc: "모든 건물 건설 비용 20% 영구 감소", cost: 3 },
-    { id: "infinite_storage", name: "압축 창고", desc: "모든 자원 생산 효율 20% 추가 증가", cost: 10 }
+  { id: "start_resource", name: "선구자의 보급품", desc: "매 회차 시작 시 나무 500, 돌 500, 판자 100 보유", cost: 1 },
+  { id: "fast_click", name: "초공간 클릭", desc: "수동 채집 효율 5배 영구 증가", cost: 2 },
+  { id: "cheap_build", name: "나노 건축 설계", desc: "모든 건물 건설 비용 20% 영구 감소", cost: 3 },
+  { id: "legacy_auto_build1", name: "초기 자율 건설", desc: "최초 시작건물 5레벨로 시작", cost: 5 },
+  { id: "legacy_auto_build2", name: "고급 자율 건설", desc: "최초 시작건물 10레벨로 시작", cost: 7 },
+  { id: "legacy_spore_start", name: "포자 보존 주머니", desc: "회차 시작 시 포자 200 보유", cost: 1 },
+  { id: "legacy_biofuel_trickle", name: "발효 잔열", desc: "유기섬유를 초당 0.1 자동 생산", cost: 4 }, 
+  { id: "legacy_less_fiber", name: "섬유 재활용", desc: "유기섬유 소모량 15% 감소", cost: 3 },
+  { id: "legacy_mutant_boost", name: "변이 적응 기억", desc: "변이세포 생산 속도 30% 증가", cost: 6 },
+  { id: "legacy_gene_boost", name: "유전자 기억 각인", desc: "유전코드 생산 속도 25% 증가", cost: 6 },
+  { id: "aurelia_start_metal", name: "개척자 합금 상자", desc: "회차 시작 시 고철 300 보유", cost: 1 },
+  { id: "aurelia_fast_setup", name: "신속 기지 전개", desc: "건물 레벨 2까지 요구 자원 50% 감소", cost: 6 },
+  { id: "aurelia_generator_boost", name: "과충전 프로토콜", desc: "발전기 생산량 25% 증가", cost: 3 },
+  { id: "aurelia_miner_boost", name: "자동 채굴 알고리즘", desc: "채굴 생산량 30% 증가", cost: 3 },
+  { id: "aurelia_scrap_recycle", name: "스크랩 재활용", desc: "고철 소모 20% 감소", cost: 4 },
+  { id: "aurelia_fusion_eff", name: "핵융합 최적화", desc: "고급 에너지 시설 전력 소모 30% 감소", cost: 6 },  
+  { id: "aurelia_prestige_drive", name: "항성 항해 데이터", desc: "환생 1회당 전기 생산 +4%", cost: 10 },  
+  { id: "infinite_storage", name: "압축 창고", desc: "모든 자원 생산 효율 20% 추가 증가", cost: 10 }
+
 ];
