@@ -1,6 +1,6 @@
 // js/ui.js 전체 교체
 
-import { gameData, getActiveStages, getActiveResearch, legacyList } from './data.js';
+import { gameData, getActiveStages, getActiveResearch, getActivePlanetData, legacyList } from './data.js';
 import * as Logic from './logic.js';
 
 // 내부에서 구매 콜백 함수를 기억하기 위한 변수
