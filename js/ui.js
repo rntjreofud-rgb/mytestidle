@@ -72,50 +72,105 @@ const resNames = {
     livingWood: "🌳 생명목",
     bioFuel: "🧪 바이오연료",
     rootBrick: "🪵 뿌리벽돌",
+    neuralFiber: "🧠 신경섬유",
+    mutantCell: "🌑 변이세포",
+    geneticCode: "🧬 유전코드",
+    pheromone: "🧪 페로몬",
+    biosphereCore: "🌐 생태코어",
+    
+
+
 
     scrapMetal: "🔩 고철파편",
     magnet: "🧲 자석",
     chargedCrystal: "💎 대전수정",
     heavyAlloy: "🛡️ 중합금",
     fluxEnergy: "🌀 플럭스에너지",
-    nanoSteel: "🌑 나노강철"
+    nanoSteel: "🌑 나노강철",
+    plasmaCore: "⚛️ 플라즈마코어"
 
 };
 
 const resourceGroups = {
-    // --- 지구 자원 그룹 ---
-    earth_raw: { planet: 'earth', title: "⛏️ 원자재 (Raw Materials)", items: ['wood', 'stone', 'coal', 'ironOre', 'copperOre', 'oil', 'titaniumOre', 'uraniumOre'] },
-    earth_mat: { planet: 'earth', title: "🧱 가공 자재 (Materials)", items: ['plank', 'brick', 'glass', 'concrete', 'ironPlate', 'copperPlate', 'steel', 'titaniumPlate', 'advAlloy', 'sulfur', 'plastic'] },
-    earth_comp: { planet: 'earth', title: "⚙️ 부품 및 첨단 (High-Tech)", items: ['gear', 'circuit', 'battery', 'optics', 'advCircuit', 'processor', 'fuelCell', 'rocketFuel', 'nanobots', 'aiCore', 'quantumData', 'gravityModule', 'warpCore'] },
+    // === [1] 지구 (Earth) 자원 그룹 ===
+    earth_raw: { 
+        planet: 'earth', title: "⛏️ 원자재 (Raw Materials)", 
+        items: ['wood', 'stone', 'coal', 'ironOre', 'copperOre', 'oil', 'titaniumOre', 'uraniumOre'] 
+    },
+    earth_mat: { 
+        planet: 'earth', title: "🧱 가공 자재 (Materials)", 
+        items: ['plank', 'brick', 'glass', 'concrete', 'ironPlate', 'copperPlate', 'steel', 'titaniumPlate', 'advAlloy', 'sulfur', 'plastic'] 
+    },
+    earth_comp: { 
+        planet: 'earth', title: "⚙️ 부품 및 첨단 (High-Tech)", 
+        items: ['gear', 'circuit', 'battery', 'optics', 'advCircuit', 'processor', 'fuelCell', 'rocketFuel', 'nanobots', 'aiCore', 'quantumData', 'gravityModule', 'warpCore'] 
+    },
 
-    // --- 아우렐리아 자원 그룹 ---
-    aurelia_raw: { planet: 'aurelia', title: "🧲 행성 자원 (Aurelia Resources)", items: ['scrapMetal', 'magnet', 'chargedCrystal'] },
-    aurelia_mat: { planet: 'aurelia', title: "🌑 특수 제련 (Aurelia Metals)", items: ['heavyAlloy', 'fluxEnergy', 'nanoSteel'] },
+    // === [2] 아우렐리아 (Aurelia) 자원 그룹 ===
+    aurelia_raw: { 
+        planet: 'aurelia', title: "🧲 행성 자원 (Aurelia Resources)", 
+        items: ['scrapMetal', 'magnet', 'chargedCrystal'] 
+    },
+    aurelia_mat: { 
+        planet: 'aurelia', title: "🌑 특수 제련 (Aurelia Metals)", 
+        items: ['heavyAlloy', 'fluxEnergy', 'nanoSteel'] 
+    },
+    aurelia_comp: { 
+        planet: 'aurelia', title: "⚛️ 에너지 코어 (High-Tech)", 
+        items: ['plasmaCore'] 
+    },
 
-    // --- 베리디안 자원 그룹 ---
-    veridian_raw: { planet: 'veridian', title: "🌿 유기 자원 (Veridian Life)", items: ['bioFiber', 'spore', 'yeast'] },
-    veridian_mat: { planet: 'veridian', title: "🧪 바이오 가공 (Bio-Processing)", items: ['livingWood', 'bioFuel', 'rootBrick'] }
+    // === [3] 베리디안 (Veridian) 자원 그룹 ===
+    veridian_raw: { 
+        planet: 'veridian', title: "🌿 유기 자원 (Veridian Life)", 
+        items: ['bioFiber', 'spore', 'yeast'] 
+    },
+    veridian_mat: { 
+        planet: 'veridian', title: "🧪 바이오 가공 (Bio-Processing)", 
+        items: ['livingWood', 'bioFuel', 'rootBrick', 'mutantCell', 'neuralFiber'] 
+    },
+    veridian_comp: { 
+        planet: 'veridian', title: "🧬 유전 공학 (Evolutionary Tech)", 
+        items: ['geneticCode', 'pheromone', 'biosphereCore'] 
+    }
 };
 
 const buildingGroups = {
     extraction: {
         title: "🚜 채집 및 채굴 (Extraction)",
-        // 100, 101, 102 추가
-        ids: [0, 1, 2, 3, 20, 25, 28, 40, 41, 42, 43, 44, 45, 49, 51, 53, 54, 200, 201, 202, 100, 101, 102]
+        // 자원을 직접 수집하거나 땅에서 퍼올리는 시설들
+        ids: [
+            0, 1, 2, 3, 20, 25, 28, 40, 41, 42, 43, 44, 45, 49, 51, 53, 54, // 지구
+            100, 101, 102, 108, 115, 118,                                   // 아우렐리아
+            200, 201, 202, 208, 210, 211, 220                               // 베리디안
+        ]
     },
     refining: {
         title: "🔥 기초 공정 및 제련 (Refining)",
-        // 103, 104, 107, 106 추가
-        ids: [4, 5, 6, 7, 13, 16, 18, 21, 26, 29, 34, 48, 50, 52, 55, 56, 57, 59, 61, 62, 63, 64, 203, 204, 205, 207, 103, 104, 107, 106]
+        // 원재료를 판, 벽돌, 강철, 화학물로 1차/2차 가공하는 시설들
+        ids: [
+            4, 5, 6, 7, 13, 16, 18, 21, 26, 29, 34, 48, 50, 52, 55, 56, 57, 59, 61, 62, 63, 64, // 지구
+            103, 104, 106, 107, 110, 112, 113, 114, 116,                                        // 아우렐리아
+            203, 204, 205, 207, 209, 213, 215                                                   // 베리디안
+        ]
     },
     production: {
         title: "🔬 첨단 제조 및 부품 (Manufacturing)",
-        ids: [9, 15, 22, 24, 27, 31, 32, 33, 35, 36, 37, 38, 47, 58, 60]
+        // 톱니, 회로, 나노봇, 유전코드 등 고차원 부품을 조립하는 시설들
+        ids: [
+            9, 15, 22, 24, 27, 31, 32, 33, 35, 36, 37, 38, 47, 58, 60, // 지구
+            109, 119,                                                  // 아우렐리아
+            212, 214, 217, 218                                         // 베리디안
+        ]
     },
     power: {
         title: "⚡ 에너지 발전 (Power Generation)",
-        // 105 추가
-        ids: [8, 14, 23, 30, 39, 46, 205, 206, 105]
+        // 기지 운영에 필요한 에너지를 생산하는 모든 발전기들
+        ids: [
+            8, 14, 23, 30, 39, 46, // 지구
+            105, 111, 117, 120,    // 아우렐리아
+            206, 216, 219          // 베리디안
+        ]
     }
 };
 
@@ -168,23 +223,40 @@ export function getResNameOnly(key) {
 }
 
 function formatNumber(num) {
-    if (num == null || isNaN(num)) return "0";
+    if (num == null || isNaN(num) || num === 0) return "0";
     
-    // 1000 미만의 작은 숫자 처리
+    // 1000 미만 처리
     if (num < 1000) {
-        if (num === 0) return "0";
-        // 소숫점이 있고 10보다 작은 경우 (예: 0.8, 1.5 등) 소숫점 1자리까지 표시
         if (num < 10 && num % 1 !== 0) return num.toFixed(1); 
-        // 그 외에는 반올림하여 정수로 표시
         return Math.round(num).toLocaleString();
     }
 
-    // 1000 이상의 큰 숫자 처리 (k, m, b... 접미사)
-    const suffixes = ["k", "m", "b", "t", "q"];
-    const suffixNum = Math.floor(("" + Math.floor(num)).length / 3);
-    let shortValue = parseFloat((suffixNum != 0 ? (num / Math.pow(1000, suffixNum)) : num).toPrecision(3));
-    if (shortValue % 1 != 0) shortValue = shortValue.toFixed(1);
-    return shortValue + suffixes[suffixNum - 1];
+    // ⭐ 확장된 단위 리스트 (k:천, M:백만, B:십억, T:조, Qa:경, Qi:해, Sx:자, Sp:양, Oc:구, No:간, Dc:정...)
+    const suffixes = [
+        "k", "M", "B", "T", "Qa", "Qi", "Sx", "Sp", "Oc", "No", 
+        "Dc", "Ud", "Dd", "Td", "qad", "qid", "sxd", "spd", "Ocd", "Nod", "vg"
+    ];
+
+    // 지수 계산 (1000 단위로 몇 번째 단위인지 확인)
+    const exp = Math.floor(Math.log10(num) / 3);
+    const suffixIndex = exp - 1;
+
+    // 단위를 넘어가는 너무 큰 숫자는 과학적 표기법(e+숫자)으로 처리
+    if (suffixIndex >= suffixes.length) {
+        return num.toExponential(2);
+    }
+
+    const suffix = suffixes[suffixIndex];
+    const shortValue = num / Math.pow(10, exp * 3);
+
+    // 소수점 처리: 100 이상이면 소수점 없음, 10 이상이면 1자리, 10 미만이면 2자리
+    let formatted;
+    if (shortValue >= 100) formatted = shortValue.toFixed(0);
+    else if (shortValue >= 10) formatted = shortValue.toFixed(1);
+    else formatted = shortValue.toFixed(2);
+
+    // .00 또는 .0 제거 후 접미사 결합
+    return formatted.replace(/\.0+$/, '') + suffix;
 }
 
 export function switchTab(tabName) {

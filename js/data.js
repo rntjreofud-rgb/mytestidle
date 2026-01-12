@@ -16,11 +16,17 @@ export let gameData = {
         aiCore: 0, nanobots: 0, advAlloy: 0, rocketFuel: 0, warpCore: 0,
         quantumData: 0, gravityModule: 0,
         // 행성2(아우렐리아) 자원
-        scrapMetal: 0, magnet: 0, chargedCrystal: 0, heavyAlloy: 0, fluxEnergy: 0, nanoSteel: 0,
-        // 행성3(베리디안) 자원
-        bioFiber: 0, spore: 0, yeast: 0, livingWood: 0, bioFuel: 0, rootBrick: 0,
+        scrapMetal: 0,      // 고철파편
+        magnet: 0,          // 자석
+        chargedCrystal: 0,  // 대전수정
+        heavyAlloy: 0,      // 중합금
+        fluxEnergy: 0,      // 플럭스에너지
+        nanoSteel: 0,       // 나노강철
+        plasmaCore: 0,      // 플라즈마코어
+        // 베리디안
+        bioFiber: 0, spore: 0, yeast: 0, livingWood: 0, bioFuel: 0, rootBrick: 0, mutantCell: 0, geneticCode: 0, pheromone: 0, biosphereCore: 0,
         // 시스템
-        energy: 0, energyMax: 0 
+        energy: 0, energyMax: 0
     },
     unlockedResources: ['wood', 'stone', 'plank'], 
     houseLevel: 0,
