@@ -64,7 +64,22 @@ const resNames = {
     processor: "🔵 프로세서", aiCore: "🧠 AI코어", rocketFuel: "🚀 로켓연료", 
     nanobots: "🤖 나노봇", warpCore: "🌀 워프코어", energy: "⚡ 전력",
     titaniumPlate: "💎 티타늄판", optics: "🔭 광학렌즈", advAlloy: "🛡️ 고급합금",
-    quantumData: "💾 양자데이터", gravityModule: "🛸 중력모듈"
+    quantumData: "💾 양자데이터", gravityModule: "🛸 중력모듈",
+
+    bioFiber: "🌿 유기섬유",
+    spore: "🍄 포자",
+    yeast: "🦠 효모",
+    livingWood: "🌳 생명목",
+    bioFuel: "🧪 바이오연료",
+    rootBrick: "🪵 뿌리벽돌",
+
+    scrapMetal: "🔩 고철파편",
+    magnet: "🧲 자석",
+    chargedCrystal: "💎 대전수정",
+    heavyAlloy: "🛡️ 중합금",
+    fluxEnergy: "🌀 플럭스에너지",
+    nanoSteel: "🌑 나노강철"
+
 };
 
 const resourceGroups = {
@@ -85,22 +100,22 @@ const resourceGroups = {
 const buildingGroups = {
     extraction: {
         title: "🚜 채집 및 채굴 (Extraction)",
-        // 자원을 직접 퍼올리는 시설들 (시추기 20, 54 포함)
-        ids: [0, 1, 2, 3, 20, 25, 28, 40, 41, 42, 43, 44, 45, 49, 51, 53, 54]
+        // 100, 101, 102 추가
+        ids: [0, 1, 2, 3, 20, 25, 28, 40, 41, 42, 43, 44, 45, 49, 51, 53, 54, 200, 201, 202, 100, 101, 102]
     },
     refining: {
         title: "🔥 기초 공정 및 제련 (Refining)",
-        // 원재료를 판, 벽돌, 강철, 플라스틱 등으로 가공하는 시설 (55, 56, 57, 59, 61 이동)
-        ids: [4, 5, 6, 7, 13, 16, 18, 21, 26, 29, 34, 48, 50, 52, 55, 56, 57, 59, 61, 62, 63, 64]
+        // 103, 104, 107, 106 추가
+        ids: [4, 5, 6, 7, 13, 16, 18, 21, 26, 29, 34, 48, 50, 52, 55, 56, 57, 59, 61, 62, 63, 64, 203, 204, 205, 207, 103, 104, 107, 106]
     },
     production: {
         title: "🔬 첨단 제조 및 부품 (Manufacturing)",
-        // 톱니, 회로, 나노봇 등 부품 조립 시설 (58, 60 이동)
         ids: [9, 15, 22, 24, 27, 31, 32, 33, 35, 36, 37, 38, 47, 58, 60]
     },
     power: {
         title: "⚡ 에너지 발전 (Power Generation)",
-        ids: [8, 14, 23, 30, 39, 46]
+        // 105 추가
+        ids: [8, 14, 23, 30, 39, 46, 205, 206, 105]
     }
 };
 
@@ -526,34 +541,26 @@ function createResourceCard(key) {
 }
 
 function checkUnlocks() {
-    const discovered = gameData.unlockedResources || ['wood', 'stone', 'plank'];
-    const toggle = (el, show) => { if(!el) return; if(show) el.classList.remove('hidden'); else el.classList.add('hidden'); };
-    const isLegacyUnlocked = (gameData.houseLevel >= 50 || gameData.prestigeLevel > 0);
-    const navLegacy = document.getElementById('nav-legacy');
-    const legacyCategory = navLegacy ? navLegacy.previousElementSibling : null;
-    
-    
+    const p = gameData.currentPlanet || 'earth', disc = gameData.unlockedResources || [];
+    const toggle = (el, show) => el && el.classList.toggle('hidden', !show);
+    const isLegacy = (gameData.houseLevel >= 50 || gameData.prestigeLevel > 0);
+
+    // 1. 행성별 버튼 이름 자동 매핑
+    const names = { earth: ["🌲 나무 베기", "🪨 돌 캐기", "⚫ 석탄 캐기"], aurelia: ["🔩 고철 줍기", "🧲 자석 수집", ""], veridian: ["🌿 섬유 채집", "🍄 포자 채취", ""] }[p];
+    [elements.btns.wood, elements.btns.stone, elements.btns.coal].forEach((btn, i) => { if(btn) btn.innerText = names[i]; });
+
+    // 2. 버튼 노출 제어 (한 줄씩 정리)
     toggle(elements.btns.wood, true);
-    toggle(elements.btns.stone, discovered.includes('stone'));
-    toggle(elements.btns.plank, discovered.includes('plank'));
-    toggle(elements.btns.coal, discovered.includes('coal'));
-    toggle(elements.btns.ironOre, discovered.includes('ironOre'));
-    toggle(elements.btns.copperOre, discovered.includes('copperOre'));
-    
+    toggle(elements.btns.stone, disc.includes(p==='earth'?'stone':(p==='aurelia'?'magnet':'spore')));
+    toggle(elements.btns.coal, p === 'earth' && disc.includes('coal'));
+    toggle(elements.btns.plank, disc.includes('plank'));
+    toggle(elements.btns.ironOre, disc.includes('ironOre'));
+    toggle(elements.btns.copperOre, disc.includes('copperOre'));
 
-
-    if(elements.navPower) {
-        const isPowerUnlocked = (gameData.houseLevel >= 5);
-        elements.navPower.style.display = isPowerUnlocked ? 'flex' : 'none';
-        if(isPowerUnlocked && !elements.navPower.classList.contains('unlocked-flash')) {
-            elements.navPower.classList.add('unlocked-flash');
-            log("⚡ 전력 관리 시스템이 활성화되었습니다!", true);
-        }
-    }
-    const isLegacyVisible = (gameData.houseLevel >= 50 || gameData.prestigeLevel > 0);
-    elements.navLegacy.style.display = isLegacyVisible ? 'flex' : 'none';
-    document.getElementById('legacy-cat').style.display = isLegacyVisible ? 'block' : 'none';
-
+    // 3. 시스템 메뉴 노출
+    if(elements.navPower) elements.navPower.style.display = (gameData.houseLevel >= 5 || p !== 'earth') ? 'flex' : 'none';
+    if(elements.navLegacy) elements.navLegacy.style.display = isLegacy ? 'flex' : 'none';
+    const lCat = document.getElementById('legacy-cat'); if(lCat) lCat.style.display = isLegacy ? 'block' : 'none';
 }
 
 export function renderShop(onBuyCallback, getCostFunc) {
@@ -756,7 +763,7 @@ export function updateHouseUI(onUpgrade) {
 
             // 2. 시즌 2 버튼 클릭 이벤트
             document.getElementById('btn-new-world').onclick = () => {
-                alert("우주선이 화성 궤도에 진입했습니다! 시즌 2 콘텐츠는 다음 업데이트에서 공개됩니다. (현재는 무한 모드로 계속 플레이 가능합니다)");
+            showPlanetSelection(); // 아래 정의할 팝업 함수 호출
             };
         }
     }
@@ -900,7 +907,33 @@ export function renderLegacyTab() {
 }
 
 
+export function showPlanetSelection() {
+    // 이미 팝업이 있다면 제거
+    const oldModal = document.getElementById('planet-modal');
+    if (oldModal) oldModal.remove();
 
+    const modal = document.createElement('div');
+    modal.id = 'planet-modal';
+    // 스타일은 이전 드린 것과 동일하게 적용 (중앙 정렬 팝업)
+    modal.style.cssText = "position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:#16213e; padding:30px; border:2px solid #4db5ff; border-radius:15px; z-index:10000; text-align:center; color:white; min-width:350px; box-shadow:0 0 50px rgba(0,0,0,0.8);";
+    
+    modal.innerHTML = `
+        <h2 style="color:#4db5ff; margin-bottom:10px;">어디로 탐사하시겠습니까?</h2>
+        <p style="margin-bottom:25px; color:#8892b0; font-size:0.85rem;">행성 진입 시 기존 자원과 건물은 리셋되지만,<br><b>우주 숙련도(Prestige)와 유산</b>은 유지됩니다.</p>
+        <div style="display:flex; flex-direction:column; gap:10px;">
+            <button onclick="window.landOnPlanet('aurelia')" style="padding:15px; background:#2c3e50; border:1px solid #7f8c8d; border-radius:8px; cursor:pointer; color:white;">
+                <div style="font-size:1.5rem;">🔩</div>
+                <strong>아우렐리아 (Aurelia)</strong><br><small>금속과 자성이 가득한 황무지</small>
+            </button>
+            <button onclick="window.landOnPlanet('veridian')" style="padding:15px; background:#1b3d2f; border:1px solid #27ae60; border-radius:8px; cursor:pointer; color:white;">
+                <div style="font-size:1.5rem;">🌿</div>
+                <strong>베리디안 (Veridian)</strong><br><small>거대 생명체와 유기물의 정글</small>
+            </button>
+            <button onclick="this.parentElement.parentElement.remove()" style="margin-top:10px; background:none; border:none; color:#556; cursor:pointer; text-decoration:underline;">돌아가기</button>
+        </div>
+    `;
+    document.body.appendChild(modal);
+}
 
 
 

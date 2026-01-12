@@ -9,6 +9,44 @@ import * as Storage from './save.js';
 window.gameData = gameData;
 
 
+/**
+ * 특정 행성에 착륙하여 새로운 시즌을 시작하는 함수
+ * @param {string} planetKey - 'aurelia' 또는 'veridian'
+ */
+window.landOnPlanet = function(planetKey) {
+    const planetName = planetKey === 'aurelia' ? '아우렐리아' : '베리디안';
+    
+    if(!confirm(`${planetName} 행성에 불시착하시겠습니까? 현재의 모든 인프라가 파괴됩니다.`)) return;
+
+    // 1. 행성 환경 전환
+    gameData.currentPlanet = planetKey;
+    gameData.houseLevel = 0;
+
+    // 2. 자원 제로베이스 초기화 (유산 및 숙련도는 보존)
+    for (let key in gameData.resources) {
+        gameData.resources[key] = 0;
+    }
+    gameData.resources.energy = 0;
+    gameData.resources.energyMax = 0;
+
+    // 3. 진행도 초기화
+    gameData.researches = [];
+    
+    // 4. ⭐ 중요: 새로운 행성의 건물 템플릿으로 건물 리스트 리셋
+    // setGameData({})를 호출하면 data.js의 로직에 의해 
+    // getActivePlanetData()를 참조하여 새 건물 리스트를 구성합니다.
+    Storage.saveGame(); // 현재 행성 키(currentPlanet)를 먼저 저장
+    
+    // 5. 페이지 새로고침으로 모든 UI와 로직을 새 행성 데이터로 초기화
+    UI.log(`🚀 ${planetName} 행성 궤도 진입 중...`, true);
+    
+    setTimeout(() => {
+        location.reload(); 
+    }, 1000);
+};
+
+
+
 window.performPrestige = function() {
     if(!confirm("지구를 떠나시겠습니까? 자원과 건물이 초기화되지만 영구 보너스 포인트 3를 얻습니다.")) return;
 
