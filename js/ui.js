@@ -1,6 +1,6 @@
 // js/ui.js 전체 교체
 
-import { gameData, houseStages, researchList, legacyList } from './data.js'; // ⭐ legacyList 추가
+import { gameData, researchList, legacyList, getActiveStages, getResNameOnly } from './data.js'; 
 import * as Logic from './logic.js';
 
 // 내부에서 구매 콜백 함수를 기억하기 위한 변수
@@ -691,8 +691,9 @@ export function updatePrestigeUI() {
 
 
 export function updateHouseUI(onUpgrade) {
-    const nextStage = houseStages[gameData.houseLevel + 1];
-    const currentStage = houseStages[gameData.houseLevel];
+    const stages = getActiveStages(); // ⭐ 현재 행성의 단계 리스트를 가져옴
+    const nextStage = stages[gameData.houseLevel + 1];
+    const currentStage = stages[gameData.houseLevel];
     
     // 1. 현재 단계 이름 및 설명 업데이트
     if(elements.houseName) elements.houseName.innerText = `Lv.${gameData.houseLevel} ${currentStage.name}`;
