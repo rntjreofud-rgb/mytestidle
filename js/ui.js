@@ -1,6 +1,6 @@
 // js/ui.js 전체 교체
 
-import { gameData, researchList, legacyList, getActiveStages, getResNameOnly } from './data.js'; 
+import { gameData, researchList, legacyList, getActiveStages, getActiveResearch } from './data.js';
 import * as Logic from './logic.js';
 
 // 내부에서 구매 콜백 함수를 기억하기 위한 변수
@@ -159,9 +159,9 @@ function initResourceGrid() {
     }
     isGridInitialized = true;
 }
-export function getResNameOnly(key) { 
+export function getResNameOnly(key) {
     const full = resNames[key];
-    if (!full) return key; 
+    if (!full) return key;
     const parts = full.split(' ');
     return parts.length > 1 ? parts[1] : parts[0];
 }
