@@ -23,6 +23,9 @@ export let gameData = {
         fluxEnergy: 0,      // 플럭스에너지
         nanoSteel: 0,       // 나노강철
         plasmaCore: 0,      // 플라즈마코어
+        magConcrete: 0,     // 자력콘크리트
+        fluxLogic: 0,       // 플럭스연산장치
+        // 행성3(베리디안) 자원
         // 베리디안
         bioFiber: 0, spore: 0, yeast: 0, livingWood: 0, bioFuel: 0, rootBrick: 0, mutantCell: 0, geneticCode: 0, pheromone: 0, biosphereCore: 0,
         // 시스템
