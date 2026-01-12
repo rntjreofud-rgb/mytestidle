@@ -552,6 +552,9 @@ function checkUnlocks() {
     const toggle = (el, show) => el && el.classList.toggle('hidden', !show);
     // ⭐ [수정] 유산 탭 해금 조건: 집 50렙 OR 환생 1회 이상 OR 현재 외계 행성 거주 중
     const isLegacy = (gameData.houseLevel >= 50 || (gameData.prestigeLevel || 0) > 0 || p !== 'earth');
+    // 중도 탈출
+    const isPrestiged = (gameData.prestigeLevel > 0 || p !== 'earth'); // 환생했거나 지구가 아니면 고수
+    
     // 1. 행성별 이름 매핑 (3번째 버튼은 지구 전용)
     const names = { earth: ["🌲 나무 베기", "🪨 돌 캐기", "⚫ 석탄 캐기"], aurelia: ["🔩 고철 줍기", "🧲 자석 수집", ""], veridian: ["🌿 섬유 채집", "🍄 포자 채취", ""] }[p];
     [elements.btns.wood, elements.btns.stone, elements.btns.coal].forEach((btn, i) => { if(btn) btn.innerText = names[i]; });
@@ -573,6 +576,13 @@ function checkUnlocks() {
     if(elements.navLegacy) elements.navLegacy.style.display = isLegacy ? 'flex' : 'none';
     const lCat = document.getElementById('legacy-cat'); 
     if(lCat) lCat.style.display = isLegacy ? 'block' : 'none';
+
+    // ⭐ [추가] 긴급 탈출 버튼 노출 제어
+    const sBtn = document.getElementById('btn-become-star');
+    if(sBtn) {
+        // 현재 행성이 지구가 아닐 때만(외계 행성일 때만) 보임
+        sBtn.style.display = (p !== 'earth') ? 'block' : 'none';
+    }
 }
 
 export function renderShop(onBuyCallback, getCostFunc) {

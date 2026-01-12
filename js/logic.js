@@ -1,5 +1,29 @@
 import { gameData, getActiveResearch, getActiveBuildings } from './data.js';
 
+
+
+const planetMaxPoints = {
+    earth: 3,
+    aurelia: 4,
+    veridian: 5
+};
+
+/**
+ * 현재 행성과 레벨에 따른 환생 포인트 계산
+ * @param {number} level - 현재 하우스 레벨 (0~50)
+ * @param {string} planet - 현재 행성 키 (earth, aurelia, veridian)
+ */
+export function calculateCurrentPrestigeGain(level, planet) {
+    const maxPoints = planetMaxPoints[planet] || 3; // 기본값 3점
+    
+    // 공식: (현재 레벨 / 50) * 최대 점수
+    // Math.floor를 사용하여 소수점은 버림 처리 (예: 지구 25렙이면 1.5점 -> 1점)
+    const gain = Math.floor((level / 50) * maxPoints);
+    
+    return Math.max(0, gain);
+}
+
+
 /**
  * 1. 건물의 생산 속도 배수 계산 (연구 + 환생 + 유산)
  */

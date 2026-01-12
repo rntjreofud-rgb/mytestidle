@@ -33,7 +33,9 @@
                 <input type="file" id="import-file" style="display:none" accept=".json">
                 <button id="btn-export" class="side-btn export">내보내기</button>
                 <button id="btn-import" class="side-btn import">가져오기</button>
-                <button id="btn-reset" class="side-btn reset" onclick="if(confirm('정말 진행 상황을 초기화하시겠습니까?')) {localStorage.removeItem('civIdleModularSave');location.reload()}">초기화</button>
+                
+                <button id="btn-become-star" class="side-btn" style="background: linear-gradient(135deg, #1e3799, #000); border: 1px solid #4db5ff; color: #4db5ff; margin-top: 10px; display: none; box-shadow: 0 0 10px rgba(77, 181, 255, 0.3);">우주의 별이 되다</button>
+                <button id="btn-reset" class="side-btn reset" onclick="if(confirm('정말 전체 초기화하시겠습니까? (숙련도 포함 모든 데이터 삭제)')) {localStorage.removeItem('civIdleModularSave');location.reload()}">전체 초기화</button>
             </div>
         </div>
     </nav>

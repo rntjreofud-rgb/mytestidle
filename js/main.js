@@ -45,32 +45,35 @@ window.landOnPlanet = function(planetKey) {
     }, 1000);
 };
 
-
-
 window.performPrestige = function() {
-    if(!confirm("지구를 떠나시겠습니까? 자원과 건물이 초기화되지만 영구 보너스 포인트 3를 얻습니다.")) return;
+    // 현재 행성과 레벨(보통 50)을 기준으로 포인트 계산
+    const gain = Logic.calculateCurrentPrestigeGain(gameData.houseLevel, gameData.currentPlanet);
+    
+    if(!confirm(`지구를 떠나시겠습니까? 자원과 건물이 초기화되지만\n우주 데이터 ${gain}개를 획득합니다.`)) return;
 
-    // 1. 유산 포인트 지급
-    gameData.cosmicData = (gameData.cosmicData || 0) + 3;
+    // 1. 데이터 업데이트
+    gameData.cosmicData = (gameData.cosmicData || 0) + gain;
     gameData.prestigeLevel = (gameData.prestigeLevel || 0) + 1;
 
-    // 2. 핵심 데이터 초기화
+    // 2. 초기화 로직 (이전과 동일)
     for (let key in gameData.resources) { gameData.resources[key] = 0; }
     gameData.buildings.forEach(b => { b.count = 0; b.activeCount = 0; });
     gameData.researches = [];
     gameData.houseLevel = 0;
     gameData.unlockedResources = ['wood', 'stone', 'plank'];
 
-    // 3. '선구자의 보급품' 보너스 적용
+    // 3. 유산 보너스 적용 및 저장
     if (gameData.legacyUpgrades.includes('start_resource')) {
-        gameData.resources.wood = 500;
-        gameData.resources.stone = 500;
-        gameData.resources.plank = 100;
+        gameData.resources.wood = 500; gameData.resources.stone = 500; gameData.resources.plank = 100;
     }
 
     Storage.saveGame();
     location.reload(); 
 };
+
+
+
+
 
 
 // setupEvents에 네비게이션 추가
@@ -195,6 +198,48 @@ function setupEvents() {
             }
         }
     });
+
+    const starBtn = document.getElementById('btn-become-star');
+    if (starBtn) {
+        starBtn.onclick = () => {
+            // 1. 현재 성과에 따른 포인트 계산
+            const gain = Logic.calculateCurrentPrestigeGain(gameData.houseLevel, gameData.currentPlanet);
+            const planetDisplayName = {aurelia: '아우렐리아', veridian: '베리디안'}[gameData.currentPlanet];
+
+            const msg = `🌌 모든 삶을 놓아버리고 우주의 별이 되시겠습니까?\n\n현재 ${planetDisplayName}에서의 인프라는 파괴되지만,\n성과를 인정받아 우주 데이터 ${gain}개를 획득하고\n고향인 '지구'에서 다시 눈을 뜹니다.`;
+
+            if (confirm(msg)) {
+                // 2. 우주 데이터 포인트 지급
+                gameData.cosmicData = (gameData.cosmicData || 0) + gain;
+
+                // 3. 행성을 지구(earth)로 강제 변경 및 레벨 초기화
+                gameData.currentPlanet = 'earth';
+                gameData.houseLevel = 0;
+
+                // 4. 자원 및 건물 초기화 (유산/숙련도는 유지됨)
+                for (let key in gameData.resources) { gameData.resources[key] = 0; }
+                gameData.buildings.forEach(b => { b.count = 0; b.activeCount = 0; });
+                gameData.researches = [];
+                gameData.unlockedResources = ['wood', 'stone', 'plank'];
+
+                // 5. '선구자의 보급품' 유산이 있다면 지구 자원 지급
+                if (gameData.legacyUpgrades && gameData.legacyUpgrades.includes('start_resource')) {
+                    gameData.resources.wood = 500;
+                    gameData.resources.stone = 500;
+                    gameData.resources.plank = 100;
+                }
+
+                // 6. 저장 및 리로드
+                Storage.saveGame();
+                UI.log(`🌌 당신은 우주의 별이 되어 지구로 다시 내려앉았습니다. (+${gain} 데이터)`, true);
+                
+                setTimeout(() => {
+                    location.reload(); 
+                }, 1000);
+            }
+        };
+    }
+
 
 }
 
