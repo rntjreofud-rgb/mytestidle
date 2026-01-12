@@ -1002,4 +1002,28 @@ export function showOfflineReport(seconds, statsBefore) {
 
 
 
+export function triggerWarpEffect(destName, callback) {
+    const overlay = document.getElementById('warp-overlay');
+    const destMsg = document.getElementById('warp-dest-msg');
+    
+    if (!overlay) return callback(); // 요소 없으면 바로 콜백 실행
+
+    destMsg.innerText = `목적지: ${destName}`;
+    overlay.style.display = 'flex';
+    
+    // 1. 화면 페이드 인
+    setTimeout(() => overlay.classList.add('active'), 10);
+
+    // 2. 충분히 연출을 보여준 뒤 데이터 처리(callback) 실행
+    setTimeout(() => {
+        callback(); 
+    }, 2000);
+}
+
+
+
+
+
+
+
 export const uiElements = elements;
