@@ -314,23 +314,33 @@ export function log(msg, isImportant = false) {
 }
 
 function checkResourceDiscovery() {
-    if(!gameData.unlockedResources) gameData.unlockedResources = ['wood', 'stone', 'plank'];
-    for (let key in gameData.resources) {
-        if (key === 'energy' || key === 'energyMax') continue;
-        if (gameData.unlockedResources.includes(key)) continue;
-        if (gameData.resources[key] > 0) {
-            gameData.unlockedResources.push(key);
-            continue;
-        }
-        gameData.buildings.forEach(b => {
-            const req = b.reqLevel || 0;
-            const isVisible = (req === 0.5 && (gameData.houseLevel >= 1 || (gameData.resources.wood || 0) >= 10)) || (gameData.houseLevel >= req);
-            if (isVisible) {
-                if (b.inputs && b.inputs[key] !== undefined) gameData.unlockedResources.push(key);
-                if (b.outputs && b.outputs[key] !== undefined) gameData.unlockedResources.push(key);
-            }
-        });
+    // 1. 현재 행성 데이터 가져오기
+    const planetTemplate = getActivePlanetData();
+    if(!gameData.unlockedResources || gameData.unlockedResources.length === 0) {
+        gameData.unlockedResources = [...planetTemplate.initialResources];
     }
+
+    const discovered = new Set(gameData.unlockedResources);
+
+    // 2. 현재 지을 수 있는 건물의 입/출력 자원 발견
+    gameData.buildings.forEach(b => {
+        const req = b.reqLevel || 0;
+        // 현재 집 레벨에서 지을 수 있는 건물만 대상으로 함
+        if (gameData.houseLevel >= req) {
+            if (b.inputs) Object.keys(b.inputs).forEach(k => { if(k !== 'energy') discovered.add(k); });
+            if (b.outputs) Object.keys(b.outputs).forEach(k => { if(k !== 'energy') discovered.add(k); });
+        }
+    });
+    
+    // 3. 현재 보유량이 0보다 큰 자원 발견 (단, NaN이나 null 제외)
+    for (let key in gameData.resources) {
+        const val = gameData.resources[key];
+        if (val > 0 && !isNaN(val) && key !== 'energy' && key !== 'energyMax') {
+            discovered.add(key);
+        }
+    }
+    
+    gameData.unlockedResources = Array.from(discovered);
 }
 
 

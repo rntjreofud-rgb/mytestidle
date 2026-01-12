@@ -15,29 +15,27 @@ window.gameData = gameData;
  */
 window.landOnPlanet = function(planetKey) {
     const planetName = { earth: '지구', aurelia: '아우렐리아', veridian: '베리디안' }[planetKey];
-    if (!confirm(`${planetName} 행성으로 향하시겠습니까? 현재의 모든 인프라가 파괴됩니다.`)) return;
+    if (!confirm(`${planetName} 행성에 진입하시겠습니까? 현재의 모든 인프라가 파괴됩니다.`)) return;
 
-    // UI 연출 시작
     UI.triggerWarpEffect(planetName, () => {
-        // [정산] 떠나기 전 현재 행성의 성과를 데이터 포인트로 변환
         const gain = Logic.calculateCurrentPrestigeGain(gameData.houseLevel, gameData.currentPlanet);
         gameData.cosmicData = (gameData.cosmicData || 0) + gain;
+        if (gameData.houseLevel >= 50) gameData.prestigeLevel = (gameData.prestigeLevel || 0) + 1;
 
-        // [숙련도] 만렙(50)을 찍고 이동하는 것이라면 숙련도 상승
-        if (gameData.houseLevel >= 50) {
-            gameData.prestigeLevel = (gameData.prestigeLevel || 0) + 1;
-        }
-
-        // [초기화] 행성 이동 및 진행도 리셋
         gameData.currentPlanet = planetKey;
         gameData.houseLevel = 0;
         gameData.researches = [];
         for (let key in gameData.resources) { gameData.resources[key] = 0; }
-        
-        // 건물 데이터는 data.js의 setGameData가 새로고침 시 템플릿을 다시 불러오므로 비우기만 함
         gameData.buildings = []; 
 
-        // [유산] '선구자의 보급품' 보너스 (지구 한정)
+        // ⭐ [핵심 수정] 행성별 초기 자원만 남기고 나머지는 삭제
+        const planetInitRes = {
+            earth: ['wood', 'stone', 'plank'],
+            aurelia: ['scrapMetal'],
+            veridian: ['bioFiber']
+        };
+        gameData.unlockedResources = [...planetInitRes[planetKey]];
+
         if (planetKey === 'earth' && gameData.legacyUpgrades.includes('start_resource')) {
             gameData.resources.wood = 500; gameData.resources.stone = 500; gameData.resources.plank = 100;
         }
@@ -49,23 +47,25 @@ window.landOnPlanet = function(planetKey) {
 
 // 2. 우주 유산 남기기 (순수 환생)
 window.performPrestige = function() {
-    if (!confirm("모든 유산을 남기고 다시 시작하시겠습니까? 영구 생산 보너스가 강화됩니다.")) return;
+    if (!confirm("모든 유산을 남기고 다시 시작하시겠습니까? 영구 보너스가 강화됩니다.")) return;
 
-    // UI 연출 시작
     UI.triggerWarpEffect("기원 지점 (지구)", () => {
-        // [정산] 현재 행성 점수 정산 + 숙련도 1 강제 상승
+        // [정산]
         const gain = Logic.calculateCurrentPrestigeGain(gameData.houseLevel, gameData.currentPlanet);
         gameData.cosmicData = (gameData.cosmicData || 0) + gain;
         gameData.prestigeLevel = (gameData.prestigeLevel || 0) + 1;
 
-        // [초기화] 무조건 지구 Lv.0으로 복귀
+        // [초기화]
         gameData.currentPlanet = 'earth';
         gameData.houseLevel = 0;
         gameData.researches = [];
         for (let key in gameData.resources) { gameData.resources[key] = 0; }
         gameData.buildings = [];
+        
+        // ⭐ [핵심 수정] 해금 목록을 지구 기초 자원으로 완전히 덮어씌움
+        gameData.unlockedResources = ['wood', 'stone', 'plank']; 
 
-        // [유산] 시작 자원 보너스 적용
+        // [유산] 보급품 체크
         if (gameData.legacyUpgrades.includes('start_resource')) {
             gameData.resources.wood = 500; gameData.resources.stone = 500; gameData.resources.plank = 100;
         }
