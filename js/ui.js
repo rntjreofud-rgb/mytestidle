@@ -793,47 +793,51 @@ export function updateHouseUI(onUpgrade) {
 }
 
 // 2. 연구 계통도 깊이 계산 함수
+// 1. [수정] 연구 깊이(티어) 계산 함수 (현재 행성 리스트를 참조하도록 보정)
 function getResearchDepth(id) {
-    const research = researchList.find(r => r.id === id);
+    const currentList = getActiveResearch(); // ⭐ 현재 행성의 연구 목록 가져오기
+    const research = currentList.find(r => r.id === id);
     if (!research || !research.reqResearch) return 0;
     return 1 + getResearchDepth(research.reqResearch);
 }
 
-const tierTitles = {
-    0: "Tier 1: 생존의 시작",
-    1: "Tier 1: 생존의 시작",
-    2: "Tier 2: 원시 산업",
-    3: "Tier 2: 원시 산업",
-    4: "Tier 3: 전기 및 회로 시대",
-    5: "Tier 3: 전기 및 회로 시대",
-    6: "Tier 4: 화학 및 정유",
-    7: "Tier 4: 화학 및 정유",
-    8: "Tier 5: 첨단 소재 및 티타늄",
-    9: "Tier 5: 첨단 소재 및 티타늄",
-    10: "Tier 6: 지구 이별 준비"
-};
-
+// 2. [수정] 기술 계통도 렌더링 함수 (전체 교체)
 export function renderTechTree() {
     const container = document.getElementById('tech-tree-content');
     if (!container) return;
-    container.innerHTML = "";
+    container.innerHTML = ""; // 기존 내용 초기화
 
+    const currentList = getActiveResearch(); // ⭐ 현재 행성의 연구 목록
+    if (!currentList || currentList.length === 0) {
+        container.innerHTML = "<p style='color:#666; padding:20px;'>이 행성에는 아직 기록된 기술 문서가 없습니다.</p>";
+        return;
+    }
+
+    // 티어별 그룹화
     const tiers = {};
-    researchList.forEach(r => {
+    currentList.forEach(r => {
         const depth = getResearchDepth(r.id);
         if (!tiers[depth]) tiers[depth] = [];
         tiers[depth].push(r);
     });
 
-    const sortedDepths = Object.keys(tiers).sort((a,b) => a-b);
-    
-    // 티어 이름이 바뀔 때만 헤더를 뿌려주기 위해 이전 티어이름 저장
+    const sortedDepths = Object.keys(tiers).sort((a, b) => a - b);
     let lastTierName = "";
 
+    // 사용자 기획안에 따른 티어 명칭 매핑
+    const tierNames = {
+        0: "Tier 1: 생존의 시작", 1: "Tier 1: 생존의 시작",
+        2: "Tier 2: 원시 산업", 3: "Tier 2: 원시 산업",
+        4: "Tier 3: 전기 및 회로 시대", 5: "Tier 3: 전기 및 회로 시대",
+        6: "Tier 4: 화학 및 정유", 7: "Tier 4: 화학 및 정유",
+        8: "Tier 5: 첨단 소재 및 티타늄", 9: "Tier 5: 첨단 소재 및 티타늄",
+        10: "Tier 6: 지구 이별 준비"
+    };
+
     sortedDepths.forEach(depth => {
-        const currentTierName = tierTitles[depth] || `Tier ${parseInt(depth/2) + 1}: 심화 기술`;
-        
-        // 새로운 티어 구역(Header) 생성
+        const currentTierName = tierNames[depth] || `Tier ${parseInt(depth / 2) + 1}: 심화 기술`;
+
+        // 티어 헤더 생성 (이름이 바뀔 때만)
         if (currentTierName !== lastTierName) {
             const header = document.createElement('div');
             header.className = 'tree-tier-header';
@@ -848,12 +852,12 @@ export function renderTechTree() {
         tiers[depth].forEach(r => {
             const isDone = gameData.researches.includes(r.id);
             const isPrereqDone = r.reqResearch ? gameData.researches.includes(r.reqResearch) : true;
-            
+
             const node = document.createElement('div');
             node.className = `tree-node ${isDone ? 'done' : (isPrereqDone ? 'available' : 'locked')}`;
-            
-            // 선행 연구 이름 가져오기
-            const parent = researchList.find(p => p.id === r.reqResearch);
+
+            // 부모 연구 이름 찾기
+            const parent = currentList.find(p => p.id === r.reqResearch);
             const parentName = parent ? `[${parent.name}]에서 연결` : "시작 기술";
 
             node.innerHTML = `
@@ -862,12 +866,14 @@ export function renderTechTree() {
                 <span class="tree-node-status">${isDone ? '✅ 완료' : (isPrereqDone ? '💡 연구 가능' : '🔒 잠김')}</span>
             `;
 
+            // 클릭 시 기술 연구 탭으로 이동
             if (isPrereqDone && !isDone) {
                 node.onclick = () => {
                     switchTab('research');
+                    // 연구소 탭에서 해당 항목을 찾아 강조(반짝임 등)할 수 있도록 스크롤
                     setTimeout(() => {
                         const targetEl = document.getElementById(`research-${r.id}`);
-                        if(targetEl) targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        if (targetEl) targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
                     }, 100);
                 };
             }
