@@ -259,12 +259,13 @@ gameData.cosmicData = 0;      // 환생 포인트
 gameData.legacyUpgrades = []; // 구매한 유산 ID 목록
 
 export function setGameData(newData) {
-    // 1. 자원 복구 (NaN/null 방지)
+    // 1. 자원 데이터 복구 (NaN/null 방지)
     for (let key in gameData.resources) {
         if (newData.resources && newData.resources[key] !== undefined) {
             let val = newData.resources[key];
             gameData.resources[key] = (val === null || isNaN(val)) ? 0 : val;
         } else {
+            // 신규 자원 혹은 세이브에 없는 경우 0으로 초기화
             gameData.resources[key] = 0;
         }
     }
@@ -278,38 +279,43 @@ export function setGameData(newData) {
     gameData.prestigeLevel = newData.prestigeLevel || 0;
     gameData.legacyUpgrades = newData.legacyUpgrades || [];
     
-    // ⭐ [수정된 소급 지급 및 보정 로직]
-    // 환생 횟수가 있는데 유산 업그레이드를 하나도 안 한 '구버전' 유저이거나,
-    // 현재 포인트가 이전 계산법(5점)으로 되어 있는 경우를 위해 3점으로 재계산합니다.
-    const correctPoints = gameData.prestigeLevel * 3; // 환생당 3점으로 변경
-    
+    // [환생 점수 보정: 5점 -> 3점]
+    const correctPoints = gameData.prestigeLevel * 3;
     if (newData.cosmicData === undefined || (gameData.legacyUpgrades.length === 0 && newData.cosmicData > correctPoints)) {
-        // 업그레이드를 아직 안 샀다면 정확한 수치(3점)로 강제 고정
         gameData.cosmicData = correctPoints;
-        console.log(`구버전 포인트 보정 완료: ${gameData.cosmicData} 데이터로 재설정됨.`);
+        console.log(`포인트 보정 완료: ${gameData.cosmicData} 데이터로 재설정됨.`);
     } else {
-        // 이미 업그레이드를 샀다면 저장된 값을 존중하되 없으면 0
         gameData.cosmicData = newData.cosmicData || 0;
     }
 
-    // 4. 건물 및 가동 레벨 복구
-    if (newData.buildings && Array.isArray(newData.buildings)) {
-        newData.buildings.forEach((savedB) => {
-            const currentB = gameData.buildings.find(b => b.id === savedB.id);
-            if (currentB) {
-                currentB.count = savedB.count || 0;
-                if (savedB.activeCount !== undefined) {
-                    currentB.activeCount = savedB.activeCount;
-                } else {
-                    currentB.activeCount = (savedB.on === false) ? 0 : currentB.count;
-                }
-            }
-        });
-    }
+    // 4. ⭐ [핵심 수정] 건물 데이터 복구 및 신규 유저 초기화
+    // 세이브 데이터가 아닌, 게임 엔진에 정의된 건물을 기준으로 반복문을 돌립니다.
+    gameData.buildings.forEach((currentB) => {
+        // 현재 건물 ID를 세이브 데이터에서 찾습니다.
+        const savedB = newData.buildings ? newData.buildings.find(b => b.id === currentB.id) : null;
 
-    // 5. 최종 안전장치
-    gameData.buildings.forEach(b => {
-        if (b.activeCount === undefined) b.activeCount = b.count || 0;
-        if (b.activeCount > b.count) b.activeCount = b.count;
+        if (savedB) {
+            // 기존 유저: 세이브 데이터 적용
+            currentB.count = savedB.count || 0;
+            if (savedB.activeCount !== undefined) {
+                currentB.activeCount = savedB.activeCount;
+            } else {
+                currentB.activeCount = (savedB.on === false) ? 0 : currentB.count;
+            }
+            currentB.on = (savedB.on !== undefined) ? savedB.on : true;
+        } else {
+            // 신규 유저 또는 새로 추가된 건물: 무조건 기본값으로 초기화
+            currentB.count = 0;
+            currentB.activeCount = 0;
+            currentB.on = true;
+        }
     });
+
+    // 5. 최종 안전장치: 가동 개수가 보유 개수를 넘지 않게 보정
+    gameData.buildings.forEach(b => {
+        if (b.activeCount > b.count) b.activeCount = b.count;
+        if (b.on === undefined) b.on = true;
+    });
+
+    console.log("데이터 동기화 및 신규 유저 초기화가 완료되었습니다.");
 }

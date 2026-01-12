@@ -15,15 +15,18 @@ export function loadGame() {
         try {
             const parsed = JSON.parse(save);
             setGameData(parsed);
-            
-            // ⭐ 오프라인 시간 계산 (밀리초 -> 초)
+            console.log("게임 불러옴");
+            // 오프라인 시간 계산
             if (parsed.lastTimestamp) {
-                const offlineSeconds = Math.floor((Date.now() - parsed.lastTimestamp) / 1000);
-                return offlineSeconds; // 오프라인 시간 반환
+                return Math.floor((Date.now() - parsed.lastTimestamp) / 1000);
             }
         } catch (e) {
             console.error("세이브 파일 손상", e);
         }
+    } else {
+        // ⭐ [핵심 추가] 세이브가 없는 신규 유저라면 빈 객체라도 넣어 초기화 로직 실행
+        setGameData({}); 
+        console.log("신규 유저: 기본 데이터로 초기화됨");
     }
     return 0;
 }

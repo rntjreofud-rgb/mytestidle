@@ -68,6 +68,8 @@ function init() {
     const offlineSeconds = Storage.loadGame(); 
     
     setupEvents();
+    const initialStats = Logic.calculateNetMPS();
+    UI.updateScreen(initialStats);
     UI.renderShop(handleBuyBuilding, Logic.getBuildingCost);
     UI.updateHouseUI(handleHouseUpgrade);
 
