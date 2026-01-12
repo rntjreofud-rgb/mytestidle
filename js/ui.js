@@ -852,7 +852,7 @@ export function updateHouseUI(onUpgrade) {
                     ✨ 우주 유산 남기기<br><small>(데이터 +3 및 환생)</small>
                 </button>
                 <button id="btn-new-world" style="flex:1; height:95px; background:#4db5ff; color:#fff; font-weight:bold; border:none; border-radius:6px; cursor:pointer;">
-                    🌌 새로운 세상 탐사<br><small>(시즌 2 진행 - 준비 중)</small>
+                    🌌 새로운 세상 탐사<br><small>(beta 벨런스가 안맞을수 있습니다)</small>
                 </button>
             `;
             btnContainer.appendChild(choiceDiv);
