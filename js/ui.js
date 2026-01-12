@@ -1,6 +1,6 @@
 // js/ui.js 전체 교체
 
-import { gameData, researchList, legacyList, getActiveStages, getActiveResearch } from './data.js';
+import { gameData, getActiveStages, getActiveResearch, legacyList } from './data.js';
 import * as Logic from './logic.js';
 
 // 내부에서 구매 콜백 함수를 기억하기 위한 변수
@@ -446,8 +446,9 @@ export function renderResearchTab() {
 
     const availableRes = [];
     const completedRes = [];
+    const currentResearchList = getActiveResearch(); 
 
-    researchList.forEach(r => {
+    currentResearchList.forEach(r => {
         const isDone = gameData.researches.includes(r.id);
         const isPrereqDone = r.reqResearch ? gameData.researches.includes(r.reqResearch) : true;
         let isTargetVisible = true;
@@ -523,7 +524,7 @@ function createResearchElement(r, isDone) {
 }
 
 function updateResearchButtons() {
-    researchList.forEach(r => {
+    getActiveResearch().forEach(r => {
         const div = document.getElementById(`research-${r.id}`);
         if(!div || gameData.researches.includes(r.id)) return;
         let canBuy = true;
