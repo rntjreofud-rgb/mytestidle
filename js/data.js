@@ -53,7 +53,6 @@ export function setGameData(newData) {
     gameData.currentPlanet = newData.currentPlanet || 'earth';
 
     // 2. 자원 데이터 복구 (NaN/null 방지)
-    // 모든 행성의 자원 키를 안전하게 0 또는 저장된 값으로 동기화
     for (let key in gameData.resources) {
         if (newData.resources && newData.resources[key] !== undefined) {
             let val = newData.resources[key];
@@ -67,35 +66,40 @@ export function setGameData(newData) {
     gameData.houseLevel = newData.houseLevel || 0;
     gameData.researches = Array.isArray(newData.researches) ? newData.researches : [];
     
-    // 행성별 초기 자원 해금 목록 가져오기
-    const planetTemplate = getActivePlanetData(); // 현재 행성 데이터(earthData 등) 가져옴
+    const planetTemplate = getActivePlanetData(); 
     gameData.unlockedResources = Array.isArray(newData.unlockedResources) 
         ? newData.unlockedResources 
         : [...planetTemplate.initialResources];
 
-    // 4. 환생 및 유산 데이터 복구
+    // 4. ⭐ 환생 및 유산 데이터 복구 (포인트 소급 적용 핵심)
     gameData.prestigeLevel = newData.prestigeLevel || 0;
     gameData.legacyUpgrades = newData.legacyUpgrades || [];
     
-    // [환생 점수 보정: 5점 -> 3점]
-    const correctPoints = gameData.prestigeLevel * 3;
-    if (newData.cosmicData === undefined || (gameData.legacyUpgrades.length === 0 && newData.cosmicData > correctPoints)) {
-        gameData.cosmicData = correctPoints;
-        console.log(`포인트 보정 완료: ${gameData.cosmicData} 데이터로 재설정됨.`);
-    } else {
-        gameData.cosmicData = newData.cosmicData || 0;
+    // [보정 A] 지구가 아닌 행성에 왔다면 최소 지구 50렙을 찍은 것이므로 숙련도 보정
+    if (gameData.currentPlanet !== 'earth' && gameData.prestigeLevel === 0) {
+        gameData.prestigeLevel = 1;
+        console.log("외계 행성 거주 확인: 숙련도 Lv.1 강제 적용");
     }
 
-    // 5. ⭐ [핵심 수정] 행성별 건물 템플릿에 맞춘 데이터 초기화
-    // 저장된 건물 데이터가 아닌, "현재 행성의 엔진 건물 리스트"를 기준으로 만듭니다.
+    // [보정 B] 환생 점수 보정 및 미지급 포인트 정산
+    const correctPoints = gameData.prestigeLevel * 3; // 현재 기준: 환생당 3점
+    let savedPoints = newData.cosmicData !== undefined ? newData.cosmicData : 0;
+
+    // 유산 업그레이드를 하나도 안 샀는데, 포인트가 숙련도 기준보다 낮다면 (예: 0점이라면)
+    if (gameData.legacyUpgrades.length === 0 && savedPoints < correctPoints) {
+        gameData.cosmicData = correctPoints;
+        console.log(`포인트 소급 지급 완료: ${correctPoints} 데이터로 설정됨.`);
+    } else {
+        // 이미 업그레이드를 샀거나 포인트가 충분하다면 세이브 데이터를 존중
+        gameData.cosmicData = savedPoints;
+    }
+
+    // 5. 행성별 건물 템플릿에 맞춘 데이터 초기화
     const currentPlanetBuildings = planetTemplate.buildings; 
 
     gameData.buildings = currentPlanetBuildings.map((templateB) => {
-        // 세이브 데이터에서 현재 템플릿 건물과 ID가 같은 것을 찾습니다.
         const savedB = newData.buildings ? newData.buildings.find(b => b.id === templateB.id) : null;
-
         if (savedB) {
-            // 기존 유저 데이터 적용
             return {
                 ...templateB,
                 count: savedB.count || 0,
@@ -103,7 +107,6 @@ export function setGameData(newData) {
                 on: (savedB.on !== undefined) ? savedB.on : true
             };
         } else {
-            // 신규 유저 또는 이 행성에 처음 온 경우: 기본값(0)으로 초기화
             return {
                 ...templateB,
                 count: 0,
@@ -113,14 +116,16 @@ export function setGameData(newData) {
         }
     });
 
-    // 6. 최종 안전장치: 가동 개수 보정 및 켜짐 상태 확인
+    // 6. 최종 안전장치
     gameData.buildings.forEach(b => {
         if (b.activeCount > b.count) b.activeCount = b.count;
         if (b.on === undefined) b.on = true;
     });
 
-    console.log(`[시스템] ${gameData.currentPlanet.toUpperCase()} 행성 데이터 동기화 완료.`);
+    console.log(`[시스템] ${gameData.currentPlanet.toUpperCase()} 데이터 동기화 완료.`);
 }
+
+
 
 export const legacyList = [
     { id: "start_resource", name: "선구자의 보급품", desc: "매 회차 시작 시 나무 500, 돌 500, 판자 100 보유", cost: 1 },

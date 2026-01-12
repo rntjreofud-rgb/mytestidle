@@ -16,29 +16,29 @@ window.gameData = gameData;
 window.landOnPlanet = function(planetKey) {
     const planetName = planetKey === 'aurelia' ? '아우렐리아' : '베리디안';
     
-    if(!confirm(`${planetName} 행성에 불시착하시겠습니까? 현재의 모든 인프라가 파괴됩니다.`)) return;
+    if(!confirm(`${planetName} 행성에 진입하시겠습니까? 현재의 모든 인프라가 파괴됩니다.`)) return;
+
+    // ⭐ [핵심 추가] 떠나기 전 현재 행성에서의 성과를 점수로 정산합니다.
+    const gain = Logic.calculateCurrentPrestigeGain(gameData.houseLevel, gameData.currentPlanet);
+    gameData.cosmicData = (gameData.cosmicData || 0) + gain;
+    
+    // 만약 50레벨을 찍고 이동하는 것이라면 숙련도(환생 레벨)도 올려줍니다.
+    if (gameData.houseLevel >= 50) {
+        gameData.prestigeLevel = (gameData.prestigeLevel || 0) + 1;
+    }
 
     // 1. 행성 환경 전환
     gameData.currentPlanet = planetKey;
     gameData.houseLevel = 0;
 
-    // 2. 자원 제로베이스 초기화 (유산 및 숙련도는 보존)
-    for (let key in gameData.resources) {
-        gameData.resources[key] = 0;
-    }
-    gameData.resources.energy = 0;
-    gameData.resources.energyMax = 0;
-
-    // 3. 진행도 초기화
+    // 2. 자원 및 건물 제로베이스 초기화 (유산 및 숙련도는 보존)
+    for (let key in gameData.resources) { gameData.resources[key] = 0; }
+    gameData.buildings.forEach(b => { b.count = 0; b.activeCount = 0; });
     gameData.researches = [];
     
-    // 4. ⭐ 중요: 새로운 행성의 건물 템플릿으로 건물 리스트 리셋
-    // setGameData({})를 호출하면 data.js의 로직에 의해 
-    // getActivePlanetData()를 참조하여 새 건물 리스트를 구성합니다.
-    Storage.saveGame(); // 현재 행성 키(currentPlanet)를 먼저 저장
-    
-    // 5. 페이지 새로고침으로 모든 UI와 로직을 새 행성 데이터로 초기화
-    UI.log(`🚀 ${planetName} 행성 궤도 진입 중...`, true);
+    // 3. 저장 및 리로드
+    Storage.saveGame();
+    UI.log(`🚀 ${planetName} 착륙 성공! 데이터 ${gain}개를 획득했습니다.`, true);
     
     setTimeout(() => {
         location.reload(); 
