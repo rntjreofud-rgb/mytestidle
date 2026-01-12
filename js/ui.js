@@ -546,19 +546,21 @@ function checkUnlocks() {
     const toggle = (el, show) => el && el.classList.toggle('hidden', !show);
     const isLegacy = (gameData.houseLevel >= 50 || gameData.prestigeLevel > 0);
 
-    // 1. 행성별 버튼 이름 자동 매핑
+    // 1. 행성별 이름 매핑 (3번째 버튼은 지구 전용)
     const names = { earth: ["🌲 나무 베기", "🪨 돌 캐기", "⚫ 석탄 캐기"], aurelia: ["🔩 고철 줍기", "🧲 자석 수집", ""], veridian: ["🌿 섬유 채집", "🍄 포자 채취", ""] }[p];
     [elements.btns.wood, elements.btns.stone, elements.btns.coal].forEach((btn, i) => { if(btn) btn.innerText = names[i]; });
 
-    // 2. 버튼 노출 제어 (한 줄씩 정리)
+    // 2. 버튼 노출 제어 (행성 체크 추가)
     toggle(elements.btns.wood, true);
-    toggle(elements.btns.stone, disc.includes(p==='earth'?'stone':(p==='aurelia'?'magnet':'spore')));
+    // 두 번째 버튼: 지구는 발견 시 노출, 외계 행성은 시작부터 노출 (첫 단계 자원이므로)
+    toggle(elements.btns.stone, p !== 'earth' || disc.includes('stone'));
+    // 석탄, 판자, 철광석, 구리광석은 '지구'일 때만 발견 여부에 따라 노출
     toggle(elements.btns.coal, p === 'earth' && disc.includes('coal'));
-    toggle(elements.btns.plank, disc.includes('plank'));
-    toggle(elements.btns.ironOre, disc.includes('ironOre'));
-    toggle(elements.btns.copperOre, disc.includes('copperOre'));
+    toggle(elements.btns.plank, p === 'earth' && disc.includes('plank'));
+    toggle(elements.btns.ironOre, p === 'earth' && disc.includes('ironOre'));
+    toggle(elements.btns.copperOre, p === 'earth' && disc.includes('copperOre'));
 
-    // 3. 시스템 메뉴 노출
+    // 3. 메뉴 노출
     if(elements.navPower) elements.navPower.style.display = (gameData.houseLevel >= 5 || p !== 'earth') ? 'flex' : 'none';
     if(elements.navLegacy) elements.navLegacy.style.display = isLegacy ? 'flex' : 'none';
     const lCat = document.getElementById('legacy-cat'); if(lCat) lCat.style.display = isLegacy ? 'block' : 'none';
