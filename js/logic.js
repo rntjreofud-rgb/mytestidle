@@ -100,6 +100,7 @@ export function getEnergyEfficiencyMultiplier(buildingId) {
 
 /**
  * 5. 상단 자원 카드용 초당 순수 변동량(Net MPS) 통계 계산
+ * ⭐ '공평 배분' 로직이 통계에도 반영되어 자원 부족 시 생산량이 정확히 깎여 보입니다.
  */
 export function calculateNetMPS() {
     let stats = {};
@@ -111,22 +112,59 @@ export function calculateNetMPS() {
     const totalReq = gameData.resources.energyMax || 0;
     const powerFactor = totalReq > 0 ? Math.min(1.0, totalProd / totalReq) : 1.0;
 
+    // A. 전체 자원 수요량(1초 기준) 먼저 계산
+    let resourceDemand = {};
     gameData.buildings.forEach(b => {
         if (b.activeCount > 0) {
             let speedMult = getBuildingMultiplier(b.id);
             let consMult = getBuildingConsumptionMultiplier(b.id);
+            let energyEff = getEnergyEfficiencyMultiplier(b.id);
             let efficiency = speedMult * ((b.inputs && b.inputs.energy) ? powerFactor : 1.0);
 
             if (b.inputs) {
                 for (let res in b.inputs) {
-                    if(res !== 'energy') {
-                        stats[res].cons += (b.inputs[res] * consMult) * b.activeCount * efficiency;
-                    }
+                    if(res === 'energy') continue;
+                    let demand = (b.inputs[res] * consMult) * b.activeCount * efficiency;
+                    resourceDemand[res] = (resourceDemand[res] || 0) + demand;
+                }
+            }
+        }
+    });
+
+    // B. 자원별 공급 가능 비율(Shortage Factor) 계산
+    let shortageFactor = {};
+    for (let res in resourceDemand) {
+        let available = gameData.resources[res] || 0;
+        // 통계용이므로 1초치 수요와 현재 보유량을 비교
+        shortageFactor[res] = resourceDemand[res] > available ? Math.max(0, available / resourceDemand[res]) : 1.0;
+    }
+
+    // C. 실제 통계치 합산
+    gameData.buildings.forEach(b => {
+        if (b.activeCount > 0) {
+            let speedMult = getBuildingMultiplier(b.id);
+            let consMult = getBuildingConsumptionMultiplier(b.id);
+            let baseEfficiency = speedMult * ((b.inputs && b.inputs.energy) ? powerFactor : 1.0);
+
+            // 해당 건물의 재료 중 가장 부족한 비율 적용
+            let inputShortage = 1.0;
+            if (b.inputs) {
+                for (let res in b.inputs) {
+                    if (res === 'energy') continue;
+                    inputShortage = Math.min(inputShortage, shortageFactor[res] || 1.0);
+                }
+            }
+
+            let finalEfficiency = baseEfficiency * inputShortage;
+
+            if (b.inputs) {
+                for (let res in b.inputs) {
+                    if(res !== 'energy') stats[res].cons += (b.inputs[res] * consMult) * b.activeCount * finalEfficiency;
                 }
             }
             if (b.outputs && !b.outputs.energy) {
                 for (let res in b.outputs) {
-                    stats[res].prod += b.outputs[res] * b.activeCount * efficiency;
+                    stats[res].prod += b.outputs[res] * b.activeCount * finalEfficiency;
                 }
             }
         }
@@ -135,13 +173,13 @@ export function calculateNetMPS() {
 }
 
 /**
- * 6. 실제 자원 생산 및 소모 엔진 (매 프레임 실행)
+ * 6. ⭐ 실제 자원 생산 및 소모 엔진 (Proportional Allocation)
  */
 export function produceResources(deltaTime) {
     let totalEnergyProd = 0;
     let totalEnergyReq = 0;
 
-    // A. 전력 생산 시설
+    // --- 1단계: 전력 생산 시설 (에너지는 최우선 순위) ---
     gameData.buildings.forEach(b => {
         if (b.activeCount > 0 && b.outputs && b.outputs.energy) {
             let speedMult = getBuildingMultiplier(b.id);
@@ -165,7 +203,7 @@ export function produceResources(deltaTime) {
         }
     });
 
-    // B. 전체 전력 요구량 계산
+    // --- 2단계: 전력망 부하 계산 ---
     gameData.buildings.forEach(b => {
         if (b.activeCount > 0 && b.inputs && b.inputs.energy) {
             let speedMult = getBuildingMultiplier(b.id);
@@ -179,41 +217,70 @@ export function produceResources(deltaTime) {
     gameData.resources.energyMax = totalEnergyReq;
     let powerFactor = totalEnergyReq > 0 ? Math.min(1.0, totalEnergyProd / totalEnergyReq) : 1.0;
 
-    // C. 일반 가공 및 제조 시설
+    // --- 3단계: 일반 공정의 "공평 배분(Proportional)" 연산 ---
+
+    // A. 현재 프레임의 전체 수요량 파악
+    let frameDemand = {};
+    gameData.buildings.forEach(b => {
+        if (b.activeCount <= 0 || (b.outputs && b.outputs.energy)) return;
+        let speedMult = getBuildingMultiplier(b.id);
+        let consMult = getBuildingConsumptionMultiplier(b.id);
+        let efficiency = speedMult * (b.inputs && b.inputs.energy ? powerFactor : 1.0);
+        if (b.inputs) {
+            for (let res in b.inputs) {
+                if (res === 'energy') continue;
+                let needed = (b.inputs[res] * consMult) * b.activeCount * deltaTime * efficiency;
+                frameDemand[res] = (frameDemand[res] || 0) + needed;
+            }
+        }
+    });
+
+    // B. 자원별 공급 가능 비율 계산
+    let shortageFactor = {};
+    for (let res in frameDemand) {
+        let available = gameData.resources[res] || 0;
+        shortageFactor[res] = (frameDemand[res] > available && available >= 0) ? (available / frameDemand[res]) : 1.0;
+    }
+
+    // C. 공평하게 나눠서 소모 및 생산
     gameData.buildings.forEach(b => {
         if (b.activeCount <= 0 || (b.outputs && b.outputs.energy)) return;
 
         let speedMult = getBuildingMultiplier(b.id);
         let consMult = getBuildingConsumptionMultiplier(b.id);
         let energyEff = getEnergyEfficiencyMultiplier(b.id);
-        let efficiency = speedMult * (b.inputs && b.inputs.energy ? powerFactor : 1.0);
+        let baseEfficiency = speedMult * (b.inputs && b.inputs.energy ? powerFactor : 1.0);
 
+        // 건물이 필요로 하는 재료 중 가장 부족한 것의 비율을 따름
+        let inputShortage = 1.0;
         if (b.inputs) {
-            let inputEfficiency = 1.0;
             for (let res in b.inputs) {
                 if (res === 'energy') continue;
-                let needed = (b.inputs[res] * consMult) * b.activeCount * deltaTime * efficiency;
-                if(needed > 0 && (gameData.resources[res] || 0) < needed) {
-                    inputEfficiency = Math.min(inputEfficiency, (gameData.resources[res] || 0) / (needed || 1));
-                }
-            }
-            efficiency *= inputEfficiency;
-
-            for (let res in b.inputs) {
-                if (res === 'energy') continue;
-                gameData.resources[res] = Math.max(0, gameData.resources[res] - (b.inputs[res] * consMult * b.activeCount * deltaTime * efficiency));
+                inputShortage = Math.min(inputShortage, shortageFactor[res] || 1.0);
             }
         }
 
-        if (efficiency > 0 && b.outputs) {
-            for (let res in b.outputs) {
-                if (res === 'energy') continue;
-                gameData.resources[res] += (b.outputs[res] * b.activeCount * deltaTime * efficiency);
+        let finalEfficiency = baseEfficiency * inputShortage;
+
+        if (finalEfficiency > 0) {
+            // 자원 실제 소모
+            if (b.inputs) {
+                for (let res in b.inputs) {
+                    if (res === 'energy') continue;
+                    let consume = (b.inputs[res] * consMult) * b.activeCount * deltaTime * finalEfficiency;
+                    gameData.resources[res] = Math.max(0, gameData.resources[res] - consume);
+                }
+            }
+            // 자원 실제 생산
+            if (b.outputs) {
+                for (let res in b.outputs) {
+                    if (res === 'energy') continue;
+                    gameData.resources[res] += (b.outputs[res] * b.activeCount * deltaTime * finalEfficiency);
+                }
             }
         }
     });
 }
-
 /**
  * 7. 수동 채집 효율 계산 (연구 + 유산)
  */
