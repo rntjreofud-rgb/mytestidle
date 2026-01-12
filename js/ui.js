@@ -550,8 +550,8 @@ function createResourceCard(key) {
 function checkUnlocks() {
     const p = gameData.currentPlanet || 'earth', disc = gameData.unlockedResources || [];
     const toggle = (el, show) => el && el.classList.toggle('hidden', !show);
-    const isLegacy = (gameData.houseLevel >= 50 || gameData.prestigeLevel > 0);
-
+    // ⭐ [수정] 유산 탭 해금 조건: 집 50렙 OR 환생 1회 이상 OR 현재 외계 행성 거주 중
+    const isLegacy = (gameData.houseLevel >= 50 || (gameData.prestigeLevel || 0) > 0 || p !== 'earth');
     // 1. 행성별 이름 매핑 (3번째 버튼은 지구 전용)
     const names = { earth: ["🌲 나무 베기", "🪨 돌 캐기", "⚫ 석탄 캐기"], aurelia: ["🔩 고철 줍기", "🧲 자석 수집", ""], veridian: ["🌿 섬유 채집", "🍄 포자 채취", ""] }[p];
     [elements.btns.wood, elements.btns.stone, elements.btns.coal].forEach((btn, i) => { if(btn) btn.innerText = names[i]; });
@@ -566,10 +566,13 @@ function checkUnlocks() {
     toggle(elements.btns.ironOre, p === 'earth' && disc.includes('ironOre'));
     toggle(elements.btns.copperOre, p === 'earth' && disc.includes('copperOre'));
 
-    // 3. 메뉴 노출
+    // 3. 시스템 메뉴 노출
     if(elements.navPower) elements.navPower.style.display = (gameData.houseLevel >= 5 || p !== 'earth') ? 'flex' : 'none';
+    
+    // ⭐ [핵심] 우주 유산 탭 노출 강제 활성화
     if(elements.navLegacy) elements.navLegacy.style.display = isLegacy ? 'flex' : 'none';
-    const lCat = document.getElementById('legacy-cat'); if(lCat) lCat.style.display = isLegacy ? 'block' : 'none';
+    const lCat = document.getElementById('legacy-cat'); 
+    if(lCat) lCat.style.display = isLegacy ? 'block' : 'none';
 }
 
 export function renderShop(onBuyCallback, getCostFunc) {
