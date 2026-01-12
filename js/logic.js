@@ -5,7 +5,7 @@ import { gameData, getActiveResearch, getActiveBuildings } from './data.js';
  */
 export function getBuildingMultiplier(buildingId) {
     let multiplier = 1.0;
-    const researchList = getActiveResearch(); // 현재 행성 연구 가져오기
+    const researchList = getActiveResearch(); 
     const completed = gameData.researches || [];
     
     // [연구 보너스]
@@ -32,10 +32,7 @@ export function getBuildingMultiplier(buildingId) {
  * 2. 건물의 현재 건설 비용 계산 (보유수 + 유산 보너스)
  */
 export function getBuildingCost(building) {
-    // 비용 증가 공식: 기본가 * 1.2^보유수
     let multiplier = Math.pow(1.2, building.count || 0);
-    
-    // [유산 보너스] '나노 건축 설계' 보유 시 비용 20% 감소
     let discount = (gameData.legacyUpgrades && gameData.legacyUpgrades.includes('cheap_build')) ? 0.8 : 1.0;
     
     let currentCost = {};
@@ -94,12 +91,7 @@ export function calculateNetMPS() {
         if (b.activeCount > 0) {
             let speedMult = getBuildingMultiplier(b.id);
             let consMult = getBuildingConsumptionMultiplier(b.id);
-            let energyEff = getEnergyEfficiencyMultiplier(b.id);
-            
-            let efficiency = speedMult;
-            if (b.inputs && b.inputs.energy) {
-                efficiency *= powerFactor;
-            }
+            let efficiency = speedMult * ((b.inputs && b.inputs.energy) ? powerFactor : 1.0);
 
             if (b.inputs) {
                 for (let res in b.inputs) {
@@ -212,6 +204,7 @@ export function getClickStrength() {
         }
     });
 
+    // [유산 보너스] 초공간 클릭 보유 시 5배
     if (gameData.legacyUpgrades && gameData.legacyUpgrades.includes('fast_click')) {
         strength *= 5;
     }
@@ -219,14 +212,29 @@ export function getClickStrength() {
 }
 
 /**
- * 8. 수동 클릭 처리
+ * 8. ⭐ 행성 대응 수동 클릭 처리 (Planet Aware)
  */
 export function manualGather(type) {
     const amount = getClickStrength(); 
+    const p = gameData.currentPlanet || 'earth';
+
+    // 첫 번째 버튼 (지구: 나무, 아우렐리아: 고철, 베리디안: 섬유)
     if (type === 'wood') {
-        gameData.resources.wood += amount;
+        if (p === 'earth') gameData.resources.wood += amount;
+        else if (p === 'aurelia') gameData.resources.scrapMetal += amount;
+        else if (p === 'veridian') gameData.resources.bioFiber += amount;
         return true;
     }
+
+    // 두 번째 버튼 (지구: 돌, 아우렐리아: 자석, 베리디안: 포자)
+    if (type === 'stone') {
+        if (p === 'earth') gameData.resources.stone += amount;
+        else if (p === 'aurelia') gameData.resources.magnet += amount;
+        else if (p === 'veridian') gameData.resources.spore += amount;
+        return true;
+    }
+
+    // 지구 전용 판자 제작 (행성 이동 시 버튼이 숨겨지므로 안전함)
     if (type === 'plank') {
         if (gameData.resources.wood >= 2) {
             gameData.resources.wood -= 2;
@@ -235,6 +243,8 @@ export function manualGather(type) {
         }
         return false;
     }
+
+    // 기타 자원 처리
     if (gameData.resources[type] !== undefined) {
         gameData.resources[type] += amount;
         return true;
@@ -243,23 +253,17 @@ export function manualGather(type) {
 }
 
 /**
- * 9. 구매 및 업그레이드 검증 (결과 객체 반환)
+ * 9. 구매 및 업그레이드 검증
  */
 export function tryBuyResearch(id) {
     const researchList = getActiveResearch();
     if (gameData.researches.includes(id)) return { success: false, missing: [] };
-    
     const research = researchList.find(r => r.id === id);
     if (!research) return { success: false, missing: [] };
-    
-    if (research.reqResearch && !gameData.researches.includes(research.reqResearch)) {
-        return { success: false, missing: ["선행 연구"] };
-    }
+    if (research.reqResearch && !gameData.researches.includes(research.reqResearch)) return { success: false, missing: ["선행 연구"] };
 
     let missing = [];
-    for (let r in research.cost) {
-        if ((gameData.resources[r] || 0) < research.cost[r]) missing.push(r);
-    }
+    for (let r in research.cost) { if ((gameData.resources[r] || 0) < research.cost[r]) missing.push(r); }
     if (missing.length > 0) return { success: false, missing };
     
     for (let r in research.cost) { gameData.resources[r] -= research.cost[r]; }
@@ -270,11 +274,8 @@ export function tryBuyResearch(id) {
 export function tryBuyBuilding(index) {
     const b = gameData.buildings[index];
     const cost = getBuildingCost(b);
-    
     let missing = [];
-    for (let r in cost) {
-        if ((gameData.resources[r] || 0) < cost[r]) missing.push(r);
-    }
+    for (let r in cost) { if ((gameData.resources[r] || 0) < cost[r]) missing.push(r); }
     if (missing.length > 0) return { success: false, missing };
 
     for (let r in cost) { gameData.resources[r] -= cost[r]; }
@@ -286,17 +287,12 @@ export function tryBuyBuilding(index) {
 export function tryUpgradeHouse(nextStage) {
     let missing = [];
     for (let r in nextStage.req) {
-        if (r === 'energy') { 
-            if (gameData.resources.energy < nextStage.req[r]) missing.push('energy');
-        } else if ((gameData.resources[r] || 0) < nextStage.req[r]) {
-            missing.push(r);
-        }
+        if (r === 'energy') { if (gameData.resources.energy < nextStage.req[r]) missing.push('energy'); }
+        else { if ((gameData.resources[r] || 0) < nextStage.req[r]) missing.push(r); }
     }
     if (missing.length > 0) return { success: false, missing };
 
-    for (let r in nextStage.req) {
-        if (r !== 'energy') gameData.resources[r] -= nextStage.req[r];
-    }
+    for (let r in nextStage.req) { if (r !== 'energy') gameData.resources[r] -= nextStage.req[r]; }
     gameData.houseLevel++;
     return { success: true };
 }

@@ -1,6 +1,6 @@
 // js/main.js
 
-import { gameData, houseStages } from './data.js';
+import { gameData, getActiveStages } from './data.js';
 import * as UI from './ui.js';
 import * as Logic from './logic.js';
 import * as Storage from './save.js';
@@ -239,26 +239,35 @@ function handleBuyBuilding(index) {
 }
 
 function handleHouseUpgrade(nextStage) {
-    // 1. 결과를 변수에 담아 success 여부를 확인합니다.
+    // 1. 업그레이드 시도 (결과 객체 반환받음)
     const result = Logic.tryUpgradeHouse(nextStage);
     
     if (result.success) {
-         if (gameData.houseLevel >= houseStages.length - 1) {
-            UI.log("🚀 [지구 탈출 성공] 대기권을 돌파하여 우주로 나아갑니다!", true);
+        // 현재 행성의 전체 단계 리스트를 가져와서 엔딩 여부 확인
+        const stages = getActiveStages(); 
+        
+        // 엔딩 단계(Lv.50 등)에 도달했는지 체크
+        if (gameData.houseLevel >= stages.length - 1) {
+            UI.log(`🚀 [미션 완료] ${nextStage.name}! 행성을 떠날 준비가 되었습니다.`, true);
             
-            setTimeout(() => {
-                if (confirm(`🎉 축하합니다! 지구를 탈출했습니다!\n\n우주 항해를 통해 얻은 데이터로 숙련도가 상승합니다.\n현재 숙련도: Lv.${gameData.prestigeLevel}\n\n숙련도 Lv.${gameData.prestigeLevel + 1}로 다음 회차를 시작하시겠습니까?\n(영구 생산 속도 20% 보너스 부여)`)) {
-                    performPrestige();
-                }
-            }, 1000);
+            // UI를 즉시 갱신하여 '환생' 및 '탐사' 버튼이 나타나게 함
+            UI.renderShop(handleBuyBuilding, Logic.getBuildingCost);
+            UI.updateHouseUI(handleHouseUpgrade);
+            
+            // 별도의 confirm 창 없이 버튼 선택으로 유도 (UI가 알아서 바뀜)
             return;
         }
 
+        // 일반 업그레이드 성공 로그
         UI.log(`🎉 기술 발전 성공! [${nextStage.name}]`, true);
+        
+        // 상점(새 건물 해금 대비) 및 하우스 UI 갱신
         UI.renderShop(handleBuyBuilding, Logic.getBuildingCost);
         UI.updateHouseUI(handleHouseUpgrade);
+        
     } else {
-        // 2. 부족한 자원 목록을 로그에 출력합니다.
+        // 자원 부족 시 어떤 자원이 모자란지 구체적으로 출력
+        // UI.getResNameOnly 가 export 되어 있어야 에러가 나지 않습니다.
         const missingNames = result.missing.map(key => UI.getResNameOnly(key)).join(', ');
         UI.log(`⬆️ 업그레이드 불가 (부족: ${missingNames})`, false);
     }
