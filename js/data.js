@@ -249,8 +249,8 @@ export const houseStages = [
 
 export const legacyList = [
     { id: "start_resource", name: "선구자의 보급품", desc: "시작 시 나무 500, 돌 500, 판자 100 보유", cost: 1 },
+    { id: "fast_click", name: "초공간 클릭", desc: "수동 채집 효율 5배 영구 증가", cost: 2 },
     { id: "cheap_build", name: "나노 건축 설계", desc: "모든 건물 건설 비용 20% 영구 감소", cost: 3 }
-    
 ];
 
 

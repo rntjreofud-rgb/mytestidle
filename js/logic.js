@@ -159,16 +159,20 @@ export function produceResources(deltaTime) {
 
 export function getClickStrength() {
     let strength = 1; 
-    // ⭐ [안전장치]
     const completed = gameData.researches || [];
     
+    // 1. 일반 연구 보너스 합산
     researchList.forEach(r => {
-        if (completed.includes(r.id)) {
-            if (r.type === 'manual') {
-                strength += r.value;
-            }
+        if (completed.includes(r.id) && r.type === 'manual') {
+            strength += r.value;
         }
     });
+
+    // 2. ⭐ [추가] 유산 보너스 적용 (초공간 클릭 보유 시 5배)
+    if (gameData.legacyUpgrades && gameData.legacyUpgrades.includes('fast_click')) {
+        strength *= 5;
+    }
+
     return strength;
 }
 
