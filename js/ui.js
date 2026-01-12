@@ -83,18 +83,18 @@ const resNames = {
 };
 
 const resourceGroups = {
-    raw: {
-        title: "⛏️ 원자재 (Raw Materials)",
-        items: ['wood', 'stone', 'coal', 'ironOre', 'copperOre', 'oil', 'titaniumOre', 'uraniumOre']
-    },
-    material: {
-        title: "🧱 가공 자재 (Materials)",
-        items: ['plank', 'brick', 'glass', 'concrete', 'ironPlate', 'copperPlate', 'steel', 'titaniumPlate', 'advAlloy', 'sulfur', 'plastic']
-    },
-    component: {
-        title: "⚙️ 부품 및 첨단 (High-Tech)",
-        items: ['gear', 'circuit', 'battery', 'optics', 'advCircuit', 'processor', 'fuelCell', 'rocketFuel', 'nanobots', 'aiCore', 'quantumData', 'gravityModule', 'warpCore']
-    }
+    // --- 지구 자원 그룹 ---
+    earth_raw: { planet: 'earth', title: "⛏️ 원자재 (Raw Materials)", items: ['wood', 'stone', 'coal', 'ironOre', 'copperOre', 'oil', 'titaniumOre', 'uraniumOre'] },
+    earth_mat: { planet: 'earth', title: "🧱 가공 자재 (Materials)", items: ['plank', 'brick', 'glass', 'concrete', 'ironPlate', 'copperPlate', 'steel', 'titaniumPlate', 'advAlloy', 'sulfur', 'plastic'] },
+    earth_comp: { planet: 'earth', title: "⚙️ 부품 및 첨단 (High-Tech)", items: ['gear', 'circuit', 'battery', 'optics', 'advCircuit', 'processor', 'fuelCell', 'rocketFuel', 'nanobots', 'aiCore', 'quantumData', 'gravityModule', 'warpCore'] },
+
+    // --- 아우렐리아 자원 그룹 ---
+    aurelia_raw: { planet: 'aurelia', title: "🧲 행성 자원 (Aurelia Resources)", items: ['scrapMetal', 'magnet', 'chargedCrystal'] },
+    aurelia_mat: { planet: 'aurelia', title: "🌑 특수 제련 (Aurelia Metals)", items: ['heavyAlloy', 'fluxEnergy', 'nanoSteel'] },
+
+    // --- 베리디안 자원 그룹 ---
+    veridian_raw: { planet: 'veridian', title: "🌿 유기 자원 (Veridian Life)", items: ['bioFiber', 'spore', 'yeast'] },
+    veridian_mat: { planet: 'veridian', title: "🧪 바이오 가공 (Bio-Processing)", items: ['livingWood', 'bioFuel', 'rootBrick'] }
 };
 
 const buildingGroups = {
@@ -121,35 +121,35 @@ const buildingGroups = {
 
 let isGridInitialized = false;
 function initResourceGrid() {
-    if (isGridInitialized) return;
+    // 행성이 바뀌었을 수도 있으므로, 매번 초기화하거나 행성 체크 로직이 필요함
+    // 여기서는 간단히 행성이 바뀔 때마다 초기화되도록 처리
+    if (isGridInitialized === gameData.currentPlanet) return;
+    
     elements.resGrid.innerHTML = "";
     elements.resGrid.style.display = "block";
 
     for (const [key, group] of Object.entries(resourceGroups)) {
+        // ⭐ 중요: 현재 행성에 해당하지 않는 그룹은 건너뜁니다.
+        if (group.planet !== gameData.currentPlanet) continue;
+
         const titleContainer = document.createElement('div');
         titleContainer.className = 'res-category-title';
-        
-        // 제목 텍스트와 버튼 영역 분리
         titleContainer.innerHTML = `
             <span>${group.title} <span class="toggle-arrow">▼</span></span>
-            <div class="title-ctrls">
-                <span class="btn-size-toggle" data-key="${key}">슬림</span>
-            </div>
+            <div class="title-ctrls"><span class="btn-size-toggle" data-key="${key}">슬림</span></div>
         `;
         
         const container = document.createElement('div');
         container.className = 'sub-res-grid';
         container.id = `grid-group-${key}`;
 
-        // 1. 접기/펴기 (텍스트 클릭 시)
-        titleContainer.querySelector('span').onclick = (e) => {
+        titleContainer.querySelector('span').onclick = () => {
             titleContainer.classList.toggle('collapsed');
             container.classList.toggle('collapsed-content');
         };
 
-        // 2. 슬림 모드 토글 (버튼 클릭 시)
         titleContainer.querySelector('.btn-size-toggle').onclick = (e) => {
-            e.stopPropagation(); // 접기 이벤트 방지
+            e.stopPropagation();
             container.classList.toggle('slim-mode');
             e.target.innerText = container.classList.contains('slim-mode') ? "기본" : "슬림";
         };
@@ -157,8 +157,9 @@ function initResourceGrid() {
         elements.resGrid.appendChild(titleContainer);
         elements.resGrid.appendChild(container);
     }
-    isGridInitialized = true;
+    isGridInitialized = gameData.currentPlanet; // 현재 행성 저장
 }
+
 export function getResNameOnly(key) {
     const full = resNames[key];
     if (!full) return key;
@@ -264,10 +265,10 @@ function checkResourceDiscovery() {
 export function updateScreen(stats) {
     checkResourceDiscovery();
     
-    // 그리드 구조가 안 잡혀있으면 잡기
+    // 1. 현재 행성에 맞는 그리드 구조 초기화 (행성 변경 시 재구축됨)
     initResourceGrid();
 
-    // 전력 상태 확인
+    const planet = gameData.currentPlanet || 'earth';
     const powerProd = gameData.resources.energy || 0;
     const powerReq = gameData.resources.energyMax || 0;
     const isPowerShort = powerProd < powerReq;
@@ -276,40 +277,43 @@ export function updateScreen(stats) {
         if(key === 'energy' || key === 'energyMax') continue;
         if (!gameData.unlockedResources.includes(key)) continue;
 
-        // 카드가 이미 있는지 확인
+        // ⭐ [핵심 추가] 현재 행성의 자원 그룹에 속하는지 확인
+        let targetGroupId = null;
+        for (const [groupKey, groupData] of Object.entries(resourceGroups)) {
+            // 현재 행성(planet)과 그룹의 행성이 일치하고, 아이템 목록에 key가 있는 경우
+            if (groupData.planet === planet && groupData.items.includes(key)) {
+                targetGroupId = `grid-group-${groupKey}`;
+                break;
+            }
+        }
+
+        // 현재 행성에 속한 자원이 아니면 카드를 생성하거나 업데이트하지 않고 건너뜀
+        if (!targetGroupId) continue;
+
         let card = document.getElementById(`card-${key}`);
         
-        // 없으면 새로 생성하여 올바른 그룹에 넣기
+        // 없으면 새로 생성하여 해당 행성의 그룹 컨테이너에 추가
         if (!card) {
             card = createResourceCard(key);
-            
-            // 어느 그룹인지 찾기
-            let targetGroupId = 'grid-group-raw'; // 기본값
-            for (const [groupKey, groupData] of Object.entries(resourceGroups)) {
-                if (groupData.items.includes(key)) {
-                    targetGroupId = `grid-group-${groupKey}`;
-                    break;
-                }
-            }
-            
-            // 해당 그룹 컨테이너에 추가
             const container = document.getElementById(targetGroupId);
             if(container) container.appendChild(card);
         }
 
-        // 수치 업데이트 (기존 로직 동일)
+        // 수치 업데이트 로직
         const val = gameData.resources[key] || 0;
-        const net = (stats[key].prod - stats[key].cons);
+        const net = (stats[key] ? stats[key].prod - stats[key].cons : 0);
         
         card.querySelector('.res-amount').innerText = formatNumber(val);
         const mpsEl = card.querySelector('.res-mps');
 
         let powerWarning = isPowerShort ? `<span style="color:#f1c40f; font-size:0.7rem;">⚡</span>` : "";
 
-        if (stats[key].prod > 0 && stats[key].cons > 0) {
+        if (stats[key] && stats[key].prod > 0 && stats[key].cons > 0) {
             mpsEl.innerHTML = `<span style="color:#2ecc71">+${formatNumber(stats[key].prod)}</span>|<span style="color:#e74c3c">-${formatNumber(stats[key].cons)}</span>/s${powerWarning}`;
         } else {
-            let mpsText = Math.abs(net) < 10 ? net.toFixed(1) : formatNumber(net);
+            let mpsValue = Math.abs(net);
+            let mpsText = mpsValue < 10 && mpsValue > 0 ? net.toFixed(1) : formatNumber(net);
+            
             if(net < 0) { mpsEl.style.color = "#e74c3c"; mpsEl.innerText = `▼ ${mpsText}/s`; }
             else if(net > 0) { mpsEl.style.color = "#2ecc71"; mpsEl.innerText = `▲ ${mpsText}/s`; }
             else { mpsEl.style.color = "#7f8c8d"; mpsEl.innerText = `+0.0/s`; }
@@ -317,6 +321,8 @@ export function updateScreen(stats) {
             if (isPowerShort && net !== 0) mpsEl.innerHTML += powerWarning;
         }
     }
+    
+    // 시스템 UI들 업데이트
     updatePowerUI();
     if(!elements.viewResearch.classList.contains('hidden')) updateResearchButtons();
     checkUnlocks();
