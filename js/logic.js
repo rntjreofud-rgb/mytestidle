@@ -33,11 +33,26 @@ export function getProductionBonus() {
  * 2. 건물의 현재 건설 비용 계산
  */
 export function getBuildingCost(building) {
+    // 기본 가격 공식: 기본가 * 1.2 ^ 현재보유수
     let multiplier = Math.pow(1.2, building.count || 0);
-    let discount = (gameData.legacyUpgrades && gameData.legacyUpgrades.includes('cheap_build')) ? 0.8 : 1.0;
+    const legacy = gameData.legacyUpgrades || [];
+    
+    let discount = 1.0;
+
+    // [유산: 나노 건축 설계] 모든 건물 비용 20% 상시 할인
+    if (legacy.includes('cheap_build')) {
+        discount *= 0.8;
+    }
+
+    // ⭐ [유산: 신속 기지 전개] 건물 레벨 2 미만(0, 1레벨)일 때만 비용 50% 추가 할인
+    if (legacy.includes('aurelia_fast_setup') && (building.count || 0) < 2) {
+        discount *= 0.5;
+    }
+    
     let currentCost = {};
     for (let r in building.cost) {
-        currentCost[r] = Math.floor(building.cost[r] * multiplier * discount);
+        // 최종 비용 계산 (소수점 버림)
+        currentCost[r] = Math.max(1, Math.floor(building.cost[r] * multiplier * discount));
     }
     return currentCost;
 }
