@@ -1022,20 +1022,20 @@ export function renderTechTree() {
 export function renderLegacyTab() {
     const listContainer = document.getElementById('legacy-upgrade-list');
     const dataDisplay = document.getElementById('cosmic-data-count');
-    
     if (!listContainer || !dataDisplay) return;
 
-    // 보유 포인트 표시
     dataDisplay.innerText = formatNumber(gameData.cosmicData || 0);
     listContainer.innerHTML = "";
 
-    // 유산 목록 출력
     legacyList.forEach(u => {
         const isBought = gameData.legacyUpgrades.includes(u.id);
-        const canAfford = (gameData.cosmicData || 0) >= u.cost;
         
+        // ⭐ [추가] 선행 조건 체크: 선행 유산이 없으면 리스트에서 숨김 (이미 산 경우는 제외)
+        const isUnlocked = u.req ? gameData.legacyUpgrades.includes(u.req) : true;
+        if (!isBought && !isUnlocked) return;
+
+        const canAfford = (gameData.cosmicData || 0) >= u.cost;
         const div = document.createElement('div');
-        // 구매 완료면 done, 돈 없으면 disabled 클래스 부여
         div.className = `shop-item ${isBought ? 'done' : (canAfford ? '' : 'disabled')}`;
         
         div.innerHTML = `
@@ -1045,7 +1045,6 @@ export function renderLegacyTab() {
             <div class="si-cost">${isBought ? '영구 보너스' : '비용: ' + u.cost + ' 데이터'}</div>
         `;
 
-        // 아직 안 샀고 돈이 있으면 클릭 이벤트 연결
         if (!isBought && canAfford) {
             div.style.cursor = "pointer";
             div.onclick = () => {
@@ -1053,15 +1052,8 @@ export function renderLegacyTab() {
                     gameData.cosmicData -= u.cost;
                     gameData.legacyUpgrades.push(u.id);
                     log(`✨ 유산 보너스 해금: ${u.name}`, true);
-                    // 1. 현재 유산 탭 새로고침
                     renderLegacyTab(); 
-                    
-                    // 2. ⭐ [중요] 상점(건물 목록)의 가격 텍스트도 즉시 갱신
-                    // cachedBuyCallback과 Logic.getBuildingCost를 사용하여 상점을 다시 그립니다.
-                    if (typeof renderShop === 'function') {
-                        renderShop(cachedBuyCallback, Logic.getBuildingCost);
-                    }
-
+                    if (typeof renderShop === 'function') renderShop(cachedBuyCallback, Logic.getBuildingCost);
                 }
             };
         }
