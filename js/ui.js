@@ -386,7 +386,11 @@ export function updateScreen(stats) {
         
         // 수치 업데이트 로직
         const val = gameData.resources[key] || 0;
-        const net = (stats[key] ? stats[key].prod - stats[key].cons : 0);
+        
+        // ⭐ 변수 정의 추가: stats에서 prod와 cons를 미리 가져옵니다.
+        const prod = stats[key] ? stats[key].prod : 0;
+        const cons = stats[key] ? stats[key].cons : 0;
+        const net = prod - cons;
         
         card.classList.remove('res-warning', 'res-danger');
         
