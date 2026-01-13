@@ -390,14 +390,14 @@ export function updateScreen(stats) {
         
         card.classList.remove('res-warning', 'res-danger');
         
-        if (net < -0.01) { // 소모가 생산보다 많을 때 (부동소수점 오차 방지 위해 -0.01 기준)
-            if (val <= 0.1) {
-                // 자원이 거의 없고 적자 상태 -> 빨간색 (위험)
-                card.classList.add('res-danger');
-            } else {
-                // 자원은 있지만 줄어드는 중 -> 노란색 (주의)
-                card.classList.add('res-warning');
-            }
+        // 1. 순수하게 자원이 줄어들고 있을 때 (노란색)
+        if (net < -0.01 && val > 0.5) {
+            card.classList.add('res-warning');
+        } 
+        // 2. 자원이 바닥났는데 공장은 계속 돌아가려 할 때 (빨간색)
+        // 혹은 자원이 0인데 생산량(prod)보다 요구량(cons)이 클 때
+        else if (val <= 0.5 && cons > 0 && net <= 0.01) {
+            card.classList.add('res-danger');
         }
 
         card.querySelector('.res-amount').innerText = formatNumber(val);

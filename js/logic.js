@@ -163,21 +163,32 @@ export function calculateNetMPS() {
             let inputShortage = 1.0;
             if (b.inputs) {
                 for (let res in b.inputs) {
-                    if (res === 'energy') continue;
-                    inputShortage = Math.min(inputShortage, shortageFactor[res] || 1.0);
-                }
-            }
-
-            let finalEfficiency = baseEfficiency * inputShortage;
-
-            if (b.inputs) {
-                for (let res in b.inputs) {
-                    if(res !== 'energy') stats[res].cons += (b.inputs[res] * consMult) * b.activeCount * finalEfficiency;
+                    if(res !== 'energy') {
+                        // 자원 유무와 상관없이 요구량(Demand)을 통계에 표시
+                        stats[res].cons += (b.inputs[res] * consMult) * b.activeCount * baseEfficiency;
+                    }
                 }
             }
             if (b.outputs && !b.outputs.energy) {
+                // 생산량은 실제 자원이 있어야 돌아가므로 여기는 기존 로직(공평 배분)을 어느 정도 따르거나, 
+                // 혹은 생산 잠재력을 보여주기 위해 baseEfficiency를 쓸 수 있습니다.
+                // 여기서는 "잠재 생산량"을 보여주기 위해 baseEfficiency를 적용합니다.
+                
+                let inputShortage = 1.0;
+                // 실제 생산량을 보고 싶다면 아래 로직 유지, 잠재량을 보고 싶다면 삭제
+                
+                if (b.inputs) {
+                    for (let r in b.inputs) {
+                        if (r === 'energy') continue;
+                        let available = gameData.resources[r] || 0;
+                        let demand = (b.inputs[r] * consMult) * b.activeCount * baseEfficiency;
+                        if (demand > available) inputShortage = Math.min(inputShortage, available / demand);
+                    }
+                }
+                
+
                 for (let res in b.outputs) {
-                    stats[res].prod += b.outputs[res] * b.activeCount * finalEfficiency;
+                    stats[res].prod += b.outputs[res] * b.activeCount * baseEfficiency * inputShortage;
                 }
             }
         }
