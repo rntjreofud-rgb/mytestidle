@@ -6,6 +6,11 @@ import * as Logic from './logic.js';
 // 내부에서 구매 콜백 함수를 기억하기 위한 변수
 let cachedBuyCallback = null;
 
+const collapsedState = {};
+
+
+
+
 window.adjustActiveCount = function(id, delta) {
     const b = gameData.buildings.find(build => build.id === id);
     if (b) {
@@ -575,16 +580,21 @@ export function renderResearchTab() {
 }
 
 function renderResearchSection(titleText, list, isDone, parentContainer) {
+    const stateKey = `res_${titleText}`;
+    const isCollapsed = collapsedState[stateKey] === true;
+
     const title = document.createElement('div');
-    title.className = 'research-section-title';
+    title.className = `research-section-title ${isCollapsed ? 'collapsed' : ''}`; 
     title.innerHTML = `${titleText} (${list.length}) <span class="toggle-arrow">▼</span>`;
 
     const subGrid = document.createElement('div');
-    subGrid.className = 'sub-build-grid'; // CSS와 이름 일치 확인
+    subGrid.className = `sub-build-grid ${isCollapsed ? 'collapsed-content' : ''}`; 
 
     title.onclick = () => {
         title.classList.toggle('collapsed');
         subGrid.classList.toggle('collapsed-content');
+
+        collapsedState[stateKey] = nowCollapsed;
     };
 
     parentContainer.appendChild(title);
@@ -705,16 +715,20 @@ export function renderShop(onBuyCallback, getCostFunc) {
 
         if (visibleBuildings.length === 0) continue;
 
+        const isCollapsed = collapsedState[groupKey] === true;
+
         const title = document.createElement('div');
-        title.className = 'build-category-title';
+        title.className = `build-category-title ${isCollapsed ? 'collapsed' : ''}`;
         title.innerHTML = `${group.title} <span class="toggle-arrow">▼</span>`;
         
         const subGrid = document.createElement('div');
-        subGrid.className = 'sub-build-grid'; // CSS와 이름 일치 확인
+        subGrid.className = `sub-build-grid ${isCollapsed ? 'collapsed-content' : ''}`; 
 
         title.onclick = () => {
             title.classList.toggle('collapsed');
             subGrid.classList.toggle('collapsed-content');
+                // 접기추가
+            collapsedState[groupKey] = nowCollapsed;
         };
 
         elements.buildingList.appendChild(title);
