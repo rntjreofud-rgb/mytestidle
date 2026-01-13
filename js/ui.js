@@ -448,7 +448,7 @@ function updatePowerUI() {
         if (prod < req) elements.powerBar.classList.add('power-low');
         else elements.powerBar.classList.remove('power-low');
     }
-    // 대시보드 연동
+
     if (elements.dashPowerPanel && gameData.houseLevel >= 5) {
         elements.dashPowerPanel.classList.remove('hidden');
         elements.dashPowerText.innerHTML = `<span style="color:#2ecc71">${formatNumber(prod)}</span> / <span style="color:#e74c3c">${formatNumber(req)} MW</span>`;
@@ -459,12 +459,12 @@ function updatePowerUI() {
     const container = document.getElementById('power-breakdown-container');
     if (!container) return;
     if (!container.dataset.initialized) {
-    container.innerHTML = ""; 
-    container.style.background = "none"; // 배경 제거
-    container.style.maxHeight = "none";  // 높이 제한 해제
-    container.dataset.initialized = "true";
+        container.innerHTML = ""; 
+        container.style.background = "none";
+        container.style.maxHeight = "none";
+        container.dataset.initialized = "true";
     }
-    // 2. 카테고리별 루프
+
     for (const [groupKey, group] of Object.entries(buildingGroups)) {
         const ownedBuildings = gameData.buildings.filter(b => group.ids.includes(b.id) && b.count > 0);
         
@@ -523,25 +523,30 @@ function updatePowerUI() {
             const speedMult = Logic.getBuildingMultiplier(b.id);
             const consMult = Logic.getBuildingConsumptionMultiplier(b.id);
             const energyEff = Logic.getEnergyEfficiencyMultiplier(b.id);
-            const prodBonus = Logic.getProductionBonus(); // ⭐ 환생 보너스 가져오기
+            const prodBonus = Logic.getProductionBonus(); // 환생 보너스
             const isOn = b.activeCount > 0;
 
             let energyImpact = 0;
             const isProducer = b.outputs && b.outputs.energy;
             const isConsumer = b.inputs && b.inputs.energy;
+
+            // 에너지 영향력 계산
             if (isProducer) energyImpact = b.outputs.energy * b.activeCount * speedMult * prodBonus;
             else if (isConsumer) energyImpact = b.inputs.energy * b.activeCount * speedMult * consMult * energyEff;
 
+            // 생산 자원 텍스트
             let prodText = "가동 중지";
-            if (isOn && b.outputs) {
-            const resKey = Object.keys(b.outputs).find(k => k !== 'energy');
-            if (resKey) {
-                // ⭐ 실제 생산량 = 기본값 * 가동수 * 속도배수 * 환생보너스
-                const finalOut = b.outputs[resKey] * b.activeCount * speedMult * prodBonus;
-                prodText = `<span style="color:#2ecc71">▲ ${formatNumber(finalOut)}${getResNameOnly(resKey)}/s</span>`;
+            if (isOn) {
+                const resKey = b.outputs ? Object.keys(b.outputs).find(k => k !== 'energy') : null;
+                if (resKey) {
+                    const finalOut = b.outputs[resKey] * b.activeCount * speedMult * prodBonus;
+                    prodText = `<span style="color:#2ecc71">▲ ${formatNumber(finalOut)}${getResNameOnly(resKey)}/s</span>`;
+                } else if (isProducer) {
+                    prodText = `<span style="color:#2ecc71">에너지 생산 중</span>`;
                 }
-        }
+            }
 
+            // 에너지 수치 텍스트
             let energyText = "";
             if (isProducer) energyText = `<span style="color:#2ecc71">+${formatNumber(energyImpact)}MW</span>`;
             else if (isConsumer) energyText = `<span style="color:#e74c3c">-${formatNumber(energyImpact)}MW</span>`;
@@ -758,18 +763,20 @@ function createBuildingElement(b, index, getCostFunc) {
     const speedMult = Logic.getBuildingMultiplier(b.id);
     const consMult = Logic.getBuildingConsumptionMultiplier(b.id);
     const energyEff = Logic.getEnergyEfficiencyMultiplier(b.id);
-    const prodBonus = Logic.getProductionBonus(); // ⭐ 환생 보너스 가져오기
+    const prodBonus = Logic.getProductionBonus(); // ⭐ 보너스 배수 가져오기
 
-    // 소모량 계산 (환생 보너스 미적용 - 재료는 그대로 씀)
+    // 소모량 (환생 보너스 영향 X)
     let inArr = b.inputs ? Object.entries(b.inputs).map(([k,v]) => {
         let finalVal = v * speedMult * consMult;
         if (k === 'energy') finalVal *= energyEff;
         return `${formatNumber(finalVal)}${k === 'energy' ? '⚡' : getResNameOnly(k)}`;
     }) : [];
     
-    // 생산량 계산 (환생 보너스 적용 - 결과물 뻥튀기)
+    // 생산량 (환생 보너스 적용!)
     let outArr = b.outputs ? Object.entries(b.outputs).map(([k,v]) => {
-        let finalProd = v * speedMult * prodBonus; // ⭐ 환생 보너스 곱하기
+        let finalProd = v * speedMult;
+        if (k !== 'energy') finalProd *= prodBonus; // ⭐ 자원 생산 뻥튀기
+        else finalProd *= prodBonus; // ⭐ 전력 생산 뻥튀기
         return `${formatNumber(finalProd)}${k === 'energy' ? '⚡' : getResNameOnly(k)}`;
     }) : [];
     
@@ -777,9 +784,8 @@ function createBuildingElement(b, index, getCostFunc) {
     if (inArr.length > 0) processTxt += `<span style="color:#e74c3c">-${inArr.join(',')}</span> `;
     if (outArr.length > 0) processTxt += `➡ <span style="color:#2ecc71">+${outArr.join(',')}</span>/s`;
 
-    
     div.innerHTML = `
-        <span class="si-name">${b.name} ${prestigeBadge} <small style="color:#8892b0; font-weight:normal;">(${b.activeCount}/${b.count})</small></span>
+        <span class="si-name">${b.name} <small style="color:#8892b0; font-weight:normal;">(${b.activeCount}/${b.count})</small></span>
         <span class="si-level">Lv.${b.count}</span>
         <div class="si-desc">${processTxt}</div>
         <div class="si-cost">${costTxt}</div>
