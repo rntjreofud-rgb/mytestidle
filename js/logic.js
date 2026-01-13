@@ -40,8 +40,7 @@ export function getBuildingMultiplier(buildingId) {
         }
     });
 
-    // [환생 기본 보너스] 레벨당 20% 복리
-    if (gameData.prestigeLevel > 0) multiplier *= Math.pow(1.2, gameData.prestigeLevel);
+    
 
     // [유산 보너스]
     if (legacy.includes('infinite_storage')) multiplier *= 1.2; // 압축 창고
@@ -50,6 +49,12 @@ export function getBuildingMultiplier(buildingId) {
 
     return multiplier;
 }
+
+export function getProductionBonus() {
+    // 환생 1회당 생산량만 20% 복리 증가
+    return Math.pow(1.2, gameData.prestigeLevel || 0);
+}
+
 
 /**
  * 2. 건물의 현재 건설 비용 계산 (보유수 + 유산 보너스)
@@ -124,21 +129,27 @@ export function calculateNetMPS() {
     const totalProd = gameData.resources.energy || 0;
     const totalReq = gameData.resources.energyMax || 0;
     const powerFactor = totalReq > 0 ? Math.min(1.0, totalProd / totalReq) : 1.0;
-
+    const prodBonus = getProductionBonus(); 
     // A. 전체 자원 수요량(1초 기준) 먼저 계산
     let resourceDemand = {};
     gameData.buildings.forEach(b => {
         if (b.activeCount > 0) {
-            let speedMult = getBuildingMultiplier(b.id);
+            let speedMult = getBuildingMultiplier(b.id); // 연구/유산 속도
             let consMult = getBuildingConsumptionMultiplier(b.id);
-            let energyEff = getEnergyEfficiencyMultiplier(b.id);
             let efficiency = speedMult * ((b.inputs && b.inputs.energy) ? powerFactor : 1.0);
 
             if (b.inputs) {
                 for (let res in b.inputs) {
-                    if(res === 'energy') continue;
-                    let demand = (b.inputs[res] * consMult) * b.activeCount * efficiency;
-                    resourceDemand[res] = (resourceDemand[res] || 0) + demand;
+                    if(res !== 'energy') {
+                        // ⭐ 소모량에는 prodBonus를 곱하지 않음 (연구 속도만 반영)
+                        stats[res].cons += (b.inputs[res] * consMult) * b.activeCount * efficiency;
+                    }
+                }
+            }
+            if (b.outputs && !b.outputs.energy) {
+                for (let res in b.outputs) {
+                    // ⭐ 생산량에만 환생 보너스(prodBonus)를 곱함!
+                    stats[res].prod += b.outputs[res] * b.activeCount * efficiency * prodBonus;
                 }
             }
         }
@@ -203,7 +214,8 @@ export function produceResources(deltaTime) {
     let totalEnergyProd = 0;
     let totalEnergyReq = 0;
     const legacy = gameData.legacyUpgrades || [];
-    
+    const prodBonus = getProductionBonus();
+
     // [유산: 발효 잔열] 유기섬유 자동 생산
     if (legacy.includes('legacy_biofuel_trickle')) {
         gameData.resources.bioFiber += 0.1 * deltaTime;
@@ -216,25 +228,22 @@ export function produceResources(deltaTime) {
             let consMult = getBuildingConsumptionMultiplier(b.id);
             let inputEfficiency = 1.0;
             
-            // [유산: 과충전 프로토콜] 발전기 생산량 25% 증가
             if (legacy.includes('aurelia_generator_boost')) speedMult *= 1.25;
-            // [유산: 항성 항해 데이터] 환생 1회당 전기 생산 +4%
             if (legacy.includes('aurelia_prestige_drive')) speedMult *= (1 + (gameData.prestigeLevel * 0.04));
 
             if(b.inputs) {
                 for(let res in b.inputs) {
                     if (res === 'energy') continue;
                     let needed = (b.inputs[res] * consMult) * b.activeCount * speedMult * deltaTime;
-                    if((gameData.resources[res] || 0) < needed) {
-                        inputEfficiency = Math.min(inputEfficiency, (gameData.resources[res] || 0) / (needed || 1));
-                    }
+                    if((gameData.resources[res] || 0) < needed) inputEfficiency = Math.min(inputEfficiency, (gameData.resources[res] || 0) / (needed || 1));
                 }
                 for(let res in b.inputs) {
                     if (res === 'energy') continue;
                     gameData.resources[res] = Math.max(0, gameData.resources[res] - (b.inputs[res] * consMult * b.activeCount * speedMult * deltaTime * inputEfficiency));
                 }
             }
-            totalEnergyProd += (b.outputs.energy * b.activeCount * speedMult) * inputEfficiency;
+            // ⭐ 전력 생산량에 환생 보너스(prodBonus) 적용! 연료 소모는 그대로, 전기는 더 많이.
+            totalEnergyProd += (b.outputs.energy * b.activeCount * speedMult) * inputEfficiency * prodBonus;
         }
     });
 
@@ -244,10 +253,8 @@ export function produceResources(deltaTime) {
             let speedMult = getBuildingMultiplier(b.id);
             let consMult = getBuildingConsumptionMultiplier(b.id);
             let energyEff = getEnergyEfficiencyMultiplier(b.id);
-
-            // ⭐ [추가] [유산: 핵융합 최적화] 고급 에너지 시설(ID 30, 111 등) 전력 소모 30% 감소
             if (legacy.includes('aurelia_fusion_eff') && [30, 111].includes(b.id)) energyEff *= 0.7;
-
+            // 전력 요구량은 환생 보너스를 곱하지 않음
             totalEnergyReq += (b.inputs.energy * consMult * energyEff) * b.activeCount * speedMult;
         }
     });
@@ -262,14 +269,28 @@ export function produceResources(deltaTime) {
     let frameDemand = {};
     gameData.buildings.forEach(b => {
         if (b.activeCount <= 0 || (b.outputs && b.outputs.energy)) return;
+
         let speedMult = getBuildingMultiplier(b.id);
         let consMult = getBuildingConsumptionMultiplier(b.id);
         let efficiency = speedMult * (b.inputs && b.inputs.energy ? powerFactor : 1.0);
+
         if (b.inputs) {
+            // ... (inputEfficiency 계산 로직 동일) ...
+            
+            // 실제 자원 소모
             for (let res in b.inputs) {
                 if (res === 'energy') continue;
-                let needed = (b.inputs[res] * consMult) * b.activeCount * deltaTime * efficiency;
-                frameDemand[res] = (frameDemand[res] || 0) + needed;
+                // ⭐ 소모량은 환생 보너스 없이 연구 속도로만 차감
+                let actualConsume = (b.inputs[res] * consMult) * b.activeCount * deltaTime * efficiency;
+                gameData.resources[res] = Math.max(0, gameData.resources[res] - actualConsume);
+            }
+        }
+
+        if (efficiency > 0 && b.outputs) {
+            for (let res in b.outputs) {
+                if (res === 'energy') continue;
+                // ⭐ 생산량에만 환생 보너스 적용! (연금술 수준의 효율)
+                gameData.resources[res] += (b.outputs[res] * b.activeCount * deltaTime * efficiency * prodBonus);
             }
         }
     });
