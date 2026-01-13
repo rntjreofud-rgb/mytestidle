@@ -176,7 +176,7 @@ export function calculateNetMPS() {
                 
                 let inputShortage = 1.0;
                 // 실제 생산량을 보고 싶다면 아래 로직 유지, 잠재량을 보고 싶다면 삭제
-                
+                /*
                 if (b.inputs) {
                     for (let r in b.inputs) {
                         if (r === 'energy') continue;
@@ -185,7 +185,7 @@ export function calculateNetMPS() {
                         if (demand > available) inputShortage = Math.min(inputShortage, available / demand);
                     }
                 }
-                
+                */
 
                 for (let res in b.outputs) {
                     stats[res].prod += b.outputs[res] * b.activeCount * baseEfficiency * inputShortage;
