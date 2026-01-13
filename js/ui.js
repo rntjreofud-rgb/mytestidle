@@ -383,10 +383,23 @@ export function updateScreen(stats) {
             if(container) container.appendChild(card);
         }
 
+        
         // 수치 업데이트 로직
         const val = gameData.resources[key] || 0;
         const net = (stats[key] ? stats[key].prod - stats[key].cons : 0);
         
+        card.classList.remove('res-warning', 'res-danger');
+        
+        if (net < -0.01) { // 소모가 생산보다 많을 때 (부동소수점 오차 방지 위해 -0.01 기준)
+            if (val <= 0.1) {
+                // 자원이 거의 없고 적자 상태 -> 빨간색 (위험)
+                card.classList.add('res-danger');
+            } else {
+                // 자원은 있지만 줄어드는 중 -> 노란색 (주의)
+                card.classList.add('res-warning');
+            }
+        }
+
         card.querySelector('.res-amount').innerText = formatNumber(val);
         const mpsEl = card.querySelector('.res-mps');
 

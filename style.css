@@ -148,6 +148,30 @@ header { background-color: var(--bg-panel); border-bottom: 1px solid var(--borde
 .sub-res-grid.slim-mode .res-footer { margin: 0 !important; }
 .sub-res-grid.slim-mode .res-mps { font-size: 0.7rem !important; }
 
+/* === 자원 카드 경고 점멸 효과 === */
+
+/* 1. 노란색 점멸 (자원 감소 중) */
+@keyframes blink-yellow-bg {
+    0%, 100% { background-color: var(--bg-panel); }
+    50% { background-color: rgba(241, 196, 15, 0.15); } /* 노란색 살짝 */
+}
+.res-warning {
+    animation: blink-yellow-bg 1.5s infinite;
+    border: 1px solid rgba(241, 196, 15, 0.3) !important;
+}
+
+/* 2. 빨간색 점멸 (자원 고갈 및 가동 중단) */
+@keyframes blink-red-bg {
+    0%, 100% { background-color: var(--bg-panel); }
+    50% { background-color: rgba(231, 76, 60, 0.25); } /* 빨간색 진하게 */
+}
+.res-danger {
+    animation: blink-red-bg 0.8s infinite;
+    border: 1px solid rgba(231, 76, 60, 0.6) !important;
+}
+
+
+
 
 /* =================================================================
    6. 카테고리 접기 & 연구소 & 시스템 (Collapsible & Others)
