@@ -12,34 +12,23 @@ window.gameData = gameData;
 
 function applyLegacyStartBonuses() {
     const legacy = gameData.legacyUpgrades || [];
-    console.log("유산 보너스 적용 시작...", legacy);
+    const p = gameData.currentPlanet;
 
-    // 1. 시작 자원 보급 (지구/아우렐리아/베리디안 통합)
-    if (legacy.includes('start_resource') && gameData.currentPlanet === 'earth') {
-        gameData.resources.wood += 500;
-        gameData.resources.stone += 500;
-        gameData.resources.plank += 100;
+    // 1. 시작 자원 보급 (이미 0으로 초기화된 직후에 호출됨)
+    if (legacy.includes('start_resource') && p === 'earth') {
+        gameData.resources.wood = 500;
+        gameData.resources.stone = 500;
+        gameData.resources.plank = 100;
     }
-    if (legacy.includes('legacy_spore_start') && gameData.currentPlanet === 'veridian') {
-        gameData.resources.spore += 200;
+    if (legacy.includes('legacy_spore_start') && p === 'veridian') {
+        gameData.resources.spore = 200;
     }
-    if (legacy.includes('aurelia_start_metal') && gameData.currentPlanet === 'aurelia') {
-        gameData.resources.scrapMetal += 300;
+    if (legacy.includes('aurelia_start_metal') && p === 'aurelia') {
+        gameData.resources.scrapMetal = 300;
     }
-
-    // 2. 초기 자율 건설 (첫 번째 건물 레벨업)
-    let startBuildLevel = 0;
-    if (legacy.includes('legacy_auto_build2')) startBuildLevel = 10;
-    else if (legacy.includes('legacy_auto_build1')) startBuildLevel = 5;
-
-    if (startBuildLevel > 0) {
-        // 현재 행성의 첫 번째 건물 강제 활성화
-        if (gameData.buildings && gameData.buildings[0]) {
-            gameData.buildings[0].count = startBuildLevel;
-            gameData.buildings[0].activeCount = startBuildLevel;
-            gameData.buildings[0].on = true;
-        }
-    }
+    
+    // 건물 레벨은 이제 data.js의 setGameData가 담당하므로 여기서 삭제해도 됩니다.
+    console.log("시작 자원 유산 적용 완료");
 }
 
 
