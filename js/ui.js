@@ -485,7 +485,10 @@ function updatePowerUI() {
             sectionGrid = document.createElement('div');
             sectionGrid.id = `ctrl-grid-${groupKey}`;
             sectionGrid.className = 'sub-build-grid';
-            sectionTitle.onclick = () => { sectionTitle.classList.toggle('collapsed'); sectionGrid.classList.toggle('collapsed-content'); };
+            sectionTitle.onclick = () => { 
+                sectionTitle.classList.toggle('collapsed');
+                sectionGrid.classList.toggle('collapsed-content'); };
+               
             container.appendChild(sectionTitle);
             container.appendChild(sectionGrid);
         }
@@ -601,10 +604,10 @@ function renderResearchSection(titleText, list, isDone, parentContainer) {
     subGrid.className = `sub-build-grid ${isCollapsed ? 'collapsed-content' : ''}`; 
 
     title.onclick = () => {
-        title.classList.toggle('collapsed');
+        const isNowCollapsed = title.classList.toggle('collapsed');
         subGrid.classList.toggle('collapsed-content');
 
-        collapsedState[stateKey] = nowCollapsed;
+        collapsedState[stateKey] = isNowCollapsed;
     };
 
     parentContainer.appendChild(title);
@@ -735,10 +738,12 @@ export function renderShop(onBuyCallback, getCostFunc) {
         subGrid.className = `sub-build-grid ${isCollapsed ? 'collapsed-content' : ''}`; 
 
         title.onclick = () => {
+            
+            const isNowCollapsed = title.classList.toggle('collapsed'); 
             title.classList.toggle('collapsed');
             subGrid.classList.toggle('collapsed-content');
                 // 접기추가
-            collapsedState[groupKey] = nowCollapsed;
+            collapsedState[groupKey] = isNowCollapsed;
         };
 
         elements.buildingList.appendChild(title);
