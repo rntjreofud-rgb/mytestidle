@@ -35,19 +35,19 @@ export const elements = {
 
 export const resNames = {
     wood: "🌲 나무", stone: "🪨 돌", coal: "⚫ 석탄", ironOre: "🥈 철광", copperOre: "🥉 구리광", 
-    oil: "🛢️ 원유", titaniumOre: "💎 티타늄광", uraniumOre: "💚 우라늄광",
+    oil: "🛢️ 원유", titaniumOre: "💠 티타늄광", uraniumOre: "💚 우라늄광",
     plank: "🪵 판자", brick: "🧱 벽돌", ironPlate: "⬜ 철판", copperPlate: "🟧 구리판", 
     glass: "🍷 유리", sulfur: "💛 유황", steel: "🏗️ 강철", plastic: "🧪 플라스틱", 
     concrete: "🏢 콘크리트", battery: "🔋 배터리", fuelCell: "☢️ 연료봉",
     gear: "⚙️ 톱니", circuit: "📟 회로", advCircuit: "🔴 고급회로", 
     processor: "🔵 프로세서", aiCore: "🧠 AI코어", rocketFuel: "🚀 로켓연료", 
     nanobots: "🤖 나노봇", warpCore: "🌀 워프코어", energy: "⚡ 전력",
-    titaniumPlate: "💎 티타늄판", optics: "🔭 광학렌즈", advAlloy: "🛡️ 고급합금",
+    titaniumPlate: "🟦 티타늄판", optics: "🔭 광학렌즈", advAlloy: "🛡️ 고급합금",
     quantumData: "💾 양자데이터", gravityModule: "🛸 중력모듈",
 
     bioFiber: "🌿 유기섬유", spore: "🍄 포자", yeast: "🦠 효모", livingWood: "🌳 생명목",
     bioFuel: "🧪 바이오연료", rootBrick: "🪵 뿌리벽돌", neuralFiber: "🧠 신경섬유",
-    mutantCell: "🌑 변이세포", geneticCode: "🧬 유전코드", pheromone: "🧪 페로몬",
+    mutantCell: "🌑 변이세포", geneticCode: "🧬 유전코드", pheromone: "🏺 페로몬",
     biosphereCore: "🌐 생태코어",
     
     scrapMetal: "🔩 고철파편", magnet: "🧲 자석", chargedCrystal: "💎 대전수정",
