@@ -595,6 +595,9 @@ export function updateHouseUI(onUpgrade) {
     if (nextStage) {
         elements.upgradeBtn.style.display = "flex";
         
+        
+
+
         // ⭐ [수정] 에너지 표기 수정
         const reqTxt = Object.entries(nextStage.req)
             .map(([k, v]) => {
@@ -604,7 +607,47 @@ export function updateHouseUI(onUpgrade) {
             .join('  '); // 가독성을 위해 공백 2칸
 
         elements.upgradeBtn.innerText = `⬆️ ${nextStage.name} (${reqTxt})`;
+        
+        const epsilon = 0.0001; 
         let canUp = true;
+        let debugMissing = [];
+
+
+        for(let k in nextStage.req) {
+            let reqVal = nextStage.req[k];
+            let currentVal = (k === 'energy') ? (gameData.resources.energy || 0) : (gameData.resources[k] || 0);
+
+            if (k === 'energy') { 
+                if(currentVal < reqVal) {
+                    canUp = false;
+                    debugMissing.push(`전력 부족: 현재 ${currentVal} < 필요 ${reqVal}`);
+                }
+            } else { 
+                // 오차 범위 적용 비교
+                if(currentVal < reqVal - epsilon) {
+                    canUp = false;
+                    debugMissing.push(`${k} 부족: 현재보유 ${currentVal} < 필요량 ${reqVal}`);
+                }
+            }
+        }
+
+        if (!canUp && debugMissing.length > 0) {
+            // 콘솔창이 너무 도배되지 않게 1초에 한 번 정도만 확인해보세요
+            // console.log("업그레이드 불가 사유:", debugMissing.join(', '));
+        }
+
+        elements.upgradeBtn.disabled = !canUp;
+        
+        // 클릭 이벤트 시 디버그 정보 포함
+        elements.upgradeBtn.onclick = () => {
+            if (canUp) {
+                onUpgrade(nextStage);
+            } else {
+                console.error("⛔ 업그레이드 실패 사유:", debugMissing.join(', '));
+                alert("업그레이드 불가! F12 콘솔을 확인하세요.\n" + debugMissing.join('\n'));
+            }
+        };
+
         for(let k in nextStage.req) {
             if (k === 'energy') { 
                 if((gameData.resources.energy || 0) < nextStage.req[k]) canUp = false; 
