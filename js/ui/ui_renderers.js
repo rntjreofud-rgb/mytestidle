@@ -859,3 +859,54 @@ export function checkUnlocks() {
     const sBtn = document.getElementById('btn-become-star');
     if(sBtn) sBtn.style.display = (p !== 'earth') ? 'block' : 'none';
 }
+
+export function renderResearchTab() {
+    const container = elements.viewResearch.querySelector('#research-list-container') || elements.viewResearch.querySelector('.action-box');
+    if (!container) return;
+    container.innerHTML = "";
+    if (!gameData.researches) gameData.researches = [];
+
+    const availableRes = [];
+    const completedRes = [];
+    const currentResearchList = getActiveResearch(); 
+
+    currentResearchList.forEach(r => {
+        const isDone = gameData.researches.includes(r.id);
+        const isPrereqDone = r.reqResearch ? gameData.researches.includes(r.reqResearch) : true;
+        let isTargetVisible = true;
+        if (r.type === 'building' || r.type === 'consumption' || r.type === 'energyEff') {
+            isTargetVisible = r.target.some(targetId => {
+                const b = gameData.buildings.find(build => build.id === targetId);
+                return b && gameData.houseLevel >= (b.reqLevel || 0);
+            });
+        }
+        if (isDone) completedRes.push(r);
+        else if (isPrereqDone && isTargetVisible) availableRes.push(r);
+    });
+
+    if (availableRes.length > 0) renderResearchSection("🔬 진행 가능한 연구", availableRes, false, container);
+    if (completedRes.length > 0) renderResearchSection("✅ 완료된 기술", completedRes, true, container);
+    updateResearchButtons();
+}
+
+function renderResearchSection(titleText, list, isDone, parentContainer) {
+    const stateKey = `res_${titleText}`;
+    const isCollapsed = collapsedState[stateKey] === true;
+
+    const title = document.createElement('div');
+    title.className = `research-section-title ${isCollapsed ? 'collapsed' : ''}`; 
+    title.innerHTML = `${titleText} (${list.length}) <span class="toggle-arrow">▼</span>`;
+
+    const subGrid = document.createElement('div');
+    subGrid.className = `sub-build-grid ${isCollapsed ? 'collapsed-content' : ''}`; 
+
+    title.onclick = () => {
+        const isNowCollapsed = title.classList.toggle('collapsed');
+        subGrid.classList.toggle('collapsed-content');
+        collapsedState[stateKey] = isNowCollapsed;
+    };
+
+    parentContainer.appendChild(title);
+    parentContainer.appendChild(subGrid);
+    list.forEach(r => subGrid.appendChild(createResearchElement(r, isDone)));
+}
