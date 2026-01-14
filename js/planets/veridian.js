@@ -53,7 +53,7 @@ export const veridianData = {
         { id: 201, name: "자동 가시 낫", cost: { bioFiber: 100, spore: 50 }, inputs: null, outputs: { bioFiber: 5.0 }, count: 0, reqLevel: 1 },
         { id: 202, name: "포자 포집기", cost: { bioFiber: 200 }, inputs: null, outputs: { spore: 2.0 }, count: 0, reqLevel: 1 },
         { id: 203, name: "균사체 인큐베이터", cost: { bioFiber: 500, spore: 200 }, inputs: { bioFiber: 5 }, outputs: { yeast: 2.0 }, count: 0, reqLevel: 2 },
-        { id: 204, name: "압축 섬유 분쇄기", cost: { spore: 500, yeast: 50 }, inputs: { bioFiber: 10 }, outputs: { livingWood: 3.0 }, count: 0, reqLevel: 2 },
+        { id: 204, name: "압축 섬유 분쇄기", cost: { spore: 500, yeast: 50 }, inputs: { bioFiber: 10 }, outputs: { livingWood: 3.0 }, count: 0, reqLevel: 1 },
         { id: 205, name: "미생물 발효조", cost: { livingWood: 200, yeast: 100 }, inputs: { yeast: 5, bioFiber: 10 }, outputs: { bioFuel: 1.5, energy: 10 }, count: 0, reqLevel: 3 },
         { id: 206, name: "생체 태양광 잎", cost: { livingWood: 500, yeast: 200 }, inputs: null, outputs: { energy: 30 }, count: 0, reqLevel: 5 },
         { id: 207, name: "뿌리 벽돌 가마", cost: { spore: 1000, bioFuel: 100 }, inputs: { spore: 20, bioFuel: 5 }, outputs: { rootBrick: 5.0 }, count: 0, reqLevel: 5 },
