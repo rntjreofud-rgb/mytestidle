@@ -182,7 +182,7 @@ export const earthData = {
     { id: "bio_acceleration", name: "성장 촉진 호르몬", desc: "수목 배양소의 나무 생산 및 전력 소모 속도 3배 증가", cost: { plastic: 5000, processor: 200 }, type: 'building', target: [47], value: 3, reqResearch: "polymer_science" },
     { id: "efficient_burner", name: "고효율 연소실", desc: "석탄 발전소의 석탄 소모량 50% 감소 (전력 생산 유지)", cost: { steel: 500, circuit: 200 }, type: 'consumption', value: 0.5, target: [14], reqResearch: "coal_efficiency" },
     { id: "coal_gasification", name: "석탄 가스화 공정", desc: "석탄 발전소의 전력 생산 및 석탄 소모 속도 2배 증가", cost: { steel: 2000, advCircuit: 500 }, type: 'building', target: [14], value: 2, reqResearch: "efficient_burner" },
-    { id: "coal_gasification_cons", name: "가스화 소모 절감", desc: "가스화 공정 적용으로 석탄 소모량 30% 감소", cost: { steel: 1, circuit: 1 }, type: 'consumption', value: 0.7, target: [14], reqResearch: "efficient_burner" },
+    { id: "coal_gasification_cons", name: "가스화 소모 절감", desc: "가스화 공정 적용으로 석탄 소모량 30% 감소", cost: { steel: 1000, circuit: 500 }, type: 'consumption', value: 0.7, target: [14], reqResearch: "efficient_burner" },
     { id: "nano_catalyst", name: "나노 촉매 연소", desc: "모든 석탄 소모 시설의 석탄 사용량 60% 감소", cost: { nanobots: 200, titaniumPlate: 1000 }, type: 'consumption', value: 0.4, target: [14, 13, 26, 6, 7], reqResearch: "coal_purification" },
     { id: "blasting_tech", name: "정밀 폭파 공법", desc: "모든 석재 시설의 돌 생산 및 에너지 소모 속도 2.5배 증가", cost: { sulfur: 1000, steel: 3000 }, type: 'building', target: [2, 45], value: 2.5, reqResearch: "stone_excavation" },
     { id: "titanium_alloy", name: "티타늄 합금", desc: "티타늄 채굴 및 제련 시설의 가동 및 소모 속도 2배 증가", cost: { steel: 5000, advCircuit: 200 }, type: 'building', target: [25, 26], value: 2, reqResearch: "sulfuric_acid" },
