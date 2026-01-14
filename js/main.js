@@ -197,9 +197,7 @@ function gameLoop(currentTime) {
     UI.updateScreen(netMPS);
     UI.updateShopButtons(Logic.getBuildingCost);
     
-    // 반복 호출에서 무명 함수를 계속 만들지 않도록 핸들러 전달
-    // (UI.updateHouseUI는 변화가 있을 때만 DOM을 건드리는 게 좋지만, 현재 구조상 매 프레임 호출하므로 가볍게 유지)
-    // 여기서는 UI 깜빡임 방지를 위해 로직 상태가 변했을 때만 호출하는 게 좋으나, 일단 유지합니다.
+    UI.updateHouseUI(handleHouseUpgrade);
     
     requestAnimationFrame(gameLoop);
 }
