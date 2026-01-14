@@ -443,10 +443,18 @@ export function checkUnlocks() {
 export function renderShop(onBuyCallback, getCostFunc) {
     if(onBuyCallback) cachedBuyCallback = onBuyCallback;
     if (!elements.buildingList) return;
+
+
+     if (!gameData.buildings || gameData.buildings.length === 0) {
+        console.warn("건물 데이터가 비어있습니다. 데이터 로드를 확인하세요.");
+        return;
+    }
+
     elements.buildingList.innerHTML = "";
     elements.buildingList.style.display = "block";
 
     const wood = gameData.resources.wood || 0;
+    const firstBuilding = gameData.buildings[0];
     const isStoneUnlocked = (gameData.houseLevel >= 1 || wood >= 10 || (gameData.buildings[0] && gameData.buildings[0].count > 0));
 
     for (const [groupKey, group] of Object.entries(buildingGroups)) {
