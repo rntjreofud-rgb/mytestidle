@@ -803,3 +803,59 @@ export function updateResearchButtons() {
         }
     });
 }
+
+export function checkUnlocks() {
+    const p = gameData.currentPlanet || 'earth';
+    const disc = gameData.unlockedResources || [];
+    
+    // 헬퍼 함수: 엘리먼트 보이기/숨기기
+    const toggle = (el, show) => {
+        if (el) el.classList.toggle('hidden', !show);
+    };
+
+    // 1. 유산/환생 조건 체크
+    const isLegacy = (gameData.houseLevel >= 50 || (gameData.prestigeLevel || 0) > 0 || p !== 'earth');
+    
+    // 2. 수동 채집 버튼 텍스트 및 노출 설정
+    const names = { 
+        earth: ["🌲 나무 베기", "🪨 돌 캐기", "⚫ 석탄 캐기"], 
+        aurelia: ["🔩 고철 줍기", "🧲 자석 수집", ""], 
+        veridian: ["🌿 섬유 채집", "🍄 포자 채취", ""] 
+    }[p];
+
+    // 버튼 텍스트 업데이트
+    if(elements.btns.wood) elements.btns.wood.innerText = names[0];
+    if(elements.btns.stone) elements.btns.stone.innerText = names[1];
+    if(elements.btns.coal && names[2]) elements.btns.coal.innerText = names[2];
+
+    // 버튼 노출 제어
+    toggle(elements.btns.wood, true); // 첫 번째 자원은 항상 노출
+    
+    // 두 번째 자원 (돌/자석/포자): 외계 행성은 기본 노출, 지구는 발견 시 노출
+    toggle(elements.btns.stone, p !== 'earth' || disc.includes('stone'));
+    
+    // 지구 전용 자원 버튼들
+    toggle(elements.btns.coal, p === 'earth' && disc.includes('coal'));
+    toggle(elements.btns.plank, p === 'earth' && disc.includes('plank'));
+    toggle(elements.btns.ironOre, p === 'earth' && disc.includes('ironOre'));
+    toggle(elements.btns.copperOre, p === 'earth' && disc.includes('copperOre'));
+
+    // 3. 네비게이션 메뉴 노출 제어
+    if(elements.navPower) {
+        // 전력 탭: 집 5레벨 이상이거나 외계 행성일 때
+        elements.navPower.style.display = (gameData.houseLevel >= 5 || p !== 'earth') ? 'flex' : 'none';
+    }
+    
+    if(elements.navLegacy) {
+        // 유산 탭: 조건 충족 시
+        elements.navLegacy.style.display = isLegacy ? 'flex' : 'none';
+    }
+    
+    // 사이드바 카테고리 제목
+    const lCat = document.getElementById('legacy-cat'); 
+    if(lCat) lCat.style.display = isLegacy ? 'block' : 'none';
+
+    // 4. 별이 되기(긴급 탈출) 버튼: 외계 행성에서만 노출
+    const sBtn = document.getElementById('btn-become-star');
+    if(sBtn) sBtn.style.display = (p !== 'earth') ? 'block' : 'none';
+}
