@@ -94,7 +94,7 @@ export const aureliaData = {
         
         { id: 114, name: "중합금 대형 주물소", cost: { heavyAlloy: 20000, nanoSteel: 10000 }, inputs: { scrapMetal: 500, magnet: 100, energy: 800 }, outputs: { heavyAlloy: 200.0 }, count: 0, reqLevel: 36 },
         { id: 115, name: "지열 플럭스 우물", cost: { nanoSteel: 30000, fluxEnergy: 10000 }, inputs: { energy: 1200 }, outputs: { fluxEnergy: 300.0 }, count: 0, reqLevel: 38 },
-        { id: 116, name: "플라즈마 정제탑", cost: { fluxEnergy: 50000, fluxLogic: 500 }, inputs: { chargedCrystal: 1000, energy: 3000 }, outputs: { plasmaCore: 2.0 }, count: 0, reqLevel: 40 },
+        { id: 116, name: "플라즈마 정제탑", cost: { fluxEnergy: 50000, fluxLogic: 500 }, inputs: { chargedCrystal: 1000, energy: 3000 }, outputs: { plasmaCore: 2.0 }, count: 0, reqLevel: 23},
         { id: 117, name: "마그네타 빔 타워", cost: { nanoSteel: 100000, plasmaCore: 100 }, inputs: { plasmaCore: 1 }, outputs: { energy: 50000 }, count: 0, reqLevel: 42 },
         { id: 118, name: "반물질 금속 파쇄기", cost: { nanoSteel: 200000, plasmaCore: 500 }, inputs: { energy: 10000 }, outputs: { scrapMetal: 10000.0, magnet: 2000.0 }, count: 0, reqLevel: 45 },
         { id: 119, name: "레일건 포신 가공기", cost: { heavyAlloy: 1000000, nanoSteel: 500000 }, inputs: { nanoSteel: 5000, energy: 15000 }, outputs: { plasmaCore: 10.0 }, count: 0, reqLevel: 48 },
