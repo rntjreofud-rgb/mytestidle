@@ -4,6 +4,7 @@ export const veridianData = {
 
     // === 하우스 업그레이드 (Lv.0 ~ 10) ===
     houseStages: [
+               // 0~9: 생존과 적응
         { name: "덩굴 은신처", desc: "추락한 포드가 거대 덩굴에 뒤덮였습니다. 일단 덩굴을 치워야 합니다.", req: { bioFiber: 10 } },
         { name: "이끼 침대", desc: "폭신한 이끼로 바닥을 깔았습니다. 조금은 살만해졌습니다.", req: { bioFiber: 50, spore: 20 } },
         { name: "나무 구멍 집", desc: "거대 고목의 옹이 구멍을 파내어 안전한 거처를 만들었습니다.", req: { bioFiber: 200, livingWood: 50 } },
@@ -14,6 +15,8 @@ export const veridianData = {
         { name: "수액 파이프라인", desc: "나무에서 흐르는 영양분을 효율적으로 운송합니다.", req: { bioFuel: 500, livingWood: 1000 } },
         { name: "키틴질 외벽", desc: "외계 곤충의 껍질 성분을 이용해 벽을 단단하게 보강합니다.", req: { rootBrick: 1000, spore: 5000 } },
         { name: "생체 공명 안테나", desc: "숲의 의식과 연결되어 주변 자원을 감지합니다.", req: { yeast: 2000, bioFuel: 1000 } },
+        
+        // 10~19: 공생과 확장
         { name: "거대 식물 기생실", desc: "거대 나무의 수액을 직접 빨아들여 에너지로 전환합니다.", req: { livingWood: 5000, bioFiber: 10000 } },
         { name: "유전자 조작 온실", desc: "초고속 성장이 가능한 변이 식물을 재배합니다.", req: { spore: 20000, energy: 200 } },
         { name: "광합성 유리 돔", desc: "햇빛을 99% 효율로 받아들이는 특수 유기 유리로 지붕을 덮습니다.", req: { rootBrick: 5000, bioFuel: 2000 } },
@@ -24,27 +27,42 @@ export const veridianData = {
         { name: "생체 전력 저장소", desc: "전기 뱀장어의 원리를 응용한 거대 생체 배터리입니다.", req: { energy: 2000, rootBrick: 10000 } },
         { name: "페로몬 살포 장치", desc: "특수한 향기로 숲의 생명체들을 조종하여 기지를 지킵니다.", req: { pheromone: 50, bioFuel: 20000 } },
         { name: "DNA 분석 센터", desc: "이 행성의 생명 코드를 완벽하게 해독하기 시작합니다.", req: { mutantCell: 500, geneticCode: 10 } },
+        
+        // 20~29: 진화의 시작
         { name: "엽록소 가속기", desc: "식물의 광합성 속도를 극한으로 끌어올립니다.", req: { energy: 5000, livingWood: 50000 } },
         { name: "바이오 폴리머 코팅", desc: "우주의 진공 상태를 견딜 수 있는 유기 코팅을 입힙니다.", req: { bioFuel: 50000, mutantCell: 1000 } },
         { name: "포자 추진 엔진 테스트", desc: "폭발적인 가스 포자를 분사하여 추진력을 얻는 실험을 합니다.", req: { spore: 200000, energy: 10000 } },
         { name: "지능형 덩굴 케이블", desc: "신경계처럼 작동하는 덩굴로 기지 전체를 연결합니다.", req: { geneticCode: 50, bioFiber: 100000 } },
         { name: "생태계 조율 장치", desc: "행성 전체의 산소 농도와 기온을 기지 중심으로 맞춥니다.", req: { pheromone: 200, rootBrick: 50000 } },
         { name: "유기체 나노 팩토리", desc: "미세한 박테리아들이 스스로 건물을 수리하고 조립합니다.", req: { mutantCell: 5000, yeast: 100000 } },
-        { name: "신경 인터페이스", desc: "파일럿의 뇌와 우주선을 직접 생체 조직으로 연결합니다.", req: { geneticCode: 200, energy: 20000 } },
+        { name: "신경 인터페이스", desc: "파일럿의 뇌와 우주선을 직접 생체 조직으로 연결합니다.", req: { neuralFiber: 200, energy: 20000 } },
         { name: "고밀도 생명목 선체", desc: "강철보다 단단하고 스스로 치유되는 생명목으로 선체를 만듭니다.", req: { livingWood: 200000, rootBrick: 100000 } },
         { name: "플라즈마 액낭", desc: "고에너지를 담을 수 있는 유기체 주머니를 장착합니다.", req: { bioFuel: 100000, mutantCell: 10000 } },
         { name: "바이오스피어 코어", desc: "우주선 내부에서 완벽하게 순환되는 생태계를 구축합니다.", req: { biosphereCore: 1, pheromone: 500 } },
-        { name: "유전 정보 도서관", desc: "지구의 모든 생명 정보를 데이터화하여 보관합니다.", req: { geneticCode: 1000, mutantCell: 20000 } },
+        
+        // 30~39: 초월적 생명체
+        { name: "유전 정보 도서관", desc: "지구와 베리디안의 모든 생명 정보를 데이터화하여 보관합니다.", req: { geneticCode: 1000, mutantCell: 20000 } },
         { name: "대기권 돌파 포자함", desc: "거대한 씨앗 형태의 선체를 최종 점검합니다.", req: { livingWood: 500000, bioFiber: 1000000 } },
         { name: "생체 기압 안정실", desc: "높은 고도에서도 세포가 터지지 않게 압력을 유지합니다.", req: { rootBrick: 200000, energy: 50000 } },
-        { name: "항성간 진화 센서", desc: "먼 우주의 생명 신호를 포착하기 위한 유기 안테나입니다.", req: { pheromone: 1000, mutantCell: 50000 } },
+        { name: "항성간 진화 센서", desc: "먼 우주의 생명 신호를 포착하기 위한 유기 안테나입니다.", req: { pheromone: 1000, neuralFiber: 50000 } },
         { name: "단백질 추진 탱크", desc: "가장 강력한 유기 에너지를 담을 탱크를 조립합니다.", req: { bioFuel: 300000, yeast: 500000 } },
         { name: "세포 복제 가속기", desc: "우주 여행 중 필요한 유기물을 즉시 복제합니다.", req: { geneticCode: 5000, biosphereCore: 5 } },
-        { name: "생명 유지 액체", desc: "승무원들이 동면할 특수한 양수 탱크를 채웁니다.", req: { bioFuel: 500000, mutantCell: 100000 } },
-        { name: "광섬유 덩굴 묶음", desc: "빛의 속도로 정보를 전달하는 유기 회로를 완성합니다.", req: { energy: 100000, bioFiber: 2000000 } },
-        { name: "최종 진화 정수", desc: "행성의 모든 생명력을 하나의 응축물로 모읍니다.", req: { biosphereCore: 10, pheromone: 5000 } },
+        { name: "생명 유지 양수", desc: "승무원들이 동면할 특수한 양수 탱크를 채웁니다.", req: { bioFuel: 500000, mutantCell: 100000 } },
+        { name: "광섬유 덩굴 묶음", desc: "빛의 속도로 정보를 전달하는 유기 회로를 완성합니다.", req: { energy: 100000, neuralFiber: 20000 } },
+        { name: "행성 의식 동기화", desc: "행성 그 자체와 정신을 연결하여 마지막 지혜를 얻습니다.", req: { biosphereCore: 1000, pheromone: 5000 } },
         { name: "초공간 씨앗 점화", desc: "우주선이 씨앗처럼 깨어나며 도약을 준비합니다.", req: { geneticCode: 10000, energy: 200000 } },
-        { name: "베리디안 탈출 성공", desc: "축하합니다! 당신은 거대한 숲을 떠나 별들의 씨앗이 되었습니다.", req: { biosphereCore: 50, mutantCell: 500000, livingWood: 1000000 }, unlock: "end" }
+
+        // 40~50: 우주의 포식자 (추가된 고레벨 구간)
+        { name: "공허 적응 껍질", desc: "우주의 방사능을 흡수하여 에너지로 바꾸는 외피를 두릅니다.", req: { mutantCell: 200000, rootBrick: 500000 } },
+        { name: "차원 도약 기관", desc: "물리적 거리를 무시하고 공간을 접는 기관을 이식합니다.", req: { biosphereCore: 20000, neuralFiber: 50000 } },
+        { name: "항성 에너지 광합성", desc: "별의 에너지를 직접 흡수하는 거대 잎사귀를 펼칩니다.", req: { energy: 500000, geneticCode: 20000 } },
+        { name: "군체 의식 통합", desc: "모든 승무원의 의식을 하나로 묶어 완벽한 효율을 냅니다.", req: { neuralFiber: 100000, pheromone: 20000 } },
+        { name: "암흑 물질 소화효소", desc: "우주의 암흑 물질조차 연료로 태울 수 있게 됩니다.", req: { bioFuel: 1000000, mutantCell: 500000 } },
+        { name: "불멸의 유전자", desc: "노화를 정복하고 영원한 여행을 준비합니다.", req: { geneticCode: 50000, biosphereCore: 30000 } },
+        { name: "행성 포식 뿌리", desc: "필요하다면 행성 하나를 양분으로 삼을 수 있는 뿌리를 내립니다.", req: { livingWood: 2000000, rootBrick: 1000000 } },
+        { name: "코스믹 포자 살포", desc: "지나가는 행성마다 생명의 씨앗을 퍼뜨릴 준비를 합니다.", req: { spore: 10000000, pheromone: 50000 } },
+        { name: "최종 진화: 리바이어던", desc: "이제 우주선이 아니라, 살아있는 우주 생명체로 거듭납니다.", req: { biosphereCore: 50000, geneticCode: 200000 } },
+        { name: "초월적 존재로 승천", desc: "물질계를 벗어나 별들의 의지와 하나가 됩니다. (베리디안 탈출)", req: { biosphereCore: 100000, energy: 1000000, mutantCell: 10000000 }, unlock: "end" }
         // ... (이후 50레벨까지 기획 가능)
     ],
 
