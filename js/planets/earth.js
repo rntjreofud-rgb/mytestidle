@@ -51,7 +51,7 @@ export const earthData = {
     { name: "내부 기압 안정화", desc: "마지막으로 공기 누출을 점검합니다.", req: { plastic: 50000, gear: 100000, nanobots: 500 } },
     { name: "에너지 완충 작업", desc: "모든 배터리를 100% 충전합니다.", req: { energy: 5000, battery: 20000 } },
     { name: "비행 소프트웨어 동기화", desc: "마지막 코드를 업로드합니다.", req: { processor: 10000 } },
-    { name: "발사대 이동", desc: "집(우주선)을 발사 패드로 옮깁니다.", req: { concrete: 100000, gear: 200000 } },
+    { name: "발사대 이동", desc: "집을 발사 패드로 옮깁니다.", req: { concrete: 100000, gear: 200000 } },
     { name: "액체 산소 주입", desc: "극저온 연료를 탱크에 채웁니다.", req: { sulfur: 20000, rocketFuel: 5000 } },
     { name: "선내 시스템 가동", desc: "모든 장치가 '정상' 신호를 보냅니다.", req: { advAlloy: 2000, advCircuit: 50000, processor: 20000 } },
     { name: "카운트다운 준비", desc: "모든 준비가 끝났습니다. 발사 1분 전.", req: { titaniumPlate: 20000, steel: 500000 } },

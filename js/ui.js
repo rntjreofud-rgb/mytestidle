@@ -851,7 +851,7 @@ export function updatePrestigeUI() {
 
 
 export function updateHouseUI(onUpgrade) {
-    const stages = getActiveStages(); // ⭐ 현재 행성의 단계 리스트를 가져옴
+    const stages = getActiveStages(); 
     const nextStage = stages[gameData.houseLevel + 1];
     const currentStage = stages[gameData.houseLevel];
     
@@ -865,14 +865,15 @@ export function updateHouseUI(onUpgrade) {
         // --- [일반 진행 모드: Lv.0 ~ Lv.49] ---
         elements.upgradeBtn.style.display = "flex";
         
-        // 요구 자원 텍스트 생성
+        // ⭐ [수정]: 전력(energy)을 포함하여 모든 요구 사항을 텍스트로 변환
         const reqTxt = Object.entries(nextStage.req)
-            .filter(([k]) => k !== 'energy')
-            .map(([k, v]) => `${getResNameOnly(k)} ${formatNumber(v)}`)
+            .map(([k, v]) => {
+                if (k === 'energy') return `⚡ ${formatNumber(v)}MW`; // 전력은 번개 아이콘과 MW 단위 사용
+                return `${getResNameOnly(k)} ${formatNumber(v)}`;
+            })
             .join(', ');
 
         elements.upgradeBtn.innerText = `⬆️ ${nextStage.name} (${reqTxt})`;
-        
         // 자원 충족 여부 확인 (버튼 활성화/비활성화)
         let canUp = true;
         for(let k in nextStage.req) {
