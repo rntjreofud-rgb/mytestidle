@@ -84,7 +84,7 @@ export const aureliaData = {
         { id: 110, name: "중합금 자동 압착기", cost: { nanoSteel: 2000, magnet: 5000 }, inputs: { scrapMetal: 100, magnet: 20, energy: 400 }, outputs: { heavyAlloy: 50.0 }, count: 0, reqLevel: 22 },
         
         // ⭐ [추가] Stage 29 및 건물 비용의 'AI코어'를 대체할 아우렐리아 전용 연산 장치
-        { id: 122, name: "플럭스 연산 서버", cost: { nanoSteel: 5000, chargedCrystal: 5000 }, inputs: { chargedCrystal: 50, energy: 600 }, outputs: { fluxLogic: 2.0 }, count: 0, reqLevel: 25 },
+        { id: 122, name: "플럭스 연산 서버", cost: { nanoSteel: 5000, chargedCrystal: 5000 }, inputs: { chargedCrystal: 50, energy: 600 }, outputs: { fluxLogic: 2.0 }, count: 0, reqLevel: 23 },
         
         { id: 111, name: "핵융합 자력 발전소", cost: { heavyAlloy: 10000, magConcrete: 5000 }, inputs: { chargedCrystal: 100 }, outputs: { energy: 5000 }, count: 0, reqLevel: 28 },
         { id: 112, name: "나노 입자 가속기", cost: { fluxEnergy: 5000, nanoSteel: 2000 }, inputs: { heavyAlloy: 20, energy: 1000 }, outputs: { nanoSteel: 15.0 }, count: 0, reqLevel: 32 },
