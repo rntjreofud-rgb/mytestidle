@@ -8,18 +8,27 @@ export function getBuildingMultiplier(buildingId) {
     let multiplier = 1.0;
     const researchList = getActiveResearch(); 
     const completed = gameData.researches || [];
+    const legacy = gameData.legacyUpgrades || [];
     
+    // 연구 효과 적용
     researchList.forEach(r => {
         if (completed.includes(r.id) && r.type === 'building' && r.target.includes(buildingId)) {
             multiplier *= r.value;
         }
     });
 
-    if (gameData.legacyUpgrades && gameData.legacyUpgrades.includes('infinite_storage')) {
+    // [레거시 적용] legacy_mutant_boost: 변이세포(212) 및 관련 시설 생산 속도 30% 증가
+    if (legacy.includes('legacy_mutant_boost')) {
+        if ([212, 207].includes(buildingId)) multiplier *= 1.3;
+    }
+
+    // 기본 레거시: 전체 생산 효율 20% 증가
+    if (legacy.includes('infinite_storage')) {
         multiplier *= 1.2;
     }
     return multiplier;
 }
+
 
 /**
  * ⭐ [신규] 오직 "생산량"에만 적용되는 환생 보너스 배수
@@ -64,11 +73,25 @@ export function getBuildingConsumptionMultiplier(buildingId) {
     let multiplier = 1.0;
     const researchList = getActiveResearch();
     const completed = gameData.researches || [];
+    const legacy = gameData.legacyUpgrades || [];
+
+    // 연구 효과 적용
     researchList.forEach(r => {
         if (completed.includes(r.id) && r.type === 'consumption' && r.target.includes(buildingId)) {
             multiplier *= r.value;
         }
     });
+
+    // [레거시 적용] legacy_less_fiber: 베리디안 유기섬유 소모량 15% 감소
+    if (legacy.includes('legacy_less_fiber')) {
+        if ([203, 204, 205].includes(buildingId)) multiplier *= 0.85;
+    }
+
+    // [레거시 적용] aurelia_scrap_recycle: 아우렐리아 고철 소모 20% 감소
+    if (legacy.includes('aurelia_scrap_recycle')) {
+        if ([103, 104, 107, 110, 114].includes(buildingId)) multiplier *= 0.8;
+    }
+
     return multiplier;
 }
 
@@ -94,7 +117,7 @@ export function calculateNetMPS() {
     let stats = {};
     for(let key in gameData.resources) stats[key] = { prod: 0, cons: 0 };
 
-    const prodBonus = getProductionBonus(); // ⭐ 환생 보너스
+    const prodBonus = getProductionBonus(); 
     const totalProd = gameData.resources.energy || 0;
     const totalReq = gameData.resources.energyMax || 0;
     const powerFactor = totalReq > 0 ? Math.min(1.0, totalProd / totalReq) : 1.0;
@@ -140,9 +163,11 @@ export function calculateNetMPS() {
                     if(res !== 'energy') stats[res].cons += (b.inputs[res] * consMult) * b.activeCount * finalEfficiency;
                 }
             }
-            if (b.outputs && !b.outputs.energy) {
+
+            // ⭐ [바이오연료 수정]: 에너지 생산 여부와 상관없이 모든 출력을 통계에 합산
+            if (b.outputs) {
                 for (let res in b.outputs) {
-                    // ⭐ 생산에만 환생 보너스 적용
+                    if (res === 'energy') continue;
                     stats[res].prod += b.outputs[res] * b.activeCount * finalEfficiency * prodBonus;
                 }
             }
@@ -157,12 +182,12 @@ export function calculateNetMPS() {
 export function produceResources(deltaTime) {
     let totalEnergyProd = 0;
     let totalEnergyReq = 0;
-    const prodBonus = getProductionBonus(); // ⭐ 환생 보너스
+    const prodBonus = getProductionBonus(); 
     const legacy = gameData.legacyUpgrades || [];
     
     if (legacy.includes('legacy_biofuel_trickle')) gameData.resources.bioFiber += 0.1 * deltaTime;
 
-    // --- 1단계: 전력 생산 시설 (환생 보너스로 출력 뻥튀기) ---
+    // --- 1단계: 전력 생산 시설 (에너지 + 바이오연료 등 복합 생산 처리) ---
     gameData.buildings.forEach(b => {
         if (b.activeCount > 0 && b.outputs && b.outputs.energy) {
             let speedMult = getBuildingMultiplier(b.id);
@@ -183,8 +208,16 @@ export function produceResources(deltaTime) {
                     gameData.resources[res] = Math.max(0, gameData.resources[res] - (b.inputs[res] * consMult * b.activeCount * speedMult * deltaTime * inputEfficiency));
                 }
             }
-            // ⭐ 전력 생산량에 환생 보너스(prodBonus) 적용! 연료 소모는 그대로, 전기는 더 많이.
+
+            // 전력 생산 합산
             totalEnergyProd += (b.outputs.energy * b.activeCount * speedMult) * inputEfficiency * prodBonus;
+
+            // ⭐ [바이오연료 수정]: 에너지를 만드는 건물이 자원(바이오연료)도 만든다면 여기서 추가
+            for (let res in b.outputs) {
+                if (res !== 'energy') {
+                    gameData.resources[res] += (b.outputs[res] * b.activeCount * speedMult * inputEfficiency * prodBonus * deltaTime);
+                }
+            }
         }
     });
 
