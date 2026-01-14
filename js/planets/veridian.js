@@ -1,7 +1,7 @@
 export const veridianData = {
     initialResources: ['bioFiber', 'spore'],
     
-    
+
     // === 하우스 업그레이드 (Lv.0 ~ 10) ===
     houseStages: [
         { name: "덩굴 은신처", desc: "추락한 포드가 거대 덩굴에 뒤덮였습니다. 일단 덩굴을 치워야 합니다.", req: { bioFiber: 10 } },
@@ -48,6 +48,7 @@ export const veridianData = {
         // ... (이후 50레벨까지 기획 가능)
     ],
 
+    
     // === 건물 리스트 (ID 200번대) ===
     buildings: [
         { id: 200, name: "덩굴 채집 캠프", cost: { bioFiber: 15 }, inputs: null, outputs: { bioFiber: 1.0 }, count: 0, reqLevel: 0 },
