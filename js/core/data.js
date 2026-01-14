@@ -18,7 +18,7 @@ export let gameData = {
         nanoSteel: 0, plasmaCore: 0, magConcrete: 0, fluxLogic: 0,
         // 베리디안
         bioFiber: 0, spore: 0, yeast: 0, livingWood: 0, bioFuel: 0, rootBrick: 0,
-        mutantCell: 0, geneticCode: 0, pheromone: 0, biosphereCore: 0,
+        mutantCell: 0, geneticCode: 0, pheromone: 0, biosphereCore: 0, neuralFiber: 0,
         // 시스템
         energy: 0, energyMax: 0
     },

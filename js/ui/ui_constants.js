@@ -34,7 +34,7 @@ export const elements = {
 };
 
 export const resNames = {
-    wood: "🌲 나무", stone: "🪨 돌", coal: "⚫ 석탄", ironOre: "⚙️ 철광", copperOre: "🥉 구리광", 
+    wood: "🌲 나무", stone: "🪨 돌", coal: "⚫ 석탄", ironOre: "🥈 철광", copperOre: "🥉 구리광", 
     oil: "🛢️ 원유", titaniumOre: "💎 티타늄광", uraniumOre: "💚 우라늄광",
     plank: "🪵 판자", brick: "🧱 벽돌", ironPlate: "⬜ 철판", copperPlate: "🟧 구리판", 
     glass: "🍷 유리", sulfur: "💛 유황", steel: "🏗️ 강철", plastic: "🧪 플라스틱", 
