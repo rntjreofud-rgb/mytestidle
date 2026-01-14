@@ -384,13 +384,25 @@ export function tryBuyBuilding(index) {
 }
 
 export function tryUpgradeHouse(nextStage) {
-    let missing = [];
-    for (let r in nextStage.req) {
-        if (r === 'energy') { if (gameData.resources.energy < nextStage.req[r]) missing.push('energy'); }
-        else { if ((gameData.resources[r] || 0) < nextStage.req[r]) missing.push(r); }
+    // 1. 가능 여부 재확인
+    if (!canUpgradeHouse(nextStage)) {
+        // 불가능하면 부족한 자원 목록 리턴 (로그용)
+        let missing = [];
+        const epsilon = 0.0001;
+        for (let r in nextStage.req) {
+            let val = (r === 'energy') ? gameData.resources.energy : gameData.resources[r];
+            if (val < nextStage.req[r] - epsilon) missing.push(r);
+        }
+        return { success: false, missing };
     }
-    if (missing.length > 0) return { success: false, missing };
-    for (let r in nextStage.req) { if (r !== 'energy') gameData.resources[r] -= nextStage.req[r]; }
+
+    // 2. 자원 소모 실행
+    for (let r in nextStage.req) { 
+        if (r !== 'energy') {
+            gameData.resources[r] = Math.max(0, gameData.resources[r] - nextStage.req[r]);
+        }
+    }
+    
     gameData.houseLevel++;
     return { success: true };
 }
@@ -400,4 +412,23 @@ export function calculateCurrentPrestigeGain(level, planet) {
     const maxPoints = planetMaxPoints[planet] || 3;
     const gain = Math.floor((level / 50) * maxPoints);
     return Math.max(0, gain);
+}
+
+export function canUpgradeHouse(nextStage) {
+    if (!nextStage) return false;
+    const epsilon = 0.0001; // 소수점 오차 허용
+
+    for (let r in nextStage.req) {
+        let reqAmount = nextStage.req[r];
+        
+        if (r === 'energy') { 
+            // 전력은 현재 생산량 기준 (오차 없이 비교)
+            if ((gameData.resources.energy || 0) < reqAmount) return false;
+        } else { 
+            // 일반 자원은 보유량 기준 (오차 허용)
+            let currentAmount = gameData.resources[r] || 0;
+            if (currentAmount < reqAmount - epsilon) return false;
+        }
+    }
+    return true;
 }

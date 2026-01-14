@@ -583,99 +583,64 @@ export function updatePrestigeUI() {
 }
 
 export function updateHouseUI(onUpgrade) {
+    // 1. 데이터 가져오기
     const stages = getActiveStages(); 
+    if (!stages || stages.length === 0) return;
+
     const nextStage = stages[gameData.houseLevel + 1];
-    const currentStage = stages[gameData.houseLevel];
+    const currentStage = stages[gameData.houseLevel] || { name: "최고 레벨", desc: "-" };
     
+    // 2. 텍스트 업데이트
     if(elements.houseName) elements.houseName.innerText = `Lv.${gameData.houseLevel} ${currentStage.name}`;
     if(elements.houseDesc) elements.houseDesc.innerText = currentStage.desc;
 
-    const btnContainer = elements.upgradeBtn.parentElement; 
-
+    // 3. 다음 단계가 있을 경우
     if (nextStage) {
         elements.upgradeBtn.style.display = "flex";
         
-        
-
-
-        // ⭐ [수정] 에너지 표기 수정
+        // 버튼 텍스트 생성
         const reqTxt = Object.entries(nextStage.req)
             .map(([k, v]) => {
                 if (k === 'energy') return `⚡ ${formatNumber(v)}MW`; 
                 return `${getResEmoji(k)} ${formatNumber(v)}`;
             })
-            .join('  '); // 가독성을 위해 공백 2칸
+            .join('  ');
 
         elements.upgradeBtn.innerText = `⬆️ ${nextStage.name} (${reqTxt})`;
         
-        const epsilon = 0.0001; 
-        let canUp = true;
-        let debugMissing = [];
+        // ⭐ [핵심 수정] 로직 파일에 직접 물어봐서 정확도 일치시킴
+        const isPossible = Logic.canUpgradeHouse(nextStage);
 
-
-        for(let k in nextStage.req) {
-            let reqVal = nextStage.req[k];
-            let currentVal = (k === 'energy') ? (gameData.resources.energy || 0) : (gameData.resources[k] || 0);
-
-            if (k === 'energy') { 
-                if(currentVal < reqVal) {
-                    canUp = false;
-                    debugMissing.push(`전력 부족: 현재 ${currentVal} < 필요 ${reqVal}`);
-                }
-            } else { 
-                // 오차 범위 적용 비교
-                if(currentVal < reqVal - epsilon) {
-                    canUp = false;
-                    debugMissing.push(`${k} 부족: 현재보유 ${currentVal} < 필요량 ${reqVal}`);
-                }
-            }
-        }
-
-        if (!canUp && debugMissing.length > 0) {
-            // 콘솔창이 너무 도배되지 않게 1초에 한 번 정도만 확인해보세요
-            // console.log("업그레이드 불가 사유:", debugMissing.join(', '));
-        }
-
-        elements.upgradeBtn.disabled = !canUp;
-        
-        // 클릭 이벤트 시 디버그 정보 포함
-        elements.upgradeBtn.onclick = () => {
-            if (canUp) {
-                onUpgrade(nextStage);
-            } else {
-                console.error("⛔ 업그레이드 실패 사유:", debugMissing.join(', '));
-                alert("업그레이드 불가! F12 콘솔을 확인하세요.\n" + debugMissing.join('\n'));
-            }
-        };
-
-        for(let k in nextStage.req) {
-            if (k === 'energy') { 
-                if((gameData.resources.energy || 0) < nextStage.req[k]) canUp = false; 
-            } else { 
-                if((gameData.resources[k] || 0) < nextStage.req[k]) canUp = false; 
-            }
-        }
-        if (canUp) {
+        // 버튼 상태 강제 적용 (매 프레임 실행됨)
+        if (isPossible) {
             elements.upgradeBtn.disabled = false;
+            elements.upgradeBtn.classList.remove('disabled'); // 스타일 확실하게 적용
             elements.upgradeBtn.style.opacity = "1";
             elements.upgradeBtn.style.cursor = "pointer";
+            // 클릭 이벤트는 함수 참조가 계속 바뀌지 않도록 한 번만 연결하는 게 좋지만,
+            // 현재 구조상 매번 연결해도 기능엔 문제 없음. 확실한 동작을 위해 유지.
             elements.upgradeBtn.onclick = () => onUpgrade(nextStage);
         } else {
             elements.upgradeBtn.disabled = true;
-            elements.upgradeBtn.style.opacity = "0.6";
+            elements.upgradeBtn.classList.add('disabled');
+            elements.upgradeBtn.style.opacity = "0.5";
             elements.upgradeBtn.style.cursor = "not-allowed";
-            elements.upgradeBtn.onclick = null; // 클릭 방지
+            elements.upgradeBtn.onclick = null;
         }
+        
         const choiceDiv = document.getElementById('ending-choices');
         if(choiceDiv) choiceDiv.remove();
 
     } else {
+        // 4. 엔딩 처리 (기존 코드 유지)
         elements.upgradeBtn.style.display = "none"; 
         
         if (!document.getElementById('ending-choices')) {
+            const btnContainer = elements.upgradeBtn.parentElement; 
             const choiceDiv = document.createElement('div');
             choiceDiv.id = 'ending-choices';
             choiceDiv.style.cssText = "display:flex; gap:10px; width:100%;";
+
             choiceDiv.innerHTML = `
                 <button id="btn-prestige-final" class="prestige-ready" style="flex:1; height:95px; font-weight:bold; border-radius:6px; cursor:pointer;">
                     ✨ 우주 유산 남기기<br><small>(데이터 +3 및 환생)</small>
@@ -685,11 +650,10 @@ export function updateHouseUI(onUpgrade) {
                 </button>
             `;
             btnContainer.appendChild(choiceDiv);
+
             document.getElementById('btn-prestige-final').onclick = () => {
                 if(confirm("지구를 떠나시겠습니까? 모든 자원과 건물은 초기화되지만 영구적인 유산 보너스를 얻습니다.")) {
-                    if (typeof window.performPrestige === 'function') {
-                        window.performPrestige();
-                    }
+                    if (typeof window.performPrestige === 'function') window.performPrestige();
                 }
             };
             document.getElementById('btn-new-world').onclick = () => showPlanetSelection();
