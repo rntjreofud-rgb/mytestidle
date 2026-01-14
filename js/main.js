@@ -95,6 +95,9 @@ function init() {
     UI.renderShop(handleBuyBuilding, Logic.getBuildingCost); // 콜백 함수 전달
     UI.updateHouseUI(handleHouseUpgrade);
 
+    const buildVer = '__BUILD_NUMBER__'; 
+    const versionText = (buildVer.startsWith('__')) ? 'Local-Dev' : `Build.${buildVer}`;
+
     // 오프라인 보상
     if (offlineSeconds > 10) { 
         const cappedSeconds = Math.min(offlineSeconds, 43200);
@@ -102,7 +105,7 @@ function init() {
         UI.showOfflineReport(cappedSeconds, initialStats);
         UI.log(`💤 ${Math.floor(cappedSeconds/60)}분 동안의 오프라인 자원이 생산되었습니다.`, true); 
     } else {
-        UI.log("시스템 가동. Escape Earth 시작.", true);
+        UI.log(`시스템 가동. Escape Earth 시작. (${versionText})`, true);
     }
 
     // 게임 루프 시작
