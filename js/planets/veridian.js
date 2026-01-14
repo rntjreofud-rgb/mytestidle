@@ -69,7 +69,7 @@ export const veridianData = {
         { id: 217, name: "생태계 심장 반응로", cost: { geneticCode: 1000, mutantCell: 200000 }, inputs: { geneticCode: 10, energy: 5000 }, outputs: { biosphereCore: 1.0 }, count: 0, reqLevel: 44 },
         { id: 218, name: "항성간 씨앗 연구소", cost: { biosphereCore: 10, livingWood: 500000 }, inputs: { livingWood: 5000, geneticCode: 50 }, outputs: { geneticCode: 100.0 }, count: 0, reqLevel: 46 },
         { id: 219, name: "행성 의식 링크 터미널", cost: { biosphereCore: 50, geneticCode: 10000 }, inputs: null, outputs: { energy: 100000, mutantCell: 5000.0 }, count: 0, reqLevel: 48 },
-        { id: 220, name: "영원한 포자 저장소", cost: { biosphereCore: 200, mutantCell: 1000000 }, inputs: null, outputs: { spore: 10000.0, bioFiber: 50000.0 }, count: 0, reqLevel: 50 }
+        { id: 220, name: "영원한 포자 저장소", cost: { biosphereCore: 200, mutantCell: 1000000 }, inputs: null, outputs: { spore: 10000.0, bioFiber: 50000.0 }, count: 0, reqLevel: 48 }
     ],
 
     // === 연구 리스트 ===
