@@ -115,24 +115,27 @@ export function getEnergyEfficiencyMultiplier(buildingId) {
  */
 export function calculateNetMPS() {
     let stats = {};
-    for(let key in gameData.resources) stats[key] = { prod: 0, cons: 0 };
+    // 1. 현재 보유 중인 자원을 기준으로 통계 객체 초기화
+    for(let key in gameData.resources) {
+        stats[key] = { prod: 0, cons: 0 };
+    }
 
     const prodBonus = getProductionBonus(); 
     const totalProd = gameData.resources.energy || 0;
     const totalReq = gameData.resources.energyMax || 0;
     const powerFactor = totalReq > 0 ? Math.min(1.0, totalProd / totalReq) : 1.0;
 
+    // --- [1단계] 수요(Demand) 및 부족분(Shortage) 계산 ---
     let resourceDemand = {};
     gameData.buildings.forEach(b => {
-        if (b.activeCount > 0) {
+        if (b.activeCount > 0 && b.inputs) {
             let speedMult = getBuildingMultiplier(b.id);
             let consMult = getBuildingConsumptionMultiplier(b.id);
-            let efficiency = speedMult * ((b.inputs && b.inputs.energy) ? powerFactor : 1.0);
-            if (b.inputs) {
-                for (let res in b.inputs) {
-                    if(res === 'energy') continue;
-                    resourceDemand[res] = (resourceDemand[res] || 0) + (b.inputs[res] * consMult) * b.activeCount * efficiency;
-                }
+            let efficiency = speedMult * ((b.inputs.energy) ? powerFactor : 1.0);
+            
+            for (let res in b.inputs) {
+                if(res === 'energy') continue;
+                resourceDemand[res] = (resourceDemand[res] || 0) + (b.inputs[res] * consMult) * b.activeCount * efficiency;
             }
         }
     });
@@ -143,6 +146,7 @@ export function calculateNetMPS() {
         shortageFactor[res] = resourceDemand[res] > available ? Math.max(0, available / resourceDemand[res]) : 1.0;
     }
 
+    // --- [2단계] 실제 소비(cons) 및 생산(prod) 계산 ---
     gameData.buildings.forEach(b => {
         if (b.activeCount > 0) {
             let speedMult = getBuildingMultiplier(b.id);
@@ -158,16 +162,26 @@ export function calculateNetMPS() {
             }
             let finalEfficiency = baseEfficiency * inputShortage;
 
+            // [소비 계산]
             if (b.inputs) {
                 for (let res in b.inputs) {
-                    if(res !== 'energy') stats[res].cons += (b.inputs[res] * consMult) * b.activeCount * finalEfficiency;
+                    if(res !== 'energy') {
+                        // ⭐ 안전장치: stats에 해당 자원이 없으면 즉석 생성
+                        if (!stats[res]) stats[res] = { prod: 0, cons: 0 };
+                        
+                        stats[res].cons += (b.inputs[res] * consMult) * b.activeCount * finalEfficiency;
+                    }
                 }
             }
 
-            // ⭐ [바이오연료 수정]: 에너지 생산 여부와 상관없이 모든 출력을 통계에 합산
+            // [생산 계산]
             if (b.outputs) {
                 for (let res in b.outputs) {
                     if (res === 'energy') continue;
+
+                    // ⭐ 안전장치: stats에 해당 자원이 없으면 즉석 생성 (이 부분이 에러 해결 핵심)
+                    if (!stats[res]) stats[res] = { prod: 0, cons: 0 };
+
                     stats[res].prod += b.outputs[res] * b.activeCount * finalEfficiency * prodBonus;
                 }
             }
