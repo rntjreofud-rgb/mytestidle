@@ -1,6 +1,7 @@
 export const veridianData = {
     initialResources: ['bioFiber', 'spore'],
     
+    
     // === 하우스 업그레이드 (Lv.0 ~ 10) ===
     houseStages: [
         { name: "덩굴 은신처", desc: "추락한 포드가 거대 덩굴에 뒤덮였습니다. 일단 덩굴을 치워야 합니다.", req: { bioFiber: 10 } },
