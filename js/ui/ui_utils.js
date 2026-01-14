@@ -7,6 +7,14 @@ export function getResNameOnly(key) {
     return parts.length > 1 ? parts[1] : parts[0];
 }
 
+export function getResEmoji(key) {
+    const full = resNames[key];
+    if (!full) return key;
+    // 공백으로 나눈 후 첫 번째 부분(이모지)만 반환
+    return full.split(' ')[0];
+}
+
+
 export function formatNumber(num) {
     if (num == null || isNaN(num) || num === 0) return "0";
     

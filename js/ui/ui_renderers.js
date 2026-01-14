@@ -1,7 +1,7 @@
 import { gameData, getActiveStages, getActiveResearch, getActivePlanetData, legacyList } from '../core/data.js';
 import * as Logic from '../core/logic.js';
 import { elements, resourceGroups, buildingGroups, resNames } from './ui_constants.js';
-import { formatNumber, getResNameOnly, log } from './ui_utils.js';
+import { formatNumber, getResNameOnly, getResEmoji, log } from './ui_utils.js';
 
 // 내부 상태 유지 변수
 export let cachedBuyCallback = null;
@@ -378,7 +378,9 @@ function createResearchElement(r, isDone) {
     div.className = `shop-item research-item ${isDone ? 'done disabled' : ''}`;
     div.id = `research-${r.id}`;
     
-    let costTxt = Object.entries(r.cost).map(([k, v]) => `${formatNumber(v)}${getResNameOnly(k)}`).join(' ');
+    let costTxt = Object.entries(r.cost)
+        .map(([k, v]) => `${getResEmoji(k)} ${formatNumber(v)}`)
+        .join(' ');
     let warning = (r.type === 'building' && r.value > 1) ? `<br><span style="color:#ff7675; font-size:0.7rem;">⚠️ 속도 증가 시 재료 소모량 비례 증가</span>` : "";
 
     div.innerHTML = `
@@ -503,7 +505,9 @@ function createBuildingElement(b, index, getCostFunc) {
     const newBadgeHtml = isNew ? `<span class="new-badge">NEW</span>` : "";
 
     const cost = getCostFunc(b);
-    let costTxt = Object.entries(cost).map(([k, v]) => `${formatNumber(v)}${getResNameOnly(k)}`).join(' ');
+     let costTxt = Object.entries(cost)
+        .map(([k, v]) => `${getResEmoji(k)} ${formatNumber(v)}`)
+        .join(' ');
 
     const speedMult = Logic.getBuildingMultiplier(b.id);
     const consMult = Logic.getBuildingConsumptionMultiplier(b.id);
@@ -513,19 +517,20 @@ function createBuildingElement(b, index, getCostFunc) {
     let inArr = b.inputs ? Object.entries(b.inputs).map(([k,v]) => {
         let finalVal = v * speedMult * consMult;
         if (k === 'energy') finalVal *= energyEff;
-        return `${formatNumber(finalVal)}${k === 'energy' ? '⚡' : getResNameOnly(k)}`;
+        return `${formatNumber(finalVal)}${k === 'energy' ? '⚡' : getResEmoji(k)}`;
     }) : [];
     
+    // ⭐ [이모지 적용]: getResEmoji 사용
     let outArr = b.outputs ? Object.entries(b.outputs).map(([k,v]) => {
         let finalProd = v * speedMult;
         if (k !== 'energy') finalProd *= prodBonus;
         else finalProd *= prodBonus;
-        return `${formatNumber(finalProd)}${k === 'energy' ? '⚡' : getResNameOnly(k)}`;
+        return `${formatNumber(finalProd)}${k === 'energy' ? '⚡' : getResEmoji(k)}`;
     }) : [];
     
     let processTxt = "";
-    if (inArr.length > 0) processTxt += `<span style="color:#e74c3c">-${inArr.join(',')}</span> `;
-    if (outArr.length > 0) processTxt += `➡ <span style="color:#2ecc71">+${outArr.join(',')}</span>/s`;
+    if (inArr.length > 0) processTxt += `<span style="color:#e74c3c">-${inArr.join(' ')}</span> `;
+    if (outArr.length > 0) processTxt += `➡ <span style="color:#2ecc71">+${outArr.join(' ')}</span>/s`;
 
     div.innerHTML = `
         ${newBadgeHtml}
@@ -594,9 +599,9 @@ export function updateHouseUI(onUpgrade) {
         const reqTxt = Object.entries(nextStage.req)
             .map(([k, v]) => {
                 if (k === 'energy') return `⚡ ${formatNumber(v)}MW`; 
-                return `${getResNameOnly(k)} ${formatNumber(v)}`;
+                return `${getResEmoji(k)} ${formatNumber(v)}`;
             })
-            .join(', ');
+            .join('  '); // 가독성을 위해 공백 2칸
 
         elements.upgradeBtn.innerText = `⬆️ ${nextStage.name} (${reqTxt})`;
         let canUp = true;
