@@ -655,9 +655,17 @@ export function updateHouseUI(onUpgrade) {
                 if((gameData.resources[k] || 0) < nextStage.req[k]) canUp = false; 
             }
         }
-        elements.upgradeBtn.disabled = !canUp;
-        elements.upgradeBtn.onclick = () => onUpgrade(nextStage);
-        
+        if (canUp) {
+            elements.upgradeBtn.disabled = false;
+            elements.upgradeBtn.style.opacity = "1";
+            elements.upgradeBtn.style.cursor = "pointer";
+            elements.upgradeBtn.onclick = () => onUpgrade(nextStage);
+        } else {
+            elements.upgradeBtn.disabled = true;
+            elements.upgradeBtn.style.opacity = "0.6";
+            elements.upgradeBtn.style.cursor = "not-allowed";
+            elements.upgradeBtn.onclick = null; // 클릭 방지
+        }
         const choiceDiv = document.getElementById('ending-choices');
         if(choiceDiv) choiceDiv.remove();
 
