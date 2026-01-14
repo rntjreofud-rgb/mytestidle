@@ -491,7 +491,7 @@ export function updateHouseUI(onUpgrade) {
             .map(([k, v]) => {
                 let currentVal = (k === 'energy') ? (gameData.resources.energy || 0) : (gameData.resources[k] || 0);
                 let isEnough = (k === 'energy') ? (currentVal >= v) : (currentVal >= v - epsilon);
-                let color = isEnough ? '#2ecc71' : '#e74c3c';
+                let color = isEnough ? '#ffffff' : '#ff6b6b'; 
                 
                 if (k === 'energy') return `<span style="color:${color}">⚡ ${formatNumber(v)}MW</span>`; 
                 return `<span style="color:${color}">${getResEmoji(k)} ${formatNumber(v)}</span>`;
