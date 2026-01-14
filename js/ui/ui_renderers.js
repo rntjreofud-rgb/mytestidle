@@ -422,7 +422,13 @@ function createBuildingElement(b, index, getCostFunc) {
             </small>
         </span>
         <span class="si-level">Lv.${b.count}</span>
-        <div class="si-desc">${processTxt}</div>
+        
+        <!-- 생산 정보: 이름 바로 아래에 고정 -->
+        <div class="si-desc" style="top: 38px; bottom: auto; left: 14px; right: 14px; white-space: normal; line-height: 1.3;">
+            ${processTxt}
+        </div>
+
+        <!-- 건설 비용: 맨 아래 고정 -->
         <div class="si-cost">${costTxt}</div>
     `;
     
