@@ -41,27 +41,29 @@ export const getActiveBuildings = () => getActivePlanetData().buildings;
 export const getActiveResearch = () => getActivePlanetData().researchList;
 export const getActiveStages = () => getActivePlanetData().houseStages;
 
-// === [3] 데이터 동기화 (핵심 수정) ===
+// === [3] 데이터 동기화 (디버깅 강화 및 ID 매칭 수정) ===
 export function setGameData(newData) {
-    if (!newData) return;
+    if (!newData) {
+        console.warn("[데이터] 불러올 데이터가 없습니다. (Empty)");
+        return;
+    }
 
-    // 1. 행성 설정 (가장 먼저 해야 함)
+    console.log("[데이터] 세이브 파일 로드 시작...", newData);
+
+    // 1. 행성 설정
     gameData.currentPlanet = newData.currentPlanet || 'earth';
-    const planetTemplate = getActivePlanetData(); // 행성이 설정된 후 템플릿 가져오기
+    const planetTemplate = getActivePlanetData();
 
     // 2. 자원 데이터 복구
-    // 기존 gameData의 키를 기준으로 newData에 값이 있으면 가져옴
     if (newData.resources) {
         for (let key in gameData.resources) {
             if (newData.resources[key] !== undefined) {
-                gameData.resources[key] = Number(newData.resources[key]); // 숫자로 변환하여 안전하게 저장
-            } else {
-                gameData.resources[key] = 0;
+                gameData.resources[key] = Number(newData.resources[key]);
             }
         }
     }
 
-    // 3. 기초 진행도 복구
+    // 3. 진행도 복구
     gameData.houseLevel = Number(newData.houseLevel) || 0;
     gameData.researches = Array.isArray(newData.researches) ? [...newData.researches] : [];
     
@@ -69,28 +71,23 @@ export function setGameData(newData) {
         ? [...newData.unlockedResources] 
         : [...planetTemplate.initialResources];
 
-    // 4. 환생 및 유산 데이터 복구
     gameData.prestigeLevel = Number(newData.prestigeLevel) || 0;
     gameData.cosmicData = Number(newData.cosmicData) || 0;
     gameData.legacyUpgrades = Array.isArray(newData.legacyUpgrades) ? [...newData.legacyUpgrades] : [];
     
-    // [보정] 외계 행성 거주 시 숙련도 보정
-    if (gameData.currentPlanet !== 'earth' && gameData.prestigeLevel === 0) {
-        gameData.prestigeLevel = 1;
-    }
-
-    // 5. ⭐ 건물 데이터 매핑 (가장 중요한 부분)
+    // 4. ⭐ 건물 데이터 매핑 (강력한 ID 비교)
     const currentPlanetBuildings = planetTemplate.buildings; 
     const savedBuildings = Array.isArray(newData.buildings) ? newData.buildings : [];
     const legacy = gameData.legacyUpgrades;
 
+    let matchCount = 0;
+
     gameData.buildings = currentPlanetBuildings.map((templateB, index) => {
-        // ID 비교 시 문자열/숫자 차이 방지를 위해 둘 다 String으로 변환 비교하거나, 
-        // 확실하게 타입이 일치한다고 가정. 여기서는 안전하게 비교.
-        const savedB = savedBuildings.find(b => b.id == templateB.id); // '==' 사용 (타입 유연성)
+        // ⭐ ID를 무조건 문자열로 변환하여 비교 ( "0" == 0 문제 해결 )
+        const savedB = savedBuildings.find(b => String(b.id) === String(templateB.id));
 
         if (savedB) {
-            // 저장된 데이터가 있으면 개수 복구
+            matchCount++;
             return {
                 ...templateB,
                 count: Number(savedB.count) || 0,
@@ -98,9 +95,9 @@ export function setGameData(newData) {
                 on: (savedB.on !== undefined) ? savedB.on : true
             };
         } else {
-            // 데이터가 없으면 신규 초기화 (자율 건설 유산 체크)
+            // 신규 초기화 (자율 건설 유산 적용)
             let startCount = 0;
-            if (index === 0) {
+            if (index === 0) { // 첫 번째 건물(채집 캠프)에만 적용
                 if (legacy.includes('legacy_auto_build2')) startCount = 10;
                 else if (legacy.includes('legacy_auto_build1')) startCount = 5;
             }
@@ -113,12 +110,12 @@ export function setGameData(newData) {
         }
     });
 
-    // 6. 안전장치: activeCount가 count보다 크지 않게 보정
+    // 5. 안전장치
     gameData.buildings.forEach(b => {
         if (b.activeCount > b.count) b.activeCount = b.count;
     });
 
-    console.log(`[시스템] 데이터 로드 완료: ${gameData.currentPlanet} (건물 ${gameData.buildings.length}개 동기화됨)`);
+    console.log(`[데이터] 로드 완료. 행성: ${gameData.currentPlanet}, 건물 매칭 성공: ${matchCount}/${currentPlanetBuildings.length}`);
 }
 
 // === [4] 유산 목록 정의 ===
