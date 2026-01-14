@@ -1,7 +1,7 @@
 import { gameData, getActiveStages, getActiveResearch, getActivePlanetData, legacyList } from '../core/data.js';
-import * as Logic from '../core/logic.js';
+import * as Logic from '../core/logic.js'; // Logic 모듈 필수
 import { elements, resourceGroups, buildingGroups, resNames } from './ui_constants.js';
-import { formatNumber, getResNameOnly, getResEmoji, log } from './ui_utils.js';
+import { formatNumber, getResNameOnly, getResEmoji, log } from './ui_utils.js'; // getResEmoji 필수
 
 // 내부 상태 유지 변수
 export let cachedBuyCallback = null;
@@ -121,6 +121,7 @@ export function updateScreen(stats) {
         }
 
         const val = gameData.resources[key] || 0;
+        // 안전장치: stats에 해당 자원이 없으면 기본값 처리
         const prod = stats[key] ? stats[key].prod : 0;
         const cons = stats[key] ? stats[key].cons : 0;
         const net = prod - cons;
@@ -157,7 +158,40 @@ export function updateScreen(stats) {
     updatePrestigeUI();
 }
 
+export function switchTab(tabName) {
+    elements.viewDashboard.classList.add('hidden');
+    elements.viewPower.classList.add('hidden');
+    elements.viewResearch.classList.add('hidden');
+    if (elements.viewTechTree) elements.viewTechTree.classList.add('hidden');
+    if (elements.viewLegacy) elements.viewLegacy.classList.add('hidden');
 
+    elements.navDashboard.classList.remove('active');
+    elements.navPower.classList.remove('active');
+    elements.navResearch.classList.remove('active');
+    if (elements.navTechTree) elements.navTechTree.classList.remove('active');
+    if (elements.navLegacy) elements.navLegacy.classList.remove('active');
+
+    if (tabName === 'dashboard') {
+        elements.viewDashboard.classList.remove('hidden');
+        elements.navDashboard.classList.add('active');
+        renderShop(cachedBuyCallback, Logic.getBuildingCost);
+    } else if (tabName === 'power') {
+        elements.viewPower.classList.remove('hidden');
+        elements.navPower.classList.add('active');
+    } else if (tabName === 'research') {
+        elements.viewResearch.classList.remove('hidden');
+        elements.navResearch.classList.add('active');
+        renderResearchTab();
+    } else if (tabName === 'tech-tree') {
+        elements.viewTechTree.classList.remove('hidden');
+        elements.navTechTree.classList.add('active');
+        renderTechTree();
+    } else if (tabName === 'legacy') { 
+        if (elements.viewLegacy) elements.viewLegacy.classList.remove('hidden');
+        if (elements.navLegacy) elements.navLegacy.classList.add('active');
+        renderLegacyTab(); 
+    }
+}
 
 export function updatePowerUI() {
     const prod = gameData.resources.energy || 0;
@@ -211,6 +245,7 @@ export function updatePowerUI() {
             sectionTitle.onclick = () => { 
                 sectionTitle.classList.toggle('collapsed');
                 sectionGrid.classList.toggle('collapsed-content'); };
+               
             container.appendChild(sectionTitle);
             container.appendChild(sectionGrid);
         }
@@ -263,7 +298,7 @@ export function updatePowerUI() {
                 const resKey = b.outputs ? Object.keys(b.outputs).find(k => k !== 'energy') : null;
                 if (resKey) {
                     const finalOut = b.outputs[resKey] * b.activeCount * speedMult * prodBonus;
-                    prodText = `<span style="color:#2ecc71">▲ ${formatNumber(finalOut)}${getResNameOnly(resKey)}/s</span>`;
+                    prodText = `<span style="color:#2ecc71">▲ ${formatNumber(finalOut)}${getResEmoji(resKey)}/s</span>`;
                 } else if (isProducer) {
                     prodText = `<span style="color:#2ecc71">에너지 생산 중</span>`;
                 }
@@ -282,213 +317,23 @@ export function updatePowerUI() {
     }
 }
 
-export function switchTab(tabName) {
-    // 1. 모든 뷰 숨기기
-    elements.viewDashboard.classList.add('hidden');
-    elements.viewPower.classList.add('hidden');
-    elements.viewResearch.classList.add('hidden');
-    if (elements.viewTechTree) elements.viewTechTree.classList.add('hidden');
-    if (elements.viewLegacy) elements.viewLegacy.classList.add('hidden');
-
-    // 2. 모든 메뉴 활성화 상태 해제
-    elements.navDashboard.classList.remove('active');
-    elements.navPower.classList.remove('active');
-    elements.navResearch.classList.remove('active');
-    if (elements.navTechTree) elements.navTechTree.classList.remove('active');
-    if (elements.navLegacy) elements.navLegacy.classList.remove('active');
-
-    // 3. 선택된 탭 활성화 및 렌더링
-    if (tabName === 'dashboard') {
-        elements.viewDashboard.classList.remove('hidden');
-        elements.navDashboard.classList.add('active');
-        // Logic.getBuildingCost를 사용하기 위해 Logic이 import 되어 있어야 합니다.
-        renderShop(cachedBuyCallback, Logic.getBuildingCost);
-    } else if (tabName === 'power') {
-        elements.viewPower.classList.remove('hidden');
-        elements.navPower.classList.add('active');
-    } else if (tabName === 'research') {
-        elements.viewResearch.classList.remove('hidden');
-        elements.navResearch.classList.add('active');
-        renderResearchTab();
-    } else if (tabName === 'tech-tree') {
-        elements.viewTechTree.classList.remove('hidden');
-        elements.navTechTree.classList.add('active');
-        renderTechTree();
-    } else if (tabName === 'legacy') {
-        if (elements.viewLegacy) elements.viewLegacy.classList.remove('hidden');
-        if (elements.navLegacy) elements.navLegacy.classList.add('active');
-        renderLegacyTab();
-    }
-}
-
-
-export function renderResearchTab() {
-    const container = elements.viewResearch.querySelector('#research-list-container') || elements.viewResearch.querySelector('.action-box');
-    if (!container) return;
-    container.innerHTML = "";
-    if (!gameData.researches) gameData.researches = [];
-
-    const availableRes = [];
-    const completedRes = [];
-    const currentResearchList = getActiveResearch(); 
-
-    currentResearchList.forEach(r => {
-        const isDone = gameData.researches.includes(r.id);
-        const isPrereqDone = r.reqResearch ? gameData.researches.includes(r.reqResearch) : true;
-        let isTargetVisible = true;
-        if (r.type === 'building' || r.type === 'consumption' || r.type === 'energyEff') {
-            isTargetVisible = r.target.some(targetId => {
-                const b = gameData.buildings.find(build => build.id === targetId);
-                return b && gameData.houseLevel >= (b.reqLevel || 0);
-            });
-        }
-        if (isDone) completedRes.push(r);
-        else if (isPrereqDone && isTargetVisible) availableRes.push(r);
-    });
-
-    if (availableRes.length > 0) renderResearchSection("🔬 진행 가능한 연구", availableRes, false, container);
-    if (completedRes.length > 0) renderResearchSection("✅ 완료된 기술", completedRes, true, container);
-    updateResearchButtons();
-}
-
-function renderResearchSection(titleText, list, isDone, parentContainer) {
-    const stateKey = `res_${titleText}`;
-    const isCollapsed = collapsedState[stateKey] === true;
-
-    const title = document.createElement('div');
-    title.className = `research-section-title ${isCollapsed ? 'collapsed' : ''}`; 
-    title.innerHTML = `${titleText} (${list.length}) <span class="toggle-arrow">▼</span>`;
-
-    const subGrid = document.createElement('div');
-    subGrid.className = `sub-build-grid ${isCollapsed ? 'collapsed-content' : ''}`; 
-
-    title.onclick = () => {
-        const isNowCollapsed = title.classList.toggle('collapsed');
-        subGrid.classList.toggle('collapsed-content');
-        collapsedState[stateKey] = isNowCollapsed;
-    };
-
-    parentContainer.appendChild(title);
-    parentContainer.appendChild(subGrid);
-    list.forEach(r => subGrid.appendChild(createResearchElement(r, isDone)));
-}
-
-function createResearchElement(r, isDone) {
-    const div = document.createElement('div');
-    div.className = `shop-item research-item ${isDone ? 'done disabled' : ''}`;
-    div.id = `research-${r.id}`;
-    
-    let costTxt = Object.entries(r.cost).map(([k, v]) => {
-        const currentVal = gameData.resources[k] || 0;
-        // 자원 충분하면 초록, 부족하면 빨강
-        const color = (currentVal >= v) ? '#2ecc71' : '#e74c3c';
-        return `<span style="color:${color}; font-weight:bold;">${getResEmoji(k)} ${formatNumber(v)}</span>`;
-    }).join('  ');
-    let warning = (r.type === 'building' && r.value > 1) ? `<br><span style="color:#ff7675; font-size:0.7rem;">⚠️ 속도 증가 시 재료 소모량 비례 증가</span>` : "";
-
-    div.innerHTML = `
-        <span class="si-name">${r.name}</span>
-        <span class="si-level">${isDone ? '✓' : ''}</span>
-        <div class="si-desc">${r.desc}${warning}</div>
-        <div class="si-cost">${isDone ? '연구 완료' : costTxt}</div>
-    `;
-
-    if (!isDone) {
-        div.onclick = (e) => {
-            e.stopPropagation();
-            const result = Logic.tryBuyResearch(r.id); 
-            if (result.success) { 
-                log(`🔬 [연구 완료] ${r.name}`, true);
-                renderResearchTab();
-                renderShop(cachedBuyCallback, Logic.getBuildingCost);
-            } else {
-                const missingNames = result.missing.map(key => getResNameOnly(key)).join(', ');
-                log(`❌ 연구 불가 (부족: ${missingNames})`);
-            }
-        };
-    }
-    return div;
-}
-
-export function updateResearchButtons() {
-    const currentList = getActiveResearch(); // 현재 행성 연구 목록 가져오기
-
-    currentList.forEach(r => {
-        // 이미 연구했으면 패스
-        if (gameData.researches.includes(r.id)) return;
-
-        const div = document.getElementById(`research-${r.id}`);
-        if (!div) return;
-
-        let canBuy = true;
-        
-        // 비용 체크 및 텍스트 색상 실시간 갱신
-        const costEl = div.querySelector('.si-cost');
-        if (costEl) {
-            const costHtml = Object.entries(r.cost).map(([k, v]) => {
-                const currentVal = gameData.resources[k] || 0;
-                
-                // 조건 체크
-                if (currentVal < v) canBuy = false;
-
-                // 색상 결정
-                const color = (currentVal >= v) ? '#2ecc71' : '#e74c3c';
-                return `<span style="color:${color}; font-weight:bold;">${getResEmoji(k)} ${formatNumber(v)}</span>`;
-            }).join('  ');
-
-            costEl.innerHTML = costHtml;
-        }
-
-        // 버튼 활성화/비활성화 처리
-        if (canBuy) {
-            div.classList.remove('disabled');
-        } else {
-            div.classList.add('disabled');
-        }
-    });
-}
-
-export function checkUnlocks() {
-    const p = gameData.currentPlanet || 'earth', disc = gameData.unlockedResources || [];
-    const toggle = (el, show) => el && el.classList.toggle('hidden', !show);
-    const isLegacy = (gameData.houseLevel >= 50 || (gameData.prestigeLevel || 0) > 0 || p !== 'earth');
-    const isPrestiged = (gameData.prestigeLevel > 0 || p !== 'earth');
-    
-    const names = { earth: ["🌲 나무 베기", "🪨 돌 캐기", "⚫ 석탄 캐기"], aurelia: ["🔩 고철 줍기", "🧲 자석 수집", ""], veridian: ["🌿 섬유 채집", "🍄 포자 채취", ""] }[p];
-    [elements.btns.wood, elements.btns.stone, elements.btns.coal].forEach((btn, i) => { if(btn) btn.innerText = names[i]; });
-
-    toggle(elements.btns.wood, true);
-    toggle(elements.btns.stone, p !== 'earth' || disc.includes('stone'));
-    toggle(elements.btns.coal, p === 'earth' && disc.includes('coal'));
-    toggle(elements.btns.plank, p === 'earth' && disc.includes('plank'));
-    toggle(elements.btns.ironOre, p === 'earth' && disc.includes('ironOre'));
-    toggle(elements.btns.copperOre, p === 'earth' && disc.includes('copperOre'));
-
-    if(elements.navPower) elements.navPower.style.display = (gameData.houseLevel >= 5 || p !== 'earth') ? 'flex' : 'none';
-    if(elements.navLegacy) elements.navLegacy.style.display = isLegacy ? 'flex' : 'none';
-    const lCat = document.getElementById('legacy-cat'); 
-    if(lCat) lCat.style.display = isLegacy ? 'block' : 'none';
-
-    const sBtn = document.getElementById('btn-become-star');
-    if(sBtn) sBtn.style.display = (p !== 'earth') ? 'block' : 'none';
-}
-
 export function renderShop(onBuyCallback, getCostFunc) {
     if(onBuyCallback) cachedBuyCallback = onBuyCallback;
+    
+    // 1. DOM 요소 확인
     if (!elements.buildingList) return;
+    
+    // 2. 데이터가 로드되지 않았으면 중단 (에러 방지)
+    if (!gameData.buildings || gameData.buildings.length === 0) return;
 
-
-     if (!gameData.buildings || gameData.buildings.length === 0) {
-        console.warn("건물 데이터가 비어있습니다. 데이터 로드를 확인하세요.");
-        return;
-    }
+    if (!buildingGroups) return;
 
     elements.buildingList.innerHTML = "";
     elements.buildingList.style.display = "block";
 
     const wood = gameData.resources.wood || 0;
-    const firstBuilding = gameData.buildings[0];
-    const isStoneUnlocked = (gameData.houseLevel >= 1 || wood >= 10 || (gameData.buildings[0] && gameData.buildings[0].count > 0));
+    const firstBuilding = gameData.buildings[0]; 
+    const isStoneUnlocked = (gameData.houseLevel >= 1 || wood >= 10 || (firstBuilding && firstBuilding.count > 0));
 
     for (const [groupKey, group] of Object.entries(buildingGroups)) {
         const visibleBuildings = gameData.buildings.filter(b => {
@@ -505,6 +350,7 @@ export function renderShop(onBuyCallback, getCostFunc) {
         const title = document.createElement('div');
         title.className = `build-category-title ${isCollapsed ? 'collapsed' : ''}`;
         title.innerHTML = `${group.title} <span class="toggle-arrow">▼</span>`;
+        
         const subGrid = document.createElement('div');
         subGrid.className = `sub-build-grid ${isCollapsed ? 'collapsed-content' : ''}`; 
 
@@ -523,6 +369,7 @@ export function renderShop(onBuyCallback, getCostFunc) {
             subGrid.appendChild(createBuildingElement(b, index, getCostFunc));
         });
     }
+    
     updateShopButtons(getCostFunc);
 }
 
@@ -531,13 +378,15 @@ function createBuildingElement(b, index, getCostFunc) {
     div.className = `shop-item`;
     div.id = `build-${index}`;
     
-    // ⭐ [NEW 표기 추가]
+    // NEW 배지
     const isNew = (b.count || 0) === 0;
     const newBadgeHtml = isNew ? `<span class="new-badge">NEW</span>` : "";
 
+    const cost = getCostFunc(b);
+    
+    // ⭐ [핵심] getResEmoji 사용 (import 되어 있어야 에러 안 남)
     let costTxt = Object.entries(cost).map(([k, v]) => {
         const currentVal = gameData.resources[k] || 0;
-        // 보유량이 충분하면 초록색(#2ecc71), 부족하면 빨간색(#e74c3c)
         const color = (currentVal >= v) ? '#2ecc71' : '#e74c3c'; 
         return `<span style="color:${color}; font-weight:bold;">${getResEmoji(k)} ${formatNumber(v)}</span>`;
     }).join('  ');
@@ -553,7 +402,6 @@ function createBuildingElement(b, index, getCostFunc) {
         return `${formatNumber(finalVal)}${k === 'energy' ? '⚡' : getResEmoji(k)}`;
     }) : [];
     
-    // ⭐ [이모지 적용]: getResEmoji 사용
     let outArr = b.outputs ? Object.entries(b.outputs).map(([k,v]) => {
         let finalProd = v * speedMult;
         if (k !== 'energy') finalProd *= prodBonus;
@@ -565,7 +413,8 @@ function createBuildingElement(b, index, getCostFunc) {
     if (inArr.length > 0) processTxt += `<span style="color:#e74c3c">-${inArr.join(' ')}</span> `;
     if (outArr.length > 0) processTxt += `➡ <span style="color:#2ecc71">+${outArr.join(' ')}</span>/s`;
 
-     div.innerHTML = `
+    // ⭐ [핵심] NEW 배지를 이름 옆에 붙임
+    div.innerHTML = `
         <span class="si-name">
             ${b.name}${newBadgeHtml} 
             <small style="color:#8892b0; font-weight:normal; font-size:0.75rem; margin-left:4px;">
@@ -582,6 +431,8 @@ function createBuildingElement(b, index, getCostFunc) {
 }
 
 export function updateShopButtons(getCostFunc) {
+    if (!gameData.buildings) return;
+    
     gameData.buildings.forEach((b, index) => {
         const div = document.getElementById(`build-${index}`);
         if(!div) return;
@@ -610,7 +461,7 @@ export function updatePrestigeUI() {
     } else {
         if (headerPrestige) {
             headerPrestige.innerText = "";
-            headerPrestige.style.display = "none";
+            headerPrestige.style.display = "none"; // 공간 차지하지 않게 숨김
         }
         if (sideSmall) {
             sideSmall.innerText = "IDLE GAME"; 
@@ -620,28 +471,25 @@ export function updatePrestigeUI() {
 }
 
 export function updateHouseUI(onUpgrade) {
-    // 1. 데이터 가져오기
     const stages = getActiveStages(); 
     if (!stages || stages.length === 0) return;
 
     const nextStage = stages[gameData.houseLevel + 1];
     const currentStage = stages[gameData.houseLevel] || { name: "최고 레벨", desc: "-" };
     
-    // 2. 텍스트 업데이트
     if(elements.houseName) elements.houseName.innerText = `Lv.${gameData.houseLevel} ${currentStage.name}`;
     if(elements.houseDesc) elements.houseDesc.innerText = currentStage.desc;
 
-    // 3. 다음 단계가 있을 경우
+    const btnContainer = elements.upgradeBtn.parentElement; 
+
     if (nextStage) {
         elements.upgradeBtn.style.display = "flex";
         
-        // 버튼 텍스트 생성
+        // ⭐ [핵심] 업그레이드 비용 색상 처리 (이모지 포함)
+        const epsilon = 0.0001;
         const reqTxt = Object.entries(nextStage.req)
             .map(([k, v]) => {
                 let currentVal = (k === 'energy') ? (gameData.resources.energy || 0) : (gameData.resources[k] || 0);
-                
-                // 조건 충족 시 초록, 부족 시 빨강
-                // 에너지는 단순 비교, 자원은 오차범위 포함 비교
                 let isEnough = (k === 'energy') ? (currentVal >= v) : (currentVal >= v - epsilon);
                 let color = isEnough ? '#2ecc71' : '#e74c3c';
                 
@@ -650,24 +498,21 @@ export function updateHouseUI(onUpgrade) {
             })
             .join('  ');
 
-        elements.upgradeBtn.innerText = `⬆️ ${nextStage.name} (${reqTxt})`;
+        elements.upgradeBtn.innerHTML = `⬆️ ${nextStage.name}<br><span style="font-size:0.9rem">${reqTxt}</span>`;
         
-        // ⭐ [핵심 수정] 로직 파일에 직접 물어봐서 정확도 일치시킴
+        // 버튼 활성화 로직
         const isPossible = Logic.canUpgradeHouse(nextStage);
 
-        // 버튼 상태 강제 적용 (매 프레임 실행됨)
         if (isPossible) {
             elements.upgradeBtn.disabled = false;
-            elements.upgradeBtn.classList.remove('disabled'); // 스타일 확실하게 적용
+            elements.upgradeBtn.classList.remove('disabled');
             elements.upgradeBtn.style.opacity = "1";
             elements.upgradeBtn.style.cursor = "pointer";
-            // 클릭 이벤트는 함수 참조가 계속 바뀌지 않도록 한 번만 연결하는 게 좋지만,
-            // 현재 구조상 매번 연결해도 기능엔 문제 없음. 확실한 동작을 위해 유지.
             elements.upgradeBtn.onclick = () => onUpgrade(nextStage);
         } else {
             elements.upgradeBtn.disabled = true;
             elements.upgradeBtn.classList.add('disabled');
-            elements.upgradeBtn.style.opacity = "0.5";
+            elements.upgradeBtn.style.opacity = "0.6";
             elements.upgradeBtn.style.cursor = "not-allowed";
             elements.upgradeBtn.onclick = null;
         }
@@ -676,11 +521,9 @@ export function updateHouseUI(onUpgrade) {
         if(choiceDiv) choiceDiv.remove();
 
     } else {
-        // 4. 엔딩 처리 (기존 코드 유지)
         elements.upgradeBtn.style.display = "none"; 
         
         if (!document.getElementById('ending-choices')) {
-            const btnContainer = elements.upgradeBtn.parentElement; 
             const choiceDiv = document.createElement('div');
             choiceDiv.id = 'ending-choices';
             choiceDiv.style.cssText = "display:flex; gap:10px; width:100%;";
@@ -697,7 +540,9 @@ export function updateHouseUI(onUpgrade) {
 
             document.getElementById('btn-prestige-final').onclick = () => {
                 if(confirm("지구를 떠나시겠습니까? 모든 자원과 건물은 초기화되지만 영구적인 유산 보너스를 얻습니다.")) {
-                    if (typeof window.performPrestige === 'function') window.performPrestige();
+                    if (typeof window.performPrestige === 'function') {
+                        window.performPrestige();
+                    }
                 }
             };
             document.getElementById('btn-new-world').onclick = () => showPlanetSelection();
@@ -744,6 +589,7 @@ export function renderTechTree() {
 
     sortedDepths.forEach(depth => {
         const currentTierName = tierNames[depth] || `Tier ${parseInt(depth / 2) + 1}: 심화 기술`;
+
         if (currentTierName !== lastTierName) {
             const header = document.createElement('div');
             header.className = 'tree-tier-header';
@@ -758,8 +604,10 @@ export function renderTechTree() {
         tiers[depth].forEach(r => {
             const isDone = gameData.researches.includes(r.id);
             const isPrereqDone = r.reqResearch ? gameData.researches.includes(r.reqResearch) : true;
+
             const node = document.createElement('div');
             node.className = `tree-node ${isDone ? 'done' : (isPrereqDone ? 'available' : 'locked')}`;
+
             const parent = currentList.find(p => p.id === r.reqResearch);
             const parentName = parent ? `[${parent.name}]에서 연결` : "시작 기술";
 
@@ -875,9 +723,83 @@ export function showOfflineReport(seconds, statsBefore) {
 export function triggerWarpEffect(destName, callback) {
     const overlay = document.getElementById('warp-overlay');
     const destMsg = document.getElementById('warp-dest-msg');
+    
     if (!overlay) return callback(); 
+
     destMsg.innerText = `목적지: ${destName}`;
     overlay.style.display = 'flex';
+    
     setTimeout(() => overlay.classList.add('active'), 10);
     setTimeout(() => { callback(); }, 2000);
+}
+
+function createResearchElement(r, isDone) {
+    const div = document.createElement('div');
+    div.className = `shop-item research-item ${isDone ? 'done disabled' : ''}`;
+    div.id = `research-${r.id}`;
+    
+    // ⭐ [핵심] getResEmoji 사용 (import 필수)
+    let costTxt = Object.entries(r.cost).map(([k, v]) => {
+        const currentVal = gameData.resources[k] || 0;
+        const color = (currentVal >= v) ? '#2ecc71' : '#e74c3c';
+        return `<span style="color:${color}; font-weight:bold;">${getResEmoji(k)} ${formatNumber(v)}</span>`;
+    }).join('  ');
+        
+    let warning = (r.type === 'building' && r.value > 1) ? `<br><span style="color:#ff7675; font-size:0.7rem;">⚠️ 속도 증가 시 재료 소모량 비례 증가</span>` : "";
+
+    div.innerHTML = `
+        <span class="si-name">${r.name}</span>
+        <span class="si-level">${isDone ? '✓' : ''}</span>
+        <div class="si-desc">${r.desc}${warning}</div>
+        <div class="si-cost">${isDone ? '연구 완료' : costTxt}</div>
+    `;
+
+    if (!isDone) {
+        div.onclick = (e) => {
+            e.stopPropagation();
+            const result = Logic.tryBuyResearch(r.id); 
+            if (result.success) { 
+                log(`🔬 [연구 완료] ${r.name}`, true);
+                renderResearchTab();
+                renderShop(cachedBuyCallback, Logic.getBuildingCost);
+            } else {
+                const missingNames = result.missing.map(key => getResNameOnly(key)).join(', ');
+                log(`❌ 연구 불가 (부족: ${missingNames})`);
+            }
+        };
+    }
+    return div;
+}
+
+export function updateResearchButtons() {
+    const currentList = getActiveResearch();
+
+    currentList.forEach(r => {
+        if (gameData.researches.includes(r.id)) return;
+
+        const div = document.getElementById(`research-${r.id}`);
+        if (!div) return;
+
+        let canBuy = true;
+        
+        const costEl = div.querySelector('.si-cost');
+        if (costEl) {
+            const costHtml = Object.entries(r.cost).map(([k, v]) => {
+                const currentVal = gameData.resources[k] || 0;
+                
+                if (currentVal < v) canBuy = false;
+
+                const color = (currentVal >= v) ? '#2ecc71' : '#e74c3c';
+                return `<span style="color:${color}; font-weight:bold;">${getResEmoji(k)} ${formatNumber(v)}</span>`;
+            }).join('  ');
+
+            costEl.innerHTML = costHtml;
+        }
+
+        if (canBuy) {
+            div.classList.remove('disabled');
+        } else {
+            div.classList.add('disabled');
+        }
+    });
 }
