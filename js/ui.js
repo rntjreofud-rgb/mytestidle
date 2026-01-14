@@ -762,6 +762,9 @@ function createBuildingElement(b, index, getCostFunc) {
     div.className = `shop-item`;
     div.id = `build-${index}`;
     
+    const isNew = (b.count || 0) === 0;
+    const newBadgeHtml = isNew ? `<span class="new-badge">NEW</span>` : "";
+
     const cost = getCostFunc(b);
     let costTxt = Object.entries(cost).map(([k, v]) => `${formatNumber(v)}${getResNameOnly(k)}`).join(' ');
 
@@ -790,6 +793,7 @@ function createBuildingElement(b, index, getCostFunc) {
     if (outArr.length > 0) processTxt += `➡ <span style="color:#2ecc71">+${outArr.join(',')}</span>/s`;
 
     div.innerHTML = `
+        ${newBadgeHtml}
         <span class="si-name">${b.name} <small style="color:#8892b0; font-weight:normal;">(${b.activeCount}/${b.count})</small></span>
         <span class="si-level">Lv.${b.count}</span>
         <div class="si-desc">${processTxt}</div>

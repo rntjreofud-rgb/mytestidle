@@ -103,6 +103,28 @@ header { background-color: var(--bg-panel); border-bottom: 1px solid var(--borde
 #upgrade-btn:hover { filter: brightness(1.1); transform: translateY(-2px); } 
 #upgrade-btn:active { transform: translateY(2px); box-shadow: none; } 
 #upgrade-btn:disabled { background-color: #333 !important; color: #555 !important; cursor: not-allowed; box-shadow: none; transform: none; }
+/* 'NEW' 배지 스타일 */
+.new-badge {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    background: var(--primary-orange);
+    color: white;
+    font-size: 0.65rem;
+    font-weight: bold;
+    padding: 2px 5px;
+    border-radius: 3px;
+    z-index: 10;
+    box-shadow: 0 0 5px rgba(233, 69, 96, 0.5);
+    animation: pulse-new 1.5s infinite;
+    pointer-events: none; /* 클릭 방해 금지 */
+}
+
+@keyframes pulse-new {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+    100% { transform: scale(1); opacity: 1; }
+}
 
 
 
