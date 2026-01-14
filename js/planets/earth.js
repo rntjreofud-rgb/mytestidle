@@ -107,7 +107,7 @@ export const earthData = {
     { id: 50, name: "대형 아크 용광로", cost: { titaniumPlate: 5000, advCircuit: 1000, concrete: 5000 }, inputs: { ironOre: 20, copperOre: 20, coal: 10, energy: 300 }, outputs: { ironPlate: 20, copperPlate: 20, steel: 10 }, count: 0, reqLevel: 30 },
     { id: 51, name: "초전도 자기력 채굴기", cost: { steel: 10000, advCircuit: 2000, concrete: 5000 }, inputs: { energy: 250 }, outputs: { copperOre: 50.0 }, count: 0, reqLevel: 25 },
     { id: 52, name: "대기 유황 포집기", cost: { titaniumPlate: 5000, optics: 1000, plastic: 10000 }, inputs: { energy: 200 }, outputs: { sulfur: 30.0 }, count: 0, reqLevel: 28 },
-    { id: 53, name: "심부 우라늄 파쇄기", cost: { advAlloy: 5000, aiCore: 200, concrete: 20000 }, inputs: { energy: 500 }, outputs: { uraniumOre: 10.0 }, count: 0, reqLevel: 40 },
+    { id: 53, name: "심부 우라늄 파쇄기", cost: { advAlloy: 5000, aiCore: 200, concrete: 20000 }, inputs: { energy: 500 }, outputs: { uraniumOre: 10.0 }, count: 0, reqLevel: 42 },
     { id: 54, name: "심해 해상 시추 플랫폼", cost: { steel: 50000, concrete: 30000, advCircuit: 5000 }, inputs: { energy: 400 }, outputs: { oil: 100.0 }, count: 0, reqLevel: 30 },
     { id: 55, name: "전기 철 용광로", cost: { steel: 1000, circuit: 500, gear: 300 }, inputs: { ironOre: 10, energy: 60 }, outputs: { ironPlate: 12.0 }, count: 0, reqLevel: 15 },
     { id: 56, name: "전기 구리 용광로", cost: { steel: 1000, circuit: 500, gear: 300 }, inputs: { copperOre: 10, energy: 60 }, outputs: { copperPlate: 12.0 }, count: 0, reqLevel: 15 },
