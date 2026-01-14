@@ -378,9 +378,12 @@ function createResearchElement(r, isDone) {
     div.className = `shop-item research-item ${isDone ? 'done disabled' : ''}`;
     div.id = `research-${r.id}`;
     
-    let costTxt = Object.entries(r.cost)
-        .map(([k, v]) => `${getResEmoji(k)} ${formatNumber(v)}`)
-        .join(' ');
+    let costTxt = Object.entries(r.cost).map(([k, v]) => {
+        const currentVal = gameData.resources[k] || 0;
+        // 자원 충분하면 초록, 부족하면 빨강
+        const color = (currentVal >= v) ? '#2ecc71' : '#e74c3c';
+        return `<span style="color:${color}; font-weight:bold;">${getResEmoji(k)} ${formatNumber(v)}</span>`;
+    }).join('  ');
     let warning = (r.type === 'building' && r.value > 1) ? `<br><span style="color:#ff7675; font-size:0.7rem;">⚠️ 속도 증가 시 재료 소모량 비례 증가</span>` : "";
 
     div.innerHTML = `
@@ -408,12 +411,40 @@ function createResearchElement(r, isDone) {
 }
 
 export function updateResearchButtons() {
-    getActiveResearch().forEach(r => {
+    const currentList = getActiveResearch(); // 현재 행성 연구 목록 가져오기
+
+    currentList.forEach(r => {
+        // 이미 연구했으면 패스
+        if (gameData.researches.includes(r.id)) return;
+
         const div = document.getElementById(`research-${r.id}`);
-        if(!div || gameData.researches.includes(r.id)) return;
+        if (!div) return;
+
         let canBuy = true;
-        for(let k in r.cost) { if((gameData.resources[k] || 0) < r.cost[k]) canBuy = false; }
-        if(canBuy) div.classList.remove('disabled'); else div.classList.add('disabled');
+        
+        // 비용 체크 및 텍스트 색상 실시간 갱신
+        const costEl = div.querySelector('.si-cost');
+        if (costEl) {
+            const costHtml = Object.entries(r.cost).map(([k, v]) => {
+                const currentVal = gameData.resources[k] || 0;
+                
+                // 조건 체크
+                if (currentVal < v) canBuy = false;
+
+                // 색상 결정
+                const color = (currentVal >= v) ? '#2ecc71' : '#e74c3c';
+                return `<span style="color:${color}; font-weight:bold;">${getResEmoji(k)} ${formatNumber(v)}</span>`;
+            }).join('  ');
+
+            costEl.innerHTML = costHtml;
+        }
+
+        // 버튼 활성화/비활성화 처리
+        if (canBuy) {
+            div.classList.remove('disabled');
+        } else {
+            div.classList.add('disabled');
+        }
     });
 }
 
@@ -504,10 +535,12 @@ function createBuildingElement(b, index, getCostFunc) {
     const isNew = (b.count || 0) === 0;
     const newBadgeHtml = isNew ? `<span class="new-badge">NEW</span>` : "";
 
-    const cost = getCostFunc(b);
-     let costTxt = Object.entries(cost)
-        .map(([k, v]) => `${getResEmoji(k)} ${formatNumber(v)}`)
-        .join(' ');
+    let costTxt = Object.entries(cost).map(([k, v]) => {
+        const currentVal = gameData.resources[k] || 0;
+        // 보유량이 충분하면 초록색(#2ecc71), 부족하면 빨간색(#e74c3c)
+        const color = (currentVal >= v) ? '#2ecc71' : '#e74c3c'; 
+        return `<span style="color:${color}; font-weight:bold;">${getResEmoji(k)} ${formatNumber(v)}</span>`;
+    }).join('  ');
 
     const speedMult = Logic.getBuildingMultiplier(b.id);
     const consMult = Logic.getBuildingConsumptionMultiplier(b.id);
@@ -532,9 +565,13 @@ function createBuildingElement(b, index, getCostFunc) {
     if (inArr.length > 0) processTxt += `<span style="color:#e74c3c">-${inArr.join(' ')}</span> `;
     if (outArr.length > 0) processTxt += `➡ <span style="color:#2ecc71">+${outArr.join(' ')}</span>/s`;
 
-    div.innerHTML = `
-        ${newBadgeHtml}
-        <span class="si-name">${b.name} <small style="color:#8892b0; font-weight:normal;">(${b.activeCount}/${b.count})</small></span>
+     div.innerHTML = `
+        <span class="si-name">
+            ${b.name}${newBadgeHtml} 
+            <small style="color:#8892b0; font-weight:normal; font-size:0.75rem; margin-left:4px;">
+                (${b.activeCount}/${b.count})
+            </small>
+        </span>
         <span class="si-level">Lv.${b.count}</span>
         <div class="si-desc">${processTxt}</div>
         <div class="si-cost">${costTxt}</div>
@@ -601,8 +638,15 @@ export function updateHouseUI(onUpgrade) {
         // 버튼 텍스트 생성
         const reqTxt = Object.entries(nextStage.req)
             .map(([k, v]) => {
-                if (k === 'energy') return `⚡ ${formatNumber(v)}MW`; 
-                return `${getResEmoji(k)} ${formatNumber(v)}`;
+                let currentVal = (k === 'energy') ? (gameData.resources.energy || 0) : (gameData.resources[k] || 0);
+                
+                // 조건 충족 시 초록, 부족 시 빨강
+                // 에너지는 단순 비교, 자원은 오차범위 포함 비교
+                let isEnough = (k === 'energy') ? (currentVal >= v) : (currentVal >= v - epsilon);
+                let color = isEnough ? '#2ecc71' : '#e74c3c';
+                
+                if (k === 'energy') return `<span style="color:${color}">⚡ ${formatNumber(v)}MW</span>`; 
+                return `<span style="color:${color}">${getResEmoji(k)} ${formatNumber(v)}</span>`;
             })
             .join('  ');
 

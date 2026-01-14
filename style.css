@@ -105,19 +105,18 @@ header { background-color: var(--bg-panel); border-bottom: 1px solid var(--borde
 #upgrade-btn:disabled { background-color: #333 !important; color: #555 !important; cursor: not-allowed; box-shadow: none; transform: none; }
 /* 'NEW' 배지 스타일 */
 .new-badge {
-    position: absolute;
-    top: 5px;
-    left: 5px;
+    display: inline-block;       /* 글자 옆에 배치 */
+    margin-left: 6px;            /* 이름과의 간격 */
     background: var(--primary-orange);
     color: white;
-    font-size: 0.65rem;
+    font-size: 0.6rem;
     font-weight: bold;
-    padding: 2px 5px;
-    border-radius: 3px;
-    z-index: 10;
-    box-shadow: 0 0 5px rgba(233, 69, 96, 0.5);
+    padding: 1px 5px;
+    border-radius: 4px;
+    vertical-align: middle;      /* 텍스트 높이 맞춤 */
+    position: relative;
+    top: -1px;                   /* 미세 높이 조정 */
     animation: pulse-new 1.5s infinite;
-    pointer-events: none; /* 클릭 방해 금지 */
 }
 
 @keyframes pulse-new {
