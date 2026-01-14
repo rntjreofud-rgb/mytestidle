@@ -1,8 +1,8 @@
 // js/data.js
 
-import { earthData } from './planets/earth.js';
-import { aureliaData } from './planets/aurelia.js';
-import { veridianData } from './planets/veridian.js';
+import { earthData } from '../planets/earth.js';
+import { aureliaData } from '../planets/aurelia.js';
+import { veridianData } from '../planets/veridian.js';
 
 // === [1] 공통 게임 상태 정의 ===
 export let gameData = {
