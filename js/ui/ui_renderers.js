@@ -744,6 +744,8 @@ function createResearchElement(r, isDone) {
     div.className = `shop-item research-item ${isDone ? 'done disabled' : ''}`;
     div.id = `research-${r.id}`;
     
+    const newBadgeHtml = !isDone ? `<span class="new-badge">NEW</span>` : "";
+
     // ⭐ [핵심] getResEmoji 사용 (import 필수)
     let costTxt = Object.entries(r.cost).map(([k, v]) => {
         const currentVal = gameData.resources[k] || 0;
@@ -754,9 +756,13 @@ function createResearchElement(r, isDone) {
     let warning = (r.type === 'building' && r.value > 1) ? `<br><span style="color:#ff7675; font-size:0.7rem;">⚠️ 속도 증가 시 재료 소모량 비례 증가</span>` : "";
 
     div.innerHTML = `
-        <span class="si-name">${r.name}</span>
+        <span class="si-name">${r.name}${newBadgeHtml}</span>
         <span class="si-level">${isDone ? '✓' : ''}</span>
-        <div class="si-desc">${r.desc}${warning}</div>
+              
+        <div class="si-desc" style="top: 38px; bottom: auto; left: 14px; right: 14px; white-space: normal; line-height: 1.3;">
+            ${r.desc}${warning}
+        </div>
+      
         <div class="si-cost">${isDone ? '연구 완료' : costTxt}</div>
     `;
 
