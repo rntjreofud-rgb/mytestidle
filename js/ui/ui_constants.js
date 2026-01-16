@@ -76,11 +76,13 @@ export const resourceGroups = {
     },
     aurelia_mat: { 
         planet: 'aurelia', title: "🌑 특수 제련 (Aurelia Metals)", 
-        items: ['heavyAlloy', 'fluxEnergy', 'nanoSteel'] 
+        // ⭐ [수정] magConcrete(자력 콘크리트) 추가됨
+        items: ['heavyAlloy', 'fluxEnergy', 'nanoSteel', 'magConcrete'] 
     },
     aurelia_comp: { 
         planet: 'aurelia', title: "⚛️ 에너지 코어 (High-Tech)", 
-        items: ['plasmaCore'] 
+        // ⭐ [수정] fluxLogic(플럭스 회로) 추가됨 (미리 대비)
+        items: ['plasmaCore', 'fluxLogic'] 
     },
     // === [3] 베리디안 (Veridian) 자원 그룹 ===
     veridian_raw: { 
