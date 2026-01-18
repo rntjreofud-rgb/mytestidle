@@ -91,7 +91,7 @@ export const earthData = {
     { id: 34, name: "고급 합금 용광로", cost: { titaniumPlate: 5000, concrete: 10000 }, inputs: { titaniumPlate: 5, steel: 20, energy: 600 }, outputs: { advAlloy: 2 }, count: 0, reqLevel: 42 },
     { id: 35, name: "로켓 연료 정제소", cost: { oil: 10000, sulfur: 5000 }, inputs: { oil: 40, sulfur: 20, energy: 200 }, outputs: { rocketFuel: 2 }, count: 0, reqLevel: 24 },
     { id: 36, name: "퀀텀 컴퓨터 메인프레임", cost: { processor: 1000, advCircuit: 2000, titaniumPlate: 5000 }, inputs: { energy: 500 }, outputs: { quantumData: 10 }, count: 0, reqLevel: 35 },
-    { id: 37, name: "중력 제어 연구소", cost: { advAlloy: 2000, titaniumPlate: 10000 }, inputs: { energy: 5000, quantumData: 5 }, outputs: { gravityModule: 1 }, count: 0, reqLevel: 37 },
+    { id: 37, name: "중력 제어 연구소", cost: { quantumData: 2000, titaniumPlate: 10000 }, inputs: { energy: 5000, quantumData: 5 }, outputs: { gravityModule: 1 }, count: 0, reqLevel: 37 },
     { id: 38, name: "항성간 추진기 공장", cost: { advAlloy: 5000, aiCore: 500, gravityModule: 200, titaniumPlate: 10000 }, inputs: { advAlloy: 10, rocketFuel: 100, energy: 2000 }, outputs: { warpCore: 1 }, count: 0, reqLevel: 45 },
     { id: 39, name: "다이슨 스웜 송신기", cost: { advAlloy: 50000, aiCore: 1000, gravityModule: 1000 }, inputs: null, outputs: { energy: 100000 }, count: 0, reqLevel: 48 },
     { id: 40, name: "노천 철광산", cost: { stone: 150, plank: 30 }, inputs: null, outputs: { ironOre: 0.8 }, count: 0, reqLevel: 2 },
