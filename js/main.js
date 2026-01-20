@@ -47,8 +47,15 @@ window.landOnPlanet = function(planetKey) {
     UI.triggerWarpEffect(planetName, () => {
         const gain = Logic.calculateCurrentPrestigeGain(gameData.houseLevel, gameData.currentPlanet);
         gameData.cosmicData = (gameData.cosmicData || 0) + gain;
-        if (gameData.houseLevel >= 50) gameData.prestigeLevel = (gameData.prestigeLevel || 0) + 1;
         
+        const currentStages = getActiveStages(); 
+        const maxLevel = currentStages.length - 1; 
+
+        // 현재 레벨이 엔딩 레벨 이상이면 숙련도 상승
+        if (gameData.houseLevel >= maxLevel) {
+            gameData.prestigeLevel = (gameData.prestigeLevel || 0) + 1;
+            console.log("🎉 엔딩 조건 달성! 우주 숙련도 레벨업!");
+        }
         // 리셋 로직
         gameData.currentPlanet = planetKey; 
         gameData.houseLevel = 0; 
