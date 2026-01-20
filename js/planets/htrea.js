@@ -188,7 +188,7 @@ export const htreaData = {
 
     // === 연구 리스트 ===
     researchList: [
-            { id: "h_scavenge", name: "고급 스캐닝", desc: "수동 해체 효율 3배 증가", cost: { brokenParts: 500 }, type: 'manual', value: 3, reqResearch: null },
+        { id: "h_scavenge", name: "고급 스캐닝", desc: "수동 수집 효율 3배 증가", cost: { brokenParts: 500 }, type: 'manual', value: 3, reqResearch: null },
         
         { id: "h_mag_separation", name: "자력 선별 기술", desc: "고철 추출기 생산 속도 2배 증가", cost: { scrapCopper: 1000, energy: 100 }, type: 'building', target: [303], value: 2.0, reqResearch: "h_scavenge" },
         
@@ -263,7 +263,28 @@ export const htreaData = {
         { id: "h_warp_stabilizer", name: "워프장 안정화", desc: "워프 추진기 유물 속도 4배 증가 및 에너지 소모 30% 감소", cost: { warpCore: 50, quantumData: 5000 }, type: 'building', target: [334], value: 4.0, reqResearch: "h_gravity_anchor" },
 
         { id: "h_omega_protocol", name: "오메가 프로토콜", desc: "오메가 공정 센터 생산량 5배 증가", cost: { advAlloy: 100000, aiCore: 10000 }, type: 'building', target: [345], value: 5.0, reqResearch: "h_alloy_final" },
+        { 
+            id: "h_drone_swarm", 
+            name: "드론 군집 제어", 
+            desc: "잔해 해체 드론의 작업 효율을 최적화하여 속도 4배 증가", 
+            cost: { brokenParts: 2000, scrapCopper: 500 }, 
+            type: 'building', 
+            target: [300],
+            value: 4.0, 
+            reqResearch: "h_scavenge" 
+        },
 
+       
+        { 
+            id: "h_scrap_recycling_ai", 
+            name: "잔해 식별 AI", 
+            desc: "해체 드론 및 대형 폐기물 처리장의 생산 속도 3배 증가", 
+            cost: { dataCore: 500, leadPlate: 10000 }, 
+            type: 'building', 
+            target: [300, 337], // 드론(300)과 대형 처리장(337) 동시 강화
+            value: 3.0, 
+            reqResearch: "h_automation_logic" 
+        },
 
          { 
             id: "h_heavy_shielding", 
