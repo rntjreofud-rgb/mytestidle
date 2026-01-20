@@ -43,7 +43,7 @@ function applyLegacyStartBonuses() {
 
 // 2. 행성 착륙 함수
 window.landOnPlanet = function(planetKey) {
-    const planetName = { earth: '지구', aurelia: '아우렐리아', veridian: '베리디안' }[planetKey];
+    const planetName = { earth: '지구', aurelia: '아우렐리아', veridian: '베리디안', htrea: '흐트레아' }[planetKey];
     UI.triggerWarpEffect(planetName, () => {
         const gain = Logic.calculateCurrentPrestigeGain(gameData.houseLevel, gameData.currentPlanet);
         gameData.cosmicData = (gameData.cosmicData || 0) + gain;
