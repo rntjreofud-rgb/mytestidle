@@ -6,7 +6,7 @@ export const htreaData = {
             
     // 0~9: 초기 폐허 생존 (기초 자원)
     { name: "무너진 방공호", desc: "먼지와 방사능뿐입니다. 일단 입구를 확보해야 합니다.", req: { brokenParts: 500 } },
-    { name: "녹슨 환풍구", desc: "공기 정화 장치를 수리하여 숨을 쉴 수 있게 만듭니다.", req: { brokenParts: 5000, pureWater: 1000 } },
+    { name: "녹슨 환풍구", desc: "공기 정화 장치를 수리하여 숨을 쉴 수 있게 만듭니다.", req: { brokenParts: 5000 } },
     { name: "낡은 전선 복구", desc: "수천 미터의 구리선을 다시 이어야 합니다.", req: { scrapCopper: 10000, energy: 500 } },
     { name: "방사능 차폐막", desc: "외부의 오염된 공기를 완벽히 차단합니다.", req: { leadPlate: 20000, radiation: 5000 } },
     { name: "지하 거주구역", desc: "잠을 잘 수 있는 개인 공간을 마련했습니다.", req: { brokenParts: 100000, leadPlate: 50000 } },
@@ -74,9 +74,9 @@ export const htreaData = {
     buildings: [
        { id: 300, name: "잔해 해체 드론", cost: { brokenParts: 15 }, inputs: null, outputs: { brokenParts: 2.0 }, count: 0, reqLevel: 0 },
         { id: 301, name: "방사능 포집기", cost: { brokenParts: 100 }, inputs: null, outputs: { radiation: 1.0 }, count: 0, reqLevel: 1 },
-        { id: 302, name: "여과 정수기", cost: { brokenParts: 200, radiation: 50 }, inputs: { radiation: 2 }, outputs: { pureWater: 3.0 }, count: 0, reqLevel: 2 },
-        { id: 303, name: "고철 추출기", cost: { pureWater: 500, brokenParts: 1000 }, inputs: { brokenParts: 10 }, outputs: { scrapCopper: 5.0 }, count: 0, reqLevel: 3 },
-        { id: 304, name: "납 제련소", cost: { scrapCopper: 500 }, inputs: { brokenParts: 20, radiation: 5 }, outputs: { leadPlate: 4.0 }, count: 0, reqLevel: 5 },
+        { id: 302, name: "여과 정수기", cost: { brokenParts: 200, radiation: 50 }, inputs: { radiation: 2 }, outputs: { pureWater: 3.0 }, count: 0, reqLevel: 1 },
+        { id: 303, name: "고철 추출기", cost: { pureWater: 500, brokenParts: 1000 }, inputs: { brokenParts: 10 }, outputs: { scrapCopper: 5.0 }, count: 0, reqLevel: 2 },
+        { id: 304, name: "납 제련소", cost: { scrapCopper: 500 }, inputs: { brokenParts: 20, radiation: 5 }, outputs: { leadPlate: 4.0 }, count: 0, reqLevel: 2 },
         { id: 305, name: "폐기물 발전소", cost: { leadPlate: 300 }, inputs: { brokenParts: 50 }, outputs: { energy: 150 }, count: 0, reqLevel: 6 },
         { id: 306, name: "바이오 실험실", cost: { pureWater: 2000, leadPlate: 500 }, inputs: { pureWater: 10, energy: 100 }, outputs: { bioSample: 2.0 }, count: 0, reqLevel: 10 },
         { id: 311, name: "폐건물 골재 파쇄기", cost: { brokenParts: 5000, scrapCopper: 1000 }, inputs: { energy: 100 }, outputs: { stone: 10.0 }, count: 0, reqLevel: 10 },
