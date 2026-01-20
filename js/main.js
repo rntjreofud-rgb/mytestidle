@@ -14,18 +14,31 @@ function applyLegacyStartBonuses() {
     const legacy = gameData.legacyUpgrades || []; 
     const p = gameData.currentPlanet;
 
+    // 1. 지구 (Earth)
     if (legacy.includes('start_resource') && p === 'earth') { 
         gameData.resources.wood = 500; 
         gameData.resources.stone = 500; 
         gameData.resources.plank = 100; 
     }
+
+    // 2. 베리디안 (Veridian)
     if (legacy.includes('legacy_spore_start') && p === 'veridian') {
         gameData.resources.spore = 200;
     }
+
+    // 3. 아우렐리아 (Aurelia)
     if (legacy.includes('aurelia_start_metal') && p === 'aurelia') {
         gameData.resources.scrapMetal = 300;
     }
-    console.log("시작 자원 유산 적용 완료");
+
+    // 4. [신규] 흐트레아 (Htrea) - 폐허의 생존자 적용
+    if (legacy.includes('htrea_starter_kit') && p === 'htrea') {
+        // 기계잔해 10,000개, 방사능 500 지급
+        gameData.resources.brokenParts = 10000;
+        gameData.resources.radiation = 500;
+    }
+
+    console.log(`[System] 시작 자원 유산 적용 완료 (행성: ${p})`);
 }
 
 // 2. 행성 착륙 함수

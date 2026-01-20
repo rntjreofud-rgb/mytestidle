@@ -698,6 +698,10 @@ export function showPlanetSelection() {
                 <div style="font-size:1.5rem;">🌿</div>
                 <strong>베리디안 (Veridian)</strong><br><small>거대 생명체와 유기물의 정글</small>
             </button>
+            <button onclick="window.landOnPlanet('htrea')" style="padding:15px; background:#2d3436; border:1px solid #636e72; border-radius:8px; cursor:pointer; color:white;">
+                <div style="font-size:1.5rem;">💀</div>
+                <strong>흐트레아 (Htrea)</strong><br><small>멸망한 지구의 폐허 10LV 이상 도전필요</small>
+            </button>
             <button onclick="this.parentElement.parentElement.remove()" style="margin-top:10px; background:none; border:none; color:#556; cursor:pointer; text-decoration:underline;">돌아가기</button>
         </div>
     `;
@@ -832,7 +836,8 @@ export function checkUnlocks() {
     const names = { 
         earth: ["🌲 나무 베기", "🪨 돌 캐기", "⚫ 석탄 캐기"], 
         aurelia: ["🔩 고철 줍기", "🧲 자석 수집", ""], 
-        veridian: ["🌿 섬유 채집", "🍄 포자 채취", ""] 
+        veridian: ["🌿 섬유 채집", "🍄 포자 채취", ""], 
+        htrea: ["🔩 잔해 수집", "☢️ 방사능 포집", ""] 
     }[p];
 
     // 버튼 텍스트 업데이트

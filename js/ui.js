@@ -94,7 +94,20 @@ const resNames = {
     nanoSteel: "🌑 나노강철",
     plasmaCore: "⚛️ 플라즈마코어",
     magConcrete: "🧱 자력콘크리트", 
-    fluxLogic: "💾 플럭스회로"
+    fluxLogic: "💾 플럭스회로",
+
+
+    brokenParts: "🔩 기계잔해",
+    radiation: "☢️ 방사능",
+    pureWater: "💧 정제수",
+    scrapCopper: "🧵 구리조각",
+    leadPlate: "🧱 납판",
+    bioSample: "🧪 생체표본",
+    dataCore: "💾 데이터코어",
+    microChip: "📟 마이크로칩",
+    voidCrystal: "🔮 공허수정"
+
+
 
 };
 
@@ -139,6 +152,24 @@ const resourceGroups = {
     veridian_comp: { 
         planet: 'veridian', title: "🧬 유전 공학 (Evolutionary Tech)", 
         items: ['geneticCode', 'pheromone', 'biosphereCore'] 
+    },
+
+
+     htrea_raw: { 
+        planet: 'htrea', title: "🏚️ 폐허 자원 (Scavenged)", 
+        items: ['brokenParts', 'radiation', 'pureWater'] 
+    },
+    htrea_earth: { 
+        planet: 'htrea', title: "🌳 복구된 지구 자원 (Restored)", 
+        items: ['wood', 'stone', 'coal', 'ironOre', 'ironPlate', 'copperPlate'] 
+    },
+    htrea_mat: { 
+        planet: 'htrea', title: "⚒️ 재조합 소재 (Synthesis)", 
+        items: ['scrapCopper', 'leadPlate', 'bioSample', 'steel'] 
+    },
+    htrea_comp: { 
+        planet: 'htrea', title: "🧠 고대 기술 (Ancient Tech)", 
+        items: ['dataCore', 'microChip', 'voidCrystal', 'processor'] 
     }
 };
 
@@ -1088,6 +1119,10 @@ export function showPlanetSelection() {
             <button onclick="window.landOnPlanet('veridian')" style="padding:15px; background:#1b3d2f; border:1px solid #27ae60; border-radius:8px; cursor:pointer; color:white;">
                 <div style="font-size:1.5rem;">🌿</div>
                 <strong>베리디안 (Veridian)</strong><br><small>거대 생명체와 유기물의 정글</small>
+            </button>
+            <button onclick="window.landOnPlanet('htrea')" style="padding:15px; background:#2d3436; border:1px solid #636e72; border-radius:8px; cursor:pointer; color:white;">
+                <div style="font-size:1.5rem;">💀</div>
+                <strong>흐트레아 (Htrea)</strong><br><small>멸망한 지구의 폐허</small>
             </button>
             <button onclick="this.parentElement.parentElement.remove()" style="margin-top:10px; background:none; border:none; color:#556; cursor:pointer; text-decoration:underline;">돌아가기</button>
         </div>

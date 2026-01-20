@@ -1,6 +1,8 @@
 import { earthData } from '../planets/earth.js';
 import { aureliaData } from '../planets/aurelia.js';
 import { veridianData } from '../planets/veridian.js';
+import { htreaData } from '../planets/htrea.js';
+
 
 // === [1] 공통 게임 상태 정의 ===
 export let gameData = {
@@ -20,6 +22,9 @@ export let gameData = {
         bioFiber: 0, spore: 0, yeast: 0, livingWood: 0, bioFuel: 0, rootBrick: 0,
         mutantCell: 0, geneticCode: 0, pheromone: 0, biosphereCore: 0, neuralFiber: 0,
         
+        // HTREA 행성 자원
+        brokenParts: 0, radiation: 0, pureWater: 0, scrapCopper: 0, leadPlate: 0, bioSample: 0, dataCore: 0, microChip: 0, voidCrystal: 0,
+
         // 시스템
         energy: 0, energyMax: 0
     },
@@ -138,5 +143,11 @@ export const legacyList = [
   { id: "aurelia_scrap_recycle", name: "스크랩 재활용", desc: "고철 소모 20% 감소", cost: 4 },
   { id: "aurelia_fusion_eff", name: "핵융합 최적화", desc: "고급 에너지 시설 전력 소모 30% 감소", cost: 6 },  
   { id: "aurelia_prestige_drive", name: "항성 항해 데이터", desc: "환생 1회당 전기 생산 +4%", cost: 10 },  
-  { id: "infinite_storage", name: "압축 창고", desc: "모든 자원 생산 효율 20% 추가 증가", cost: 10 }
+  { id: "infinite_storage", name: "압축 창고", desc: "모든 자원 생산 효율 20% 추가 증가", cost: 10 },
+  { id: "htrea_starter_kit", name: "폐허의 생존자", desc: "흐트레아 시작 시 기계잔해 10,000개, 방사능 500 보유", cost: 2 },
+  { id: "htrea_drone_overload", name: "드론 과부하 제어", desc: "잔해 해체 드론(300) 및 파쇄 플랜트(336) 생산량 50% 증가", cost: 4 },
+  { id: "htrea_rad_recycle", name: "방사능 재순환", desc: "방사능을 소모하는 모든 건물의 소모량 20% 감소", cost: 5 },
+  { id: "htrea_ancient_wisdom", name: "고대인의 지혜", desc: "데이터 코어 및 프로세서 생산 속도 30% 증가", cost: 6 },
+  { id: "htrea_void_resonance", name: "공허 공명 장치", desc: "공허 수정(Void Crystal) 생산량 25% 증가", cost: 8 },
+  { id: "htrea_warp_drive", name: "차원 도약 가속", desc: "워프 코어 및 엔딩 건물 건설 비용 15% 감소", cost: 12 }
 ];

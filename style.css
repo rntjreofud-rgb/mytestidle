@@ -170,6 +170,16 @@ header { background-color: var(--bg-panel); border-bottom: 1px solid var(--borde
 .res-card.geneticCode::after { background-color: #0984e3; } .res-card.pheromone::after { background-color: #fd79a8; }     
 .res-card.biosphereCore::after { background-color: #81ecec; } 
 
+.res-card.brokenParts::after { background-color: #7f8fa6; } .res-card.radiation::after   { background-color: #b8e994; }   
+.res-card.pureWater::after   { background-color: #4bcffa; } .res-card.scrapCopper::after { background-color: #e58e26; }   
+.res-card.leadPlate::after   { background-color: #353b48; } .res-card.bioSample::after   { background-color: #ff9ff3; }   
+.res-card.dataCore::after    { background-color: #0abde3; } .res-card.microChip::after   { background-color: #10ac84; }   
+.res-card.voidCrystal::after { background-color: #341f97; }   
+
+
+
+
+
 /* 슬림 모드 전환 버튼 */
 .btn-size-toggle { font-size: 0.7rem; color: #556; cursor: pointer; margin-right: 10px; padding: 2px 5px; border: 1px solid #333; border-radius: 3px; }
 .btn-size-toggle:hover { color: var(--accent-blue); border-color: var(--accent-blue); }

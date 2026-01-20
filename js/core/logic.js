@@ -26,6 +26,22 @@ export function getBuildingMultiplier(buildingId) {
     if (legacy.includes('infinite_storage')) {
         multiplier *= 1.2;
     }
+
+    if (legacy.includes('htrea_drone_overload')) {
+        if ([300, 336].includes(buildingId)) multiplier *= 1.5;
+    }
+
+  
+    if (legacy.includes('htrea_ancient_wisdom')) {
+        if ([307, 340, 315, 327].includes(buildingId)) multiplier *= 1.3;
+    }
+
+    if (legacy.includes('htrea_void_resonance')) {
+        if ([331, 346].includes(buildingId)) multiplier *= 1.25;
+    }
+
+
+
     return multiplier;
 }
 
@@ -58,6 +74,11 @@ export function getBuildingCost(building) {
         discount *= 0.5;
     }
     
+    if (legacy.includes('htrea_warp_drive')) {
+        if ([334, 345, 335].includes(building.id)) discount *= 0.85;
+    }
+
+
     let currentCost = {};
     for (let r in building.cost) {
         // 최종 비용 계산 (소수점 버림)
@@ -82,15 +103,21 @@ export function getBuildingConsumptionMultiplier(buildingId) {
         }
     });
 
-    // [레거시 적용] legacy_less_fiber: 베리디안 유기섬유 소모량 15% 감소
+    // legacy_less_fiber: 베리디안 유기섬유 소모량 15% 감소
     if (legacy.includes('legacy_less_fiber')) {
         if ([203, 204, 205].includes(buildingId)) multiplier *= 0.85;
     }
 
-    // [레거시 적용] aurelia_scrap_recycle: 아우렐리아 고철 소모 20% 감소
+    // aurelia_scrap_recycle: 아우렐리아 고철 소모 20% 감소
     if (legacy.includes('aurelia_scrap_recycle')) {
         if ([103, 104, 107, 110, 114].includes(buildingId)) multiplier *= 0.8;
     }
+    // htrea_rad_recycle: 방사능 소모 건물(정수기, 제련소, 담수화 등) 소모량 20% 감소
+    if (legacy.includes('htrea_rad_recycle')) {
+        
+        if ([302, 304, 317, 318, 320, 326, 331].includes(buildingId)) multiplier *= 0.8;
+    }
+
 
     return multiplier;
 }
@@ -331,12 +358,14 @@ export function manualGather(type) {
         if (p === 'earth') gameData.resources.wood += amount;
         else if (p === 'aurelia') gameData.resources.scrapMetal += amount;
         else if (p === 'veridian') gameData.resources.bioFiber += amount;
+        else if (p === 'htrea') gameData.resources.wood += amount; 
         return true;
     }
     if (type === 'stone') {
         if (p === 'earth') gameData.resources.stone += amount;
         else if (p === 'aurelia') gameData.resources.magnet += amount;
         else if (p === 'veridian') gameData.resources.spore += amount;
+        else if (p === 'htrea') gameData.resources.stone += amount;
         return true;
     }
     if (type === 'plank') {
