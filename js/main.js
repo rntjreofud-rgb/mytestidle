@@ -151,7 +151,7 @@ function setupEvents() {
     const starBtn = document.getElementById('btn-become-star');
     if (starBtn) {
         starBtn.onclick = () => {
-            if(confirm("정말 우주의 별이 되어 지구로 귀환하시겠습니까? (데이터 획득)")) {
+            if(confirm("정말 우주의 별이 되어 지구로 귀환하시겠습니까? 행성렙 15렙 초과시 추가 점수가 부여돕니다")) {
                 window.performPrestige(); // 단순화: performPrestige 호출
             }
         }
