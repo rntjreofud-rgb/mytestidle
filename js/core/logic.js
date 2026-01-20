@@ -436,7 +436,7 @@ export function tryUpgradeHouse(nextStage) {
     return { success: true };
 }
 
-const planetMaxPoints = { earth: 3, aurelia: 4, veridian: 5 };
+const planetMaxPoints = { earth: 3, aurelia: 4, veridian: 5, htrea: 6 };
 export function calculateCurrentPrestigeGain(level, planet) {
     const maxPoints = planetMaxPoints[planet] || 3;
     const gain = Math.floor((level / 50) * maxPoints);
