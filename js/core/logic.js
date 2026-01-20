@@ -358,14 +358,14 @@ export function manualGather(type) {
         if (p === 'earth') gameData.resources.wood += amount;
         else if (p === 'aurelia') gameData.resources.scrapMetal += amount;
         else if (p === 'veridian') gameData.resources.bioFiber += amount;
-        else if (p === 'htrea') gameData.resources.wood += amount; 
+        else if (p === 'htrea') gameData.resources.brokenParts += amount; 
         return true;
     }
     if (type === 'stone') {
         if (p === 'earth') gameData.resources.stone += amount;
         else if (p === 'aurelia') gameData.resources.magnet += amount;
         else if (p === 'veridian') gameData.resources.spore += amount;
-        else if (p === 'htrea') gameData.resources.stone += amount;
+        else if (p === 'htrea') gameData.resources.radiation += amount;
         return true;
     }
     if (type === 'plank') {

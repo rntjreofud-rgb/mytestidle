@@ -144,15 +144,14 @@ export const legacyList = [
   { id: "aurelia_fusion_eff", name: "핵융합 최적화", desc: "고급 에너지 시설 전력 소모 30% 감소", cost: 6 },  
   { id: "aurelia_prestige_drive", name: "항성 항해 데이터", desc: "환생 1회당 전기 생산 +4%", cost: 10 },  
   { id: "infinite_storage", name: "압축 창고", desc: "모든 자원 생산 효율 20% 추가 증가", cost: 10 },
- 
+  { id: "htrea_starter_kit", name: "폐허의 생존자", desc: "흐트레아 시작 시 기계잔해 10,000개, 방사능 500 보유", cost: 2 },
+  { id: "htrea_drone_overload", name: "드론 과부하 제어", desc: "잔해 해체 드론(300) 및 파쇄 플랜트(336) 생산량 50% 증가", cost: 4 },
+  { id: "htrea_rad_recycle", name: "방사능 재순환", desc: "방사능을 소모하는 모든 건물의 소모량 20% 감소", cost: 5 },
+  { id: "htrea_ancient_wisdom", name: "고대인의 지혜", desc: "데이터 코어 및 프로세서 생산 속도 30% 증가", cost: 6 },
+  { id: "htrea_void_resonance", name: "공허 공명 장치", desc: "공허 수정(Void Crystal) 생산량 25% 증가", cost: 8 },
+  { id: "htrea_warp_drive", name: "차원 도약 가속", desc: "워프 코어 및 엔딩 건물 건설 비용 15% 감소", cost: 12 }
 ];
 
 
 
 
-// { id: "htrea_starter_kit", name: "폐허의 생존자", desc: "흐트레아 시작 시 기계잔해 10,000개, 방사능 500 보유", cost: 2 },
-//  { id: "htrea_drone_overload", name: "드론 과부하 제어", desc: "잔해 해체 드론(300) 및 파쇄 플랜트(336) 생산량 50% 증가", cost: 4 },
-//  { id: "htrea_rad_recycle", name: "방사능 재순환", desc: "방사능을 소모하는 모든 건물의 소모량 20% 감소", cost: 5 },
-//  { id: "htrea_ancient_wisdom", name: "고대인의 지혜", desc: "데이터 코어 및 프로세서 생산 속도 30% 증가", cost: 6 },
-//  { id: "htrea_void_resonance", name: "공허 공명 장치", desc: "공허 수정(Void Crystal) 생산량 25% 증가", cost: 8 },
-//  { id: "htrea_warp_drive", name: "차원 도약 가속", desc: "워프 코어 및 엔딩 건물 건설 비용 15% 감소", cost: 12 }

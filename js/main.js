@@ -56,7 +56,7 @@ window.landOnPlanet = function(planetKey) {
         for (let k in gameData.resources) gameData.resources[k] = 0;
         gameData.buildings = []; 
         
-        const planetInitRes = { earth: ['wood', 'stone', 'plank'], aurelia: ['scrapMetal'], veridian: ['bioFiber'] };
+        const planetInitRes = { earth: ['wood', 'stone', 'plank'], aurelia: ['scrapMetal'], veridian: ['bioFiber'] , htrea: ['brokenParts', 'radiation'] };
         gameData.unlockedResources = [...(planetInitRes[planetKey] || ['wood'])];
 
         applyLegacyStartBonuses(); 
