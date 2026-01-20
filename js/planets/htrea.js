@@ -101,7 +101,7 @@ export const htreaData = {
         { id: 317, name: "대형 고철 용해로", cost: { leadPlate: 100000, steel: 5000 }, inputs: { ironOre: 50, coal: 30, energy: 2000 }, outputs: { ironPlate: 1000.0, copperPlate: 1000.0 }, count: 0, reqLevel: 18 },
         { id: 322, name: "버려진 강철 압연기", cost: { steel: 50000, leadPlate: 500000 }, inputs: { ironPlate: 2000, coal: 1000, energy: 12000 }, outputs: { steel: 1000.0 }, count: 0, reqLevel: 19 },
 
-        { id: 313, name: "심부 지각 채굴정", cost: { leadPlate: 5000, microChip: 100 }, inputs: { energy: 500 }, outputs: { ironOre: 20.0, coal: 20.0 }, count: 0, reqLevel: 20 },
+        { id: 313, name: "심부 지각 채굴정", cost: { leadPlate: 5000, microChip: 100 }, inputs: { energy: 500 }, outputs: { ironOre: 20.0, coal: 20.0 }, count: 0, reqLevel: 18 },
         { id: 337, name: "대형 폐기물 처리장", cost: { leadPlate: 10000, scrapCopper: 5000 }, inputs: { energy: 1000 }, outputs: { brokenParts: 5000.0, scrapCopper: 500.0 }, count: 0, reqLevel: 21 },
         { id: 318, name: "오염 해수 담수화 플랜트", cost: { pureWater: 50000, bioSample: 5000 }, inputs: { radiation: 500, energy: 3000 }, outputs: { pureWater: 10000.0 }, count: 0, reqLevel: 22 },
         { id: 316, name: "고대 자동화 채석장", cost: { leadPlate: 50000, scrapCopper: 20000 }, inputs: { energy: 1000 }, outputs: { stone: 5000.0 }, count: 0, reqLevel: 23 },
