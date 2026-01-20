@@ -96,12 +96,20 @@ export const htreaData = {
         
         // [FIX] Lv.16 승급(칩) 대비 -> Lv.16 해금 (바로 건설 가능)
         { id: 321, name: "유물 회로 인쇄기", cost: { scrapCopper: 50000, dataCore: 500 }, inputs: { copperPlate: 500, dataCore: 10, energy: 10000 }, outputs: { circuit: 100.0, microChip: 10.0 }, count: 0, reqLevel: 15 },
-
+        { 
+            id: 347, 
+            name: "정제 납 주조소", 
+            cost: { ironPlate: 5000, stone: 20000 }, 
+            inputs: { brokenParts: 200, energy: 500 }, 
+            outputs: { leadPlate: 40.0 }, 
+            count: 0, 
+            reqLevel: 15 
+        },
         // [FIX] Lv.20 승급(강철) 대비 -> Lv.18 해금 (여유)
-        { id: 317, name: "대형 고철 용해로", cost: { leadPlate: 100000, steel: 5000 }, inputs: { ironOre: 50, coal: 30, energy: 2000 }, outputs: { ironPlate: 1000.0, copperPlate: 1000.0 }, count: 0, reqLevel: 18 },
-        { id: 322, name: "버려진 강철 압연기", cost: { steel: 50000, leadPlate: 500000 }, inputs: { ironPlate: 2000, coal: 1000, energy: 12000 }, outputs: { steel: 1000.0 }, count: 0, reqLevel: 19 },
+        { id: 317, name: "대형 고철 용해로", cost: { leadPlate: 10000, circuit: 1000 }, inputs: { ironOre: 50, coal: 30, energy: 2000 }, outputs: { ironPlate: 1000.0, copperPlate: 1000.0 }, count: 0, reqLevel: 17 },
+        { id: 322, name: "버려진 강철 압연기", cost: { ironPlate: 10000, leadPlate: 50000 }, inputs: { ironPlate: 2000, coal: 100, energy: 12000 }, outputs: { steel: 1000.0 }, count: 0, reqLevel: 18 },
 
-        { id: 313, name: "심부 지각 채굴정", cost: { leadPlate: 5000, microChip: 100 }, inputs: { energy: 500 }, outputs: { ironOre: 20.0, coal: 20.0 }, count: 0, reqLevel: 18 },
+        { id: 313, name: "심부 지각 채굴정", cost: { leadPlate: 5000, microChip: 100 }, inputs: { energy: 500 }, outputs: { ironOre: 20.0, coal: 20.0 }, count: 0, reqLevel: 17 },
         { id: 337, name: "대형 폐기물 처리장", cost: { leadPlate: 10000, scrapCopper: 5000 }, inputs: { energy: 1000 }, outputs: { brokenParts: 5000.0, scrapCopper: 500.0 }, count: 0, reqLevel: 21 },
         { id: 318, name: "오염 해수 담수화 플랜트", cost: { pureWater: 50000, bioSample: 5000 }, inputs: { radiation: 500, energy: 3000 }, outputs: { pureWater: 10000.0 }, count: 0, reqLevel: 22 },
         { id: 316, name: "고대 자동화 채석장", cost: { leadPlate: 50000, scrapCopper: 20000 }, inputs: { energy: 1000 }, outputs: { stone: 5000.0 }, count: 0, reqLevel: 23 },
@@ -127,7 +135,15 @@ export const htreaData = {
         
         // [FIX] Lv.31 승급(고급회로) 대비 -> Lv.30 해금
         { id: 325, name: "고대 반도체 클린룸", cost: { microChip: 50000, processor: 1000 }, inputs: { circuit: 500, glass: 200, energy: 30000 }, outputs: { advCircuit: 100.0 }, count: 0, reqLevel: 29 },
-        
+        { 
+            id: 348, 
+            name: "고밀도 납 프레스", 
+            cost: { steel: 50000, plastic: 10000 }, 
+            inputs: { brokenParts: 2000, energy: 5000 }, 
+            outputs: { leadPlate: 500.0 }, 
+            count: 0, 
+            reqLevel: 30 
+        },
         { id: 326, name: "방사능 농축 가속기", cost: { leadPlate: 5000000, voidCrystal: 50 }, inputs: { radiation: 50000, sulfur: 200, energy: 50000 }, outputs: { uraniumOre: 200.0 }, count: 0, reqLevel: 32 },
         
         // [FIX] Lv.33 승급(양자) 대비 -> Lv.33 해금
@@ -156,7 +172,15 @@ export const htreaData = {
         { id: 336, name: "도시 잔해 파쇄 플랜트", cost: { steel: 1000000, titaniumPlate: 100000 }, inputs: { energy: 500000 }, outputs: { brokenParts: 1000000.0, scrapCopper: 100000.0 }, count: 0, reqLevel: 43 }, 
         { id: 331, name: "공허 에너지 추출기", cost: { voidCrystal: 2000, aiCore: 100 }, inputs: { radiation: 500000, energy: 300000 }, outputs: { voidCrystal: 20.0 }, count: 0, reqLevel: 43 },
         { id: 343, name: "나노 입자 군집 탱크", cost: { nanobots: 1000, titaniumPlate: 500000 }, inputs: { processor: 1000, energy: 200000 }, outputs: { nanobots: 500.0 }, count: 0, reqLevel: 43 },
-        
+        { 
+            id: 349, 
+            name: "분자 납 합성기", 
+            cost: { titaniumPlate: 100000, nanobots: 2000 }, 
+            inputs: { energy: 50000, radiation: 5000 }, // 재료 없이 에너지만으로 합성
+            outputs: { leadPlate: 10000.0 }, 
+            count: 0, 
+            reqLevel: 40 
+        },
         { id: 344, name: "차원 간섭 관측소", cost: { aiCore: 1000, voidCrystal: 5000 }, inputs: { quantumData: 10, energy: 1000000 }, outputs: { quantumData: 500.0, dataCore: 10000.0 }, count: 0, reqLevel: 45 },      
         { id: 345, name: "오메가 공정 센터", cost: { advAlloy: 50000, warpCore: 10 }, inputs: { brokenParts: 1000000, energy: 5000000 }, outputs: { advAlloy: 1000.0, processor: 2000.0, nanobots: 1000.0 }, count: 0, reqLevel: 47 },
         { id: 335, name: "뉴 에덴의 심장", cost: { warpCore: 5000, quantumData: 100000 }, inputs: null, outputs: { energy: 10000000, radiation: -500000 }, count: 0, reqLevel: 48 }
@@ -239,6 +263,102 @@ export const htreaData = {
         { id: "h_warp_stabilizer", name: "워프장 안정화", desc: "워프 추진기 유물 속도 4배 증가 및 에너지 소모 30% 감소", cost: { warpCore: 50, quantumData: 5000 }, type: 'building', target: [334], value: 4.0, reqResearch: "h_gravity_anchor" },
 
         { id: "h_omega_protocol", name: "오메가 프로토콜", desc: "오메가 공정 센터 생산량 5배 증가", cost: { advAlloy: 100000, aiCore: 10000 }, type: 'building', target: [345], value: 5.0, reqResearch: "h_alloy_final" },
+
+
+         { 
+            id: "h_heavy_shielding", 
+            name: "중금속 차폐 기술", 
+            desc: "모든 납 생산 시설(제련소, 주조소, 프레스, 합성기)의 속도 2.5배 증가", 
+            cost: { leadPlate: 50000, energy: 5000 }, 
+            type: 'building', 
+            target: [304, 347, 348, 349], 
+            value: 2.5, 
+            reqResearch: "h_lead_lining" 
+        },
+
+        // [Tier 3] 정제수 및 바이오 효율화 (바이오 실험실, 수경재배)
+        { 
+            id: "h_hydro_recycle", 
+            name: "수자원 순환 시스템", 
+            desc: "물 정화 및 바이오 시설의 생산 속도 3배 증가", 
+            cost: { pureWater: 500000, plastic: 5000 }, 
+            type: 'building', 
+            target: [302, 306, 338, 318], 
+            value: 3.0, 
+            reqResearch: "h_filter" 
+        },
+
+        // [Tier 3.5] 플라스틱/로켓연료 가속 (화학단지 효율)
+        { 
+            id: "h_polymer_synthesis", 
+            name: "고분자 합성 최적화", 
+            desc: "화학 복합단지의 생산 속도 2배 및 오일 소모 20% 감소", 
+            cost: { plastic: 50000, sulfur: 10000 }, 
+            type: 'building', 
+            target: [320], 
+            value: 2.0, 
+            reqResearch: "h_chem_catalyst" 
+        },
+
+        // [Tier 4] 데이터 코어 및 AI 연산 가속
+        { 
+            id: "h_quantum_computing", 
+            name: "양자 연산 네트워크", 
+            desc: "데이터 센터 및 AI 메인프레임 속도 3배 증가", 
+            cost: { processor: 20000, quantumData: 100 }, 
+            type: 'building', 
+            target: [340, 330, 332], 
+            value: 3.0, 
+            reqResearch: "h_ancient_ai" 
+        },
+
+        // [Tier 4.5] 티타늄/합금 정제 효율 (소모량 감소)
+        { 
+            id: "h_alloy_efficiency", 
+            name: "합금 결정화 공법", 
+            desc: "티타늄 및 합금 생산 시설의 재료 소모량 20% 감소", 
+            cost: { titaniumPlate: 200000, advAlloy: 5000 }, 
+            type: 'consumption', 
+            target: [324, 341, 333], 
+            value: 0.8, 
+            reqResearch: "h_titanium_salvage" 
+        },
+
+        // [Tier 5] 워프 코어 양산 체제 (엔딩 가속)
+        { 
+            id: "h_warp_resonance", 
+            name: "차원 공명 안정화", 
+            desc: "워프 추진기 유물의 생산 속도 5배 증가", 
+            cost: { warpCore: 100, voidCrystal: 5000 }, 
+            type: 'building', 
+            target: [334], 
+            value: 5.0, 
+            reqResearch: "h_gravity_anchor" 
+        },
+
+        // [Tier 5] 극후반 에너지 효율 (뉴 에덴 심장 가동 대비)
+        { 
+            id: "h_void_containment", 
+            name: "공허 에너지 격리", 
+            desc: "모든 에너지 생산 시설의 생산량 50% 추가 증가", 
+            cost: { voidCrystal: 20000, energy: 1000000 }, 
+            type: 'building', 
+            target: [305, 339, 342, 335], 
+            value: 1.5, 
+            reqResearch: "h_nuclear_safety" 
+        },
+
+        // [Tier End] 수동 클릭의 구원 (후반에도 클릭이 의미있게)
+        { 
+            id: "h_manual_overdrive", 
+            name: "신경 접속 오버드라이브", 
+            desc: "수동 채집 효율 50배 증가", 
+            cost: { aiCore: 5000, nanobots: 20000 }, 
+            type: 'manual', 
+            value: 50, 
+            reqResearch: "h_scavenge" 
+        },
+
 
         { id: "h_final_arch", name: "인류 최후의 설계", desc: "흐트레아의 모든 시설 생산 속도 2배 증가", cost: { warpCore: 50, aiCore: 5000, dataCore: 10000000 }, type: 'building', target: [300,301,302,303,304,305,306,307,310,311,312,313,314,315,316,317,318,319,320,321,322,323,324,325,326,327,328,329,330,331,332,333,334,335,336,337,338,339,340,341,342,343,344,345,346], value: 2.0, reqResearch: "h_eden_power" },
     ]
