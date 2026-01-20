@@ -95,7 +95,7 @@ export const htreaData = {
         { id: 312, name: "고대 용광로 인양본", cost: { leadPlate: 2000, dataCore: 50 }, inputs: { brokenParts: 50, energy: 200 }, outputs: { ironPlate: 3.0, copperPlate: 3.0 }, count: 0, reqLevel: 10 },
         
         // [FIX] Lv.16 승급(칩) 대비 -> Lv.16 해금 (바로 건설 가능)
-        { id: 321, name: "유물 회로 인쇄기", cost: { microChip: 2000, dataCore: 500 }, inputs: { copperPlate: 500, plastic: 200, energy: 10000 }, outputs: { circuit: 100.0, microChip: 10.0 }, count: 0, reqLevel: 15 },
+        { id: 321, name: "유물 회로 인쇄기", cost: { scrapCopper: 50000, dataCore: 500 }, inputs: { copperPlate: 500, plastic: 200, energy: 10000 }, outputs: { circuit: 100.0, microChip: 10.0 }, count: 0, reqLevel: 15 },
 
         // [FIX] Lv.20 승급(강철) 대비 -> Lv.18 해금 (여유)
         { id: 317, name: "대형 고철 용해로", cost: { leadPlate: 100000, steel: 5000 }, inputs: { ironOre: 50, coal: 30, energy: 2000 }, outputs: { ironPlate: 1000.0, copperPlate: 1000.0 }, count: 0, reqLevel: 18 },
