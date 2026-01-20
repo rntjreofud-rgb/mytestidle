@@ -102,11 +102,10 @@ const resNames = {
     pureWater: "💧 정제수",
     scrapCopper: "🧵 구리조각",
     leadPlate: "🧱 납판",
-    bioSample: "🧪 생체표본",
-    dataCore: "💾 데이터코어",
-    microChip: "📟 마이크로칩",
-    voidCrystal: "🔮 공허수정"
-
+    voidCrystal: "🔮 공허수정",
+    bioSample: "🧫 생체표본", 
+    dataCore: "💽 데이터코어", 
+    microChip: "💳 마이크로칩" 
 
 
 };
