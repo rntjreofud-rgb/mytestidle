@@ -35,7 +35,17 @@ export let gameData = {
     cosmicData: 0,
     legacyUpgrades: [],
     lastTimestamp: Date.now(),
-    buildings: [] 
+    buildings: [],
+    planetClearCounts: {
+        earth: 0,
+        aurelia: 0,
+        veridian: 0,
+        htrea: 0
+    }
+
+
+
+
 };
 
 // === [2] 행성 데이터 라우팅 ===
@@ -80,7 +90,7 @@ export function setGameData(newData) {
     gameData.prestigeLevel = Number(newData.prestigeLevel) || 0;
     gameData.cosmicData = Number(newData.cosmicData) || 0;
     gameData.legacyUpgrades = Array.isArray(newData.legacyUpgrades) ? [...newData.legacyUpgrades] : [];
-    
+    gameData.planetClearCounts = newData.planetClearCounts || { earth: 0, aurelia: 0, veridian: 0, htrea: 0 };
     // 4. ⭐ 건물 데이터 매핑 (강력한 ID 비교)
     const currentPlanetBuildings = planetTemplate.buildings; 
     const savedBuildings = Array.isArray(newData.buildings) ? newData.buildings : [];

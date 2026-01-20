@@ -54,6 +54,10 @@ window.landOnPlanet = function(planetKey) {
         // 현재 레벨이 엔딩 레벨 이상이면 숙련도 상승
         if (gameData.houseLevel >= maxLevel) {
             gameData.prestigeLevel = (gameData.prestigeLevel || 0) + 1;
+            if (!gameData.planetClearCounts) gameData.planetClearCounts = { earth: 0, aurelia: 0, veridian: 0, htrea: 0 };
+            
+            const curP = gameData.currentPlanet;
+            gameData.planetClearCounts[curP] = (gameData.planetClearCounts[curP] || 0) + 1;
             console.log("🎉 엔딩 조건 달성! 우주 숙련도 레벨업!");
         }
         // 리셋 로직
@@ -77,7 +81,21 @@ window.performPrestige = function() {
     UI.triggerWarpEffect("지구", () => {
         const gain = Logic.calculateCurrentPrestigeGain(gameData.houseLevel, gameData.currentPlanet);
         gameData.cosmicData = (gameData.cosmicData || 0) + gain;
-        gameData.prestigeLevel = (gameData.prestigeLevel || 0) + 1;
+        const currentStages = getActiveStages();
+        const maxLevel = currentStages.length - 1;
+
+        if (gameData.houseLevel >= maxLevel) {
+            
+            gameData.prestigeLevel = (gameData.prestigeLevel || 0) + 1;
+
+           
+            if (!gameData.planetClearCounts) gameData.planetClearCounts = { earth: 0, aurelia: 0, veridian: 0, htrea: 0 };
+            
+            const curP = gameData.currentPlanet;
+            gameData.planetClearCounts[curP] = (gameData.planetClearCounts[curP] || 0) + 1;
+
+            
+        }
         
         gameData.currentPlanet = 'earth'; 
         gameData.houseLevel = 0; 
@@ -109,7 +127,7 @@ function init() {
     // 이벤트 연결
     setupEvents();
     
-    // ⭐ [중요] 초기 화면 렌더링 (이게 없어서 건물이 안 보였던 것임)
+   
     const initialStats = Logic.calculateNetMPS();
     UI.updateScreen(initialStats);
     UI.renderShop(handleBuyBuilding, Logic.getBuildingCost); // 콜백 함수 전달
