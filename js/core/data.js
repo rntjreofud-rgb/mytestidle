@@ -113,9 +113,15 @@ export function setGameData(newData) {
         } else {
             // 신규 초기화 (자율 건설 유산 적용)
             let startCount = 0;
-            if (index === 0) { // 첫 번째 건물(채집 캠프)에만 적용
-                if (legacy.includes('legacy_auto_build2')) startCount = 10;
-                else if (legacy.includes('legacy_auto_build1')) startCount = 5;
+             if (legacy.includes('legacy_auto_build1')) {
+                if (index === 0 || index === 1 || index === 2) {
+                    startCount = 5;
+                }
+            }
+            if (legacy.includes('legacy_auto_build2')) {
+                if (index === 0 || index === 1 || index === 2) {
+                    startCount = 10;
+                }
             }
             return {
                 ...templateB,
@@ -139,8 +145,8 @@ export const legacyList = [
   { id: "start_resource", name: "선구자의 보급품", desc: "매 회차 시작 시 나무 500, 돌 500, 판자 100 보유", cost: 1 },
   { id: "fast_click", name: "초공간 클릭", desc: "수동 채집 효율 5배 영구 증가", cost: 2 },
   { id: "cheap_build", name: "나노 건축 설계", desc: "모든 건물 건설 비용 20% 영구 감소", cost: 3 },
-  { id: "legacy_auto_build1", name: "초기 자율 건설", desc: "최초 시작건물 5레벨로 시작", cost: 5, req: null },
-  { id: "legacy_auto_build2", name: "고급 자율 건설", desc: "최초 시작건물 10레벨로 시작", cost: 7, req: "legacy_auto_build1" },
+  { id: "legacy_auto_build1", name: "초기 자율 건설", desc: "최초 시작건물 3개 5레벨로 시작", cost: 5, req: null },
+  { id: "legacy_auto_build2", name: "고급 자율 건설", desc: "최초 시작건물 3개 10레벨로 시작", cost: 7, req: "legacy_auto_build1" },
   { id: "legacy_spore_start", name: "포자 보존 주머니", desc: "회차 시작 시 포자 200 보유", cost: 1 },
   { id: "legacy_biofuel_trickle", name: "발효 잔열", desc: "유기섬유를 초당 0.1 자동 생산", cost: 4 }, 
   { id: "legacy_less_fiber", name: "섬유 재활용", desc: "유기섬유 소모량 15% 감소", cost: 3 },
