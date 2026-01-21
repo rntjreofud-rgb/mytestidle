@@ -44,16 +44,16 @@ export const htreaData = {
 
     // 30~39: 인류의 유산 (고티어 자원: 티타늄판, 반도체, 연산)
     { name: "프로세서 조립라인", desc: "고성능 연산 장치를 생산합니다.", req: { processor: 10000, microChip: 2000000, titaniumPlate: 50000 } },
-    { name: "반물질 차폐 용기", desc: "우주 에너지를 억제합니다.", req: { leadPlate: 1000000000, steel: 50000000, advCircuit: 10000 } },
+    { name: "반물질 차폐 용기", desc: "우주 에너지를 억제합니다.", req: { leadPlate: 50000000, steel: 10000000, advCircuit: 10000 } },
     // [수정] 우라늄 소모량 증가 (ID 326이 32레벨 해금으로 변경됨)
     { name: "지구 생태계 복원", desc: "행성 전체에 산소가 흐르기 시작합니다.", req: { wood: 50000000, bioSample: 20000000, uraniumOre: 5000 } },
     { name: "퀀텀 데이터 링크", desc: "새로운 도면을 얻습니다.", req: { dataCore: 1000000, processor: 50000, quantumData: 100 } },
-    { name: "공허 에너지 엔진", desc: "공간을 밀어내는 추진력을 얻습니다.", req: { voidCrystal: 1000, radiation: 100000000, nanobots: 2000 } },
-    { name: "나노 입자 코팅", desc: "보랏빛 은하수처럼 빛나는 장갑을 입힙니다.", req: { microChip: 5000000, steel: 100000000, gravityModule: 500 } },
+    { name: "공허 에너지 엔진", desc: "공간을 밀어내는 추진력을 얻습니다.", req: { voidCrystal: 1000, radiation: 10000000, nanobots: 2000 } },
+    { name: "나노 입자 코팅", desc: "보랏빛 은하수처럼 빛나는 장갑을 입힙니다.", req: { microChip: 5000000, steel: 50000000, gravityModule: 500 } },
     { name: "시간 왜곡 시뮬레이터", desc: "탈출 후의 수만 년을 1초 만에 계산합니다.", req: { dataCore: 5000000, processor: 200000, aiCore: 500 } },
     { name: "초고압 여과 탱크", desc: "행성 최후의 오염까지 씻어냅니다.", req: { pureWater: 100000000, leadPlate: 500000000, advAlloy: 5000 } },
     { name: "뉴 에덴의 설계도", desc: "우리의 고향을 찾았습니다.", req: { voidCrystal: 5000, processor: 500000, quantumData: 5000 } },
-    { name: "중력 닻 해제", desc: "구속 장치를 해제합니다.", req: { steel: 500000000, energy: 10000000, gravityModule: 5000 } },
+    { name: "중력 닻 해제", desc: "구속 장치를 해제합니다.", req: { steel: 100000000, energy: 10000000, gravityModule: 5000 } },
 
     // 40~50: 폐허 탈출 (최종 공정: 합금, 워프코어, 뉴에덴)
     { name: "최종 항법 동기화", desc: "인류의 모든 지식을 주입합니다.", req: { dataCore: 10000000, processor: 1000000, advAlloy: 50000 } },
@@ -62,7 +62,7 @@ export const htreaData = {
     { name: "선실 가압 시스템", desc: "내부 공기 누출을 확인합니다.", req: { brokenParts: 5000000000, microChip: 50000000, nanobots: 100000 } },
     { name: "과거의 기억 전송", desc: "은하 전역으로 신호를 송출합니다.", req: { dataCore: 20000000, scrapCopper: 1000000000, aiCore: 5000 } },
     { name: "방사능 폭발 추진", desc: "독을 약으로 바꾸어 비상합니다.", req: { radiation: 500000000, energy: 100000000, warpCore: 500 } },
-    { name: "강철의 방주 완성", desc: "거대 방주가 빛을 냅니다.", req: { steel: 100000000, leadPlate: 2000000000, advAlloy: 200000 } },
+    { name: "강철의 방주 완성", desc: "거대 방주가 빛을 냅니다.", req: { steel: 100000000, leadPlate: 200000000, advAlloy: 200000 } },
     { name: "뉴 에덴 카운트다운", desc: "안녕, 나의 멸망한 요람.", req: { voidCrystal: 100000, processor: 5000000, quantumData: 200000 } },
     { name: "차원 도약 준비", desc: "우주의 문이 열립니다.", req: { dataCore: 50000000, energy: 500000000, warpCore: 2000 } },
     { name: "별의 숨결 주입", desc: "엔진이 생명처럼 박동합니다.", req: { voidCrystal: 500000, bioSample: 500000000, aiCore: 20000 } },
@@ -161,7 +161,7 @@ export const htreaData = {
 
         // [FIX] Lv.37 승급(합금) 대비 -> Lv.37 해금
         { id: 341, name: "복합 합금 정제소", cost: { titaniumPlate: 10000, steel: 500000 }, inputs: { ironOre: 5000, coal: 5000, energy: 60000 }, outputs: { steel: 5000.0, titaniumPlate: 500.0 }, count: 0, reqLevel: 36 },
-        { id: 333, name: "최종 합금 용광로", cost: { titaniumPlate: 1000000, nanobots: 10000 }, inputs: { titaniumPlate: 5000, steel: 5000, uraniumOre: 100, energy: 800000 }, outputs: { advAlloy: 50.0 }, count: 0, reqLevel: 37 },
+        { id: 333, name: "최종 합금 용광로", cost: { titaniumPlate: 1000000, nanobots: 10000 }, inputs: { titaniumPlate: 5000, steel: 5000, uraniumOre: 100, energy: 800000 }, outputs: { advAlloy: 50.0 }, count: 0, reqLevel: 36 },
         
         { id: 327, name: "고대 연산 센터", cost: { processor: 5000, dataCore: 20000 }, inputs: { advCircuit: 50, energy: 80000 }, outputs: { processor: 500.0 }, count: 0, reqLevel: 38 },
         { id: 342, name: "핵분열 재가동로", cost: { leadPlate: 10000000, advCircuit: 5000 }, inputs: { uraniumOre: 100, pureWater: 50000 }, outputs: { energy: 1000000, radiation: 1000 }, count: 0, reqLevel: 39 },
