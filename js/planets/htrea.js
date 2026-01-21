@@ -131,7 +131,7 @@ export const htreaData = {
         
         // [FIX] Lv.30 승급(프로세서,티타늄) 대비 -> Lv.29 해금
         { id: 315, name: "기초 반도체 조립기", cost: { microChip: 1000, steel: 100000 }, inputs: { microChip: 50, energy: 15000 }, outputs: { processor: 10.0 }, count: 0, reqLevel: 28 }, 
-        { id: 324, name: "티타늄 잔해 정제소", cost: { steel: 200000, voidCrystal: 10 }, inputs: { brokenParts: 50000, sulfur: 100, energy: 20000 }, outputs: { titaniumPlate: 200.0 }, count: 0, reqLevel: 29 },
+        { id: 324, name: "티타늄 잔해 정제소", cost: { steel: 200000, voidCrystal: 10 }, inputs: { brokenParts: 50000, sulfur: 100, energy: 20000 }, outputs: { titaniumPlate: 200.0 }, count: 0, reqLevel: 28 },
         
         // [FIX] Lv.31 승급(고급회로) 대비 -> Lv.30 해금
         { id: 325, name: "고대 반도체 클린룸", cost: { microChip: 50000, processor: 1000 }, inputs: { circuit: 500, glass: 200, energy: 30000 }, outputs: { advCircuit: 100.0 }, count: 0, reqLevel: 29 },

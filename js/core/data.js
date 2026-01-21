@@ -99,7 +99,7 @@ export function setGameData(newData) {
     let matchCount = 0;
 
     gameData.buildings = currentPlanetBuildings.map((templateB, index) => {
-        // ⭐ ID를 무조건 문자열로 변환하여 비교 ( "0" == 0 문제 해결 )
+        
         const savedB = savedBuildings.find(b => String(b.id) === String(templateB.id));
 
         if (savedB) {
