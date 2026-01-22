@@ -144,7 +144,7 @@ export const htreaData = {
             count: 0, 
             reqLevel: 30 
         },
-        { id: 326, name: "방사능 농축 가속기", cost: { leadPlate: 5000000, voidCrystal: 50 }, inputs: { radiation: 50000, sulfur: 200, energy: 50000 }, outputs: { uraniumOre: 200.0 }, count: 0, reqLevel: 32 },
+        { id: 326, name: "방사능 농축 가속기", cost: { leadPlate: 5000000, voidCrystal: 50 }, inputs: { radiation: 50000, sulfur: 200, energy: 50000 }, outputs: { uraniumOre: 200.0 }, count: 0, reqLevel: 31 },
         
         // [FIX] Lv.33 승급(양자) 대비 -> Lv.33 해금
         { id: 332, name: "양자 데이터 동기화기", cost: { dataCore: 500000, aiCore: 50 }, inputs: { dataCore: 10000, aiCore: 1, energy: 500000 }, outputs: { quantumData: 100.0 }, count: 0, reqLevel: 32 },
