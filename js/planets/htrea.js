@@ -147,31 +147,31 @@ export const htreaData = {
         { id: 326, name: "방사능 농축 가속기", cost: { leadPlate: 5000000, voidCrystal: 50 }, inputs: { radiation: 50000, sulfur: 200, energy: 50000 }, outputs: { uraniumOre: 200.0 }, count: 0, reqLevel: 31 },
         
         // [FIX] Lv.33 승급(양자) 대비 -> Lv.33 해금
-        { id: 332, name: "양자 데이터 동기화기", cost: { dataCore: 500000, aiCore: 50 }, inputs: { dataCore: 10000, aiCore: 1, energy: 500000 }, outputs: { quantumData: 100.0 }, count: 0, reqLevel: 32 },
+        { id: 332, name: "양자 데이터 동기화기", cost: { dataCore: 500000, aiCore: 50 }, inputs: { dataCore: 10000, aiCore: 1, energy: 500000 }, outputs: { quantumData: 100.0 }, count: 0, reqLevel: 31 },
         
         // [FIX] Lv.34 승급(나노봇) 대비 -> Lv.34 해금
-        { id: 328, name: "나노 입자 복제기", cost: { processor: 10000, steel: 1000000 }, inputs: { titaniumPlate: 500, energy: 100000 }, outputs: { nanobots: 100.0 }, count: 0, reqLevel: 33 },
-        { id: 340, name: "데이터 센터 유적", cost: { processor: 2000, advCircuit: 500 }, inputs: { energy: 40000 }, outputs: { dataCore: 500.0 }, count: 0, reqLevel: 34 },
+        { id: 328, name: "나노 입자 복제기", cost: { processor: 10000, steel: 1000000 }, inputs: { titaniumPlate: 500, energy: 100000 }, outputs: { nanobots: 100.0 }, count: 0, reqLevel: 32 },
+        { id: 340, name: "데이터 센터 유적", cost: { processor: 2000, advCircuit: 500 }, inputs: { energy: 40000 }, outputs: { dataCore: 500.0 }, count: 0, reqLevel: 33 },
 
         // [FIX] Lv.35 승급(중력모듈) 대비 -> Lv.35 해금
-        { id: 329, name: "중력 변조 엔진 조립대", cost: { voidCrystal: 500, titaniumPlate: 50000 }, inputs: { titaniumPlate: 1000, voidCrystal: 10, energy: 150000 }, outputs: { gravityModule: 5.0 }, count: 0, reqLevel: 34 },
+        { id: 329, name: "중력 변조 엔진 조립대", cost: { voidCrystal: 500, titaniumPlate: 50000 }, inputs: { titaniumPlate: 1000, voidCrystal: 10, energy: 150000 }, outputs: { gravityModule: 5.0 }, count: 0, reqLevel: 33 },
         
         // [FIX] Lv.36 승급(AI코어) 대비 -> Lv.36 해금
-        { id: 330, name: "고대 AI 메인프레임", cost: { processor: 50000, dataCore: 100000 }, inputs: { advCircuit: 200, dataCore: 1000, energy: 200000 }, outputs: { aiCore: 2.0 }, count: 0, reqLevel: 35 },
+        { id: 330, name: "고대 AI 메인프레임", cost: { processor: 50000, dataCore: 100000 }, inputs: { advCircuit: 200, dataCore: 1000, energy: 200000 }, outputs: { aiCore: 2.0 }, count: 0, reqLevel: 34 },
 
         // [FIX] Lv.37 승급(합금) 대비 -> Lv.37 해금
-        { id: 341, name: "복합 합금 정제소", cost: { titaniumPlate: 10000, steel: 500000 }, inputs: { ironOre: 5000, coal: 5000, energy: 60000 }, outputs: { steel: 5000.0, titaniumPlate: 500.0 }, count: 0, reqLevel: 36 },
-        { id: 333, name: "최종 합금 용광로", cost: { titaniumPlate: 1000000, nanobots: 10000 }, inputs: { titaniumPlate: 5000, steel: 5000, uraniumOre: 100, energy: 800000 }, outputs: { advAlloy: 50.0 }, count: 0, reqLevel: 36 },
+        { id: 341, name: "복합 합금 정제소", cost: { titaniumPlate: 10000, steel: 500000 }, inputs: { ironOre: 5000, coal: 5000, energy: 60000 }, outputs: { steel: 5000.0, titaniumPlate: 500.0 }, count: 0, reqLevel: 35 },
+        { id: 333, name: "최종 합금 용광로", cost: { titaniumPlate: 1000000, nanobots: 10000 }, inputs: { titaniumPlate: 5000, steel: 5000, uraniumOre: 100, energy: 800000 }, outputs: { advAlloy: 50.0 }, count: 0, reqLevel: 35 },
         
-        { id: 327, name: "고대 연산 센터", cost: { processor: 5000, dataCore: 20000 }, inputs: { advCircuit: 50, energy: 80000 }, outputs: { processor: 500.0 }, count: 0, reqLevel: 38 },
-        { id: 342, name: "핵분열 재가동로", cost: { leadPlate: 10000000, advCircuit: 5000 }, inputs: { uraniumOre: 100, pureWater: 50000 }, outputs: { energy: 1000000, radiation: 1000 }, count: 0, reqLevel: 39 },
+        { id: 327, name: "고대 연산 센터", cost: { processor: 5000, dataCore: 20000 }, inputs: { advCircuit: 50, energy: 80000 }, outputs: { processor: 500.0 }, count: 0, reqLevel: 36 },
+        { id: 342, name: "핵분열 재가동로", cost: { leadPlate: 10000000, advCircuit: 5000 }, inputs: { uraniumOre: 100, pureWater: 50000 }, outputs: { energy: 1000000, radiation: 1000 }, count: 0, reqLevel: 37 },
         
         // [FIX] Lv.41 승급(워프코어) 대비 -> Lv.40 해금
-        { id: 334, name: "워프 추진기 유물", cost: { advAlloy: 10000, gravityModule: 1000 }, inputs: { rocketFuel: 2000, uraniumOre: 500, energy: 1000000 }, outputs: { warpCore: 1.0 }, count: 0, reqLevel: 39 },
+        { id: 334, name: "워프 추진기 유물", cost: { advAlloy: 10000, gravityModule: 1000 }, inputs: { rocketFuel: 2000, uraniumOre: 500, energy: 1000000 }, outputs: { warpCore: 1.0 }, count: 0, reqLevel: 38 },
         
-        { id: 336, name: "도시 잔해 파쇄 플랜트", cost: { steel: 1000000, titaniumPlate: 100000 }, inputs: { energy: 500000 }, outputs: { brokenParts: 1000000.0, scrapCopper: 100000.0 }, count: 0, reqLevel: 43 }, 
-        { id: 331, name: "공허 에너지 추출기", cost: { voidCrystal: 2000, aiCore: 100 }, inputs: { radiation: 500000, energy: 300000 }, outputs: { voidCrystal: 20.0 }, count: 0, reqLevel: 43 },
-        { id: 343, name: "나노 입자 군집 탱크", cost: { nanobots: 1000, titaniumPlate: 500000 }, inputs: { processor: 1000, energy: 200000 }, outputs: { nanobots: 500.0 }, count: 0, reqLevel: 43 },
+        { id: 336, name: "도시 잔해 파쇄 플랜트", cost: { steel: 1000000, titaniumPlate: 100000 }, inputs: { energy: 500000 }, outputs: { brokenParts: 1000000, scrapCopper: 100000 }, count: 0, reqLevel: 42 }, 
+        { id: 331, name: "공허 에너지 추출기", cost: { voidCrystal: 2000, aiCore: 100 }, inputs: { radiation: 500000, energy: 300000 }, outputs: { voidCrystal: 20 }, count: 0, reqLevel: 42 },
+        { id: 343, name: "나노 입자 군집 탱크", cost: { nanobots: 1000, titaniumPlate: 500000 }, inputs: { processor: 1000, energy: 200000 }, outputs: { nanobots: 500 }, count: 0, reqLevel: 42 },
         { 
             id: 349, 
             name: "분자 납 합성기", 
