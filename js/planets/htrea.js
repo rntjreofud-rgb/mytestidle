@@ -157,7 +157,7 @@ export const htreaData = {
         { id: 329, name: "중력 변조 엔진 조립대", cost: { voidCrystal: 500, titaniumPlate: 50000 }, inputs: { titaniumPlate: 1000, voidCrystal: 10, energy: 150000 }, outputs: { gravityModule: 5.0 }, count: 0, reqLevel: 33 },
         
         // [FIX] Lv.36 승급(AI코어) 대비 -> Lv.36 해금
-        { id: 330, name: "고대 AI 메인프레임", cost: { processor: 50000, dataCore: 100000 }, inputs: { advCircuit: 200, dataCore: 1000, energy: 200000 }, outputs: { aiCore: 2.0 }, count: 0, reqLevel: 34 },
+        { id: 330, name: "고대 AI 메인프레임", cost: { processor: 50000, dataCore: 100000 }, inputs: { advCircuit: 200, dataCore: 1000, energy: 200000 }, outputs: { aiCore: 3.0 }, count: 0, reqLevel: 31},
 
         // [FIX] Lv.37 승급(합금) 대비 -> Lv.37 해금
         { id: 341, name: "복합 합금 정제소", cost: { titaniumPlate: 10000, steel: 500000 }, inputs: { ironOre: 5000, coal: 5000, energy: 60000 }, outputs: { steel: 5000.0, titaniumPlate: 500.0 }, count: 0, reqLevel: 35 },
