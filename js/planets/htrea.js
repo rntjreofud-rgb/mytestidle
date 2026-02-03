@@ -256,7 +256,7 @@ export const htreaData = {
 
         { id: "h_copper_molecular", name: "구리 분자 재배열", desc: "구리 관련 시설(추출기, 용광로) 생산 속도 3배 증가", cost: { scrapCopper: 500000, energy: 50000 }, type: 'building', target: [303, 337, 312, 317], value: 3.0, reqResearch: "h_old_tech" },
         
-        { id: "h_plasma_containment", name: "플라즈마 가동", desc: "고온 플라즈마 화로(House Upgrade) 가동을 돕기 위해 전력 생산 시설 효율 20% 증가", cost: { plastic: 50000, magnet: 1000 }, type: 'building', target: [305, 339, 342], value: 1.2, reqResearch: "h_nuclear_safety" },
+        { id: "h_plasma_containment", name: "플라즈마 가동", desc: "전력 생산 시설 효율 20% 증가", cost: { plastic: 50000, processor: 1000 }, type: 'building', target: [305, 339, 342], value: 1.2, reqResearch: "h_nuclear_safety" },
         
         { id: "h_void_siphon", name: "공허 사이펀", desc: "공허 에너지 추출기 및 균열의 생산 속도 3배 증가", cost: { voidCrystal: 500, gravityModule: 50 }, type: 'building', target: [331, 346], value: 3.0, reqResearch: "h_void_catalyst" },
 
